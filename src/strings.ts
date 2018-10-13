@@ -2,7 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-'use strict';
+// Updated from commit 428eac3 - vscode/src/vs/base/common/strings.ts
 
 import { CharCode } from './charCode';
 
@@ -18,20 +18,6 @@ export function firstNonWhitespaceIndex(str: string): number {
 		}
 	}
 	return -1;
-}
-
-/**
- * Returns the leading whitespace of the string.
- * If the string contains only whitespaces, returns entire string
- */
-export function getLeadingWhitespace(str: string, start: number = 0, end: number = str.length): string {
-	for (let i = start; i < end; i++) {
-		let chCode = str.charCodeAt(i);
-		if (chCode !== CharCode.Space && chCode !== CharCode.Tab) {
-			return str.substring(start, i);
-		}
-	}
-	return str.substring(start, end);
 }
 
 /**

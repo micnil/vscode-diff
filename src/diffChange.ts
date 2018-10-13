@@ -2,7 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-'use strict';
+// Updated from commit d4edb9a - vscode/src/vs/base/common/diff/diffChange.ts
 
 /**
  * Represents information about a specific difference between two sequences.
@@ -58,31 +58,4 @@ export class DiffChange {
 	public getModifiedEnd() {
 		return this.modifiedStart + this.modifiedLength;
 	}
-}
-
-/**
- * A change
- */
-export interface IChange {
-	readonly originalStartLineNumber: number;
-	readonly originalEndLineNumber: number;
-	readonly modifiedStartLineNumber: number;
-	readonly modifiedEndLineNumber: number;
-}
-
-/**
- * A line change
- */
-export interface ILineChange extends IChange {
-	readonly charChanges: ICharChange[];
-}
-
-/**
- * A character level change.
- */
-export interface ICharChange extends IChange {
-	readonly originalStartColumn: number;
-	readonly originalEndColumn: number;
-	readonly modifiedStartColumn: number;
-	readonly modifiedEndColumn: number;
 }
