@@ -81,7 +81,7 @@ Since we do not want this package to differ from the original implementation in 
 
 If you want to help keep the diff algorithm up to date, you'll find from which commit and what file the code comes from in the top of the file, e.g:
 
-src/diffComputer.ts
+_src/diffComputer.ts_
 ```javascript
 // Updated from commit 46d1426 - vscode/src/vs/editor/common/diff/diffComputer.ts
 ```
