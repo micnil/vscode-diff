@@ -1,3 +1,4 @@
+// Updated from commit 7ebea5f - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -5,7 +6,6 @@
 import * as assert from 'assert';
 import { DiffComputer } from '../src/diffComputer';
 import { IChange, ICharChange, ILineChange } from '../src/editorCommon';
-// Updated from commit 7ebea5f - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
 
 function extractCharChangeRepresentation(change: ICharChange, expectedChange: ICharChange): ICharChange {
 	let hasOriginal = expectedChange && expectedChange.originalStartLineNumber > 0;

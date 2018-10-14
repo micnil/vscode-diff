@@ -1,8 +1,8 @@
+// Updated from commit 8087b0a - vscode/src/vs/base/common/charCode.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-// Updated from commit 8087b0a - vscode/src/vs/base/common/charCode.ts
 
 // Names from https://blog.codinghorror.com/ascii-pronunciation-rules-for-programmers/
 

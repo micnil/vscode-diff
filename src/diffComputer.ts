@@ -1,3 +1,4 @@
+// Updated from commit 46d1426 - vscode/src/vs/editor/common/diff/diffComputer.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -6,7 +7,6 @@
 import { IDiffChange, ISequence, LcsDiff } from './diff';
 import * as strings from './strings';
 import { ICharChange, ILineChange } from './editorCommon';
-// Updated from commit 46d1426 - vscode/src/vs/editor/common/diff/diffComputer.ts
 
 const MAXIMUM_RUN_TIME = 5000; // 5 seconds
 const MINIMUM_MATCHING_CHARACTER_LENGTH = 3;
