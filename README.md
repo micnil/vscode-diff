@@ -90,6 +90,7 @@ Any help documenting the diff API is very welcome.
 
 ## Attribution
 The source code of this package is directly extracted from the open source software VS Code, Copyright (c) Microsoft Corporation.
+The VS Code source files is licensed under the MIT license. See src/LICENSE.txt for additional details.
 
 Only minor modifications have been made to the source files:
 * Removed code unused by the diff implementation.
