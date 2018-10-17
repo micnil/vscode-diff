@@ -18,8 +18,13 @@
     "build": "tsc"
   },
   "keywords": [
-    "diff"
+    "diff",
+    "compare"
   ],
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/micnil/vscode-diff"
+  },
   "author": "Michael Nilsson <michaelnilsson90@hotmail.com>",
   "license": "MIT"
 }
