@@ -1,6 +1,6 @@
 {
   "name": "vscode-diff",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Diff utility used in the Visual Studio Code source.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,8 +22,8 @@
     "compare"
   ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/micnil/vscode-diff.git"
+    "type": "git",
+    "url": "https://github.com/micnil/vscode-diff.git"
   },
   "bugs": {
     "url": "https://github.com/micnil/vscode-diff/issues"
