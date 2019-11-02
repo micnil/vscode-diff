@@ -19,9 +19,10 @@ let options: IDiffComputerOpts = {
   shouldIgnoreTrimWhitespace: true,
   shouldMakePrettyDiff: true,
   shouldComputeCharChanges: true,
+  maxComputationTime: 0 // time in milliseconds, 0 => no computation limit.
 }
 let diffComputer = new DiffComputer(originalLines, modifiedLines, options);
-let lineChanges: ILineChange[] = diffComputer.computeDiff();
+let lineChanges: ILineChange[] = diffComputer.computeDiff().changes;
 
 console.log(JSON.stringify(lineChanges, null, 2));
 // =>
@@ -75,6 +76,21 @@ The opposite:
 }
 ```
 means that the 4th line in the original text was removed from after line 3 in the modified text.
+
+## Changelog
+
+### 2.0.0
+ * New DiffComputer option: maxComputationTime. Specify maximum time that the diff computer should run. Specify 0 for no limit. For character changes (`charChanges`) there is a new hard coded maximum limit of 5 seconds.
+ * New return type from diffComputer:  
+ ```
+ interface IDiffComputerResult {
+	quitEarly: boolean;
+	changes: ILineChange[];
+}
+ ```
+
+### 1.0.0
+Initial release
 
 ## Contribute
 Since we do not want this package to differ from the original implementation in VS Code, no changes that differs from the [source repository](https://github.com/Microsoft/vscode) will be merged. Any changes that only affect this npm package (like changes to this README) are welcome via pull requests. 
