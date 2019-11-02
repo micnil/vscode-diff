@@ -1,4 +1,4 @@
-// Updated from commit 1e2b78d - vscode/src/vs/editor/common/editorCommon.ts
+// Updated from commit a71065a - vscode/src/vs/editor/common/editorCommon.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.

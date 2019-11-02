@@ -1,4 +1,4 @@
-// Updated from commit 7ebea5f - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
+// Updated from commit e7b9c03 - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -7,7 +7,7 @@ import * as assert from 'assert';
 import { DiffComputer } from '../src/diffComputer';
 import { IChange, ICharChange, ILineChange } from '../src/editorCommon';
 
-function extractCharChangeRepresentation(change: ICharChange, expectedChange: ICharChange): ICharChange {
+function extractCharChangeRepresentation(change: ICharChange, expectedChange: ICharChange | null): ICharChange {
 	let hasOriginal = expectedChange && expectedChange.originalStartLineNumber > 0;
 	let hasModified = expectedChange && expectedChange.modifiedStartLineNumber > 0;
 	return {
@@ -24,9 +24,8 @@ function extractCharChangeRepresentation(change: ICharChange, expectedChange: IC
 }
 
 function extractLineChangeRepresentation(change: ILineChange, expectedChange: ILineChange): IChange | ILineChange {
-	let charChanges: ICharChange[];
 	if (change.charChanges) {
-		charChanges = [];
+		let charChanges: ICharChange[] = [];
 		for (let i = 0; i < change.charChanges.length; i++) {
 			charChanges.push(
 				extractCharChangeRepresentation(
@@ -35,13 +34,20 @@ function extractLineChangeRepresentation(change: ILineChange, expectedChange: IL
 				)
 			);
 		}
+		return {
+			originalStartLineNumber: change.originalStartLineNumber,
+			originalEndLineNumber: change.originalEndLineNumber,
+			modifiedStartLineNumber: change.modifiedStartLineNumber,
+			modifiedEndLineNumber: change.modifiedEndLineNumber,
+			charChanges: charChanges
+		};
 	}
 	return {
 		originalStartLineNumber: change.originalStartLineNumber,
 		originalEndLineNumber: change.originalEndLineNumber,
 		modifiedStartLineNumber: change.modifiedStartLineNumber,
 		modifiedEndLineNumber: change.modifiedEndLineNumber,
-		charChanges: charChanges
+		charChanges: undefined
 	};
 }
 
@@ -50,11 +56,12 @@ function assertDiff(originalLines: string[], modifiedLines: string[], expectedCh
 		shouldComputeCharChanges,
 		shouldPostProcessCharChanges,
 		shouldIgnoreTrimWhitespace,
-		shouldMakePrettyDiff: true
+		shouldMakePrettyDiff: true,
+		maxComputationTime: 0
 	});
-	let changes = diffComputer.computeDiff();
+	let changes = diffComputer.computeDiff().changes;
 
-	let extracted = [];
+	let extracted: IChange[] = [];
 	for (let i = 0; i < changes.length; i++) {
 		extracted.push(extractLineChangeRepresentation(changes[i], <ILineChange>(i < expectedChanges.length ? expectedChanges[i] : null)));
 	}
