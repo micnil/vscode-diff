@@ -1,4 +1,4 @@
-// Updated from commit 37d462b - vscode/src/vs/base/test/common/diff/diff.test.ts
+// Updated from commit 990906a16554f59318e6c1fb65b45ea0c62d5ce0 - vscode/src/vs/base/test/common/diff/diff.test.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -50,11 +50,11 @@ function assertAnswer(originalStr: string, modifiedStr: string, changes: IDiffCh
 	let modifiedAnswer = maskBasedSubstring(modifiedStr, modifiedMask);
 
 	if (onlyLength) {
-		assert.equal(originalAnswer.length, answerStr.length);
-		assert.equal(modifiedAnswer.length, answerStr.length);
+		assert.strictEqual(originalAnswer.length, answerStr.length);
+		assert.strictEqual(modifiedAnswer.length, answerStr.length);
 	} else {
-		assert.equal(originalAnswer, answerStr);
-		assert.equal(modifiedAnswer, answerStr);
+		assert.strictEqual(originalAnswer, answerStr);
+		assert.strictEqual(modifiedAnswer, answerStr);
 	}
 }
 
@@ -107,18 +107,18 @@ suite('Diff - Ported from VS', () => {
 		let predicateCallCount = 0;
 
 		let diff = new LcsDiff(new StringDiffSequence(left), new StringDiffSequence(right), function (leftIndex, longestMatchSoFar) {
-			assert.equal(predicateCallCount, 0);
+			assert.strictEqual(predicateCallCount, 0);
 
 			predicateCallCount++;
 
-			assert.equal(leftIndex, 1);
+			assert.strictEqual(leftIndex, 1);
 
 			// cancel processing
 			return false;
 		});
 		let changes = diff.ComputeDiff(true).changes;
 
-		assert.equal(predicateCallCount, 1);
+		assert.strictEqual(predicateCallCount, 1);
 
 		// Doesn't include 'c', 'd', or 'e', since we quit on the first request
 		assertAnswer(left, right, changes, 'abf');
@@ -179,3 +179,4 @@ suite('Diff - Ported from VS', () => {
 		assertAnswer(left, right, changes, 'abcdef');
 	});
 });
+

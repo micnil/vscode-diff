@@ -1,4 +1,4 @@
-// Updated from commit e7b9c03 - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
+// Updated from commit af10c8f65b5fa04b96a83c3be40df2437d6c3d97 - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -65,7 +65,7 @@ function assertDiff(originalLines: string[], modifiedLines: string[], expectedCh
 	for (let i = 0; i < changes.length; i++) {
 		extracted.push(extractLineChangeRepresentation(changes[i], <ILineChange>(i < expectedChanges.length ? expectedChanges[i] : null)));
 	}
-	assert.deepEqual(extracted, expectedChanges);
+	assert.deepStrictEqual(extracted, expectedChanges);
 }
 
 function createLineDeletion(startLineNumber: number, endLineNumber: number, modifiedLineNumber: number): ILineChange {
@@ -463,6 +463,13 @@ suite('Editor Diff - DiffComputer', () => {
 		assertDiff(original, modified, expected, true, false, true);
 	});
 
+	test('empty diff 5', () => {
+		let original = [''];
+		let modified = [''];
+		let expected: ILineChange[] = [];
+		assertDiff(original, modified, expected, true, false, true);
+	});
+
 	test('pretty diff 1', () => {
 		let original = [
 			'suite(function () {',
@@ -849,6 +856,63 @@ suite('Editor Diff - DiffComputer', () => {
 			),
 			createLineChange(
 				25, 55, 31, 0
+			)
+		];
+		assertDiff(original, modified, expected, false, false, false);
+	});
+
+	test('gives preference to matching longer lines', () => {
+		let original = [
+			'A',
+			'A',
+			'BB',
+			'C',
+		];
+		let modified = [
+			'A',
+			'BB',
+			'A',
+			'D',
+			'E',
+			'A',
+			'C',
+		];
+		let expected = [
+			createLineChange(
+				2, 2, 1, 0
+			),
+			createLineChange(
+				3, 0, 3, 6
+			)
+		];
+		assertDiff(original, modified, expected, false, false, false);
+	});
+
+	test('issue #119051: gives preference to fewer diff hunks', () => {
+		const original = [
+			'1',
+			'',
+			'',
+			'2',
+			'',
+		];
+		const modified = [
+			'1',
+			'',
+			'1.5',
+			'',
+			'',
+			'2',
+			'',
+			'3',
+			'',
+		];
+		const expected = [
+			createLineChange(
+				2, 0, 3, 4
+			),
+			createLineChange(
+				5, 0, 8, 9
 			)
 		];
 		assertDiff(original, modified, expected, false, false, false);

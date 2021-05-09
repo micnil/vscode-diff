@@ -79,6 +79,10 @@ means that the 4th line in the original text was removed from after line 3 in th
 
 ## Changelog
 
+### 2.0.1
+* Fix missing typescript types
+* Fix issue [119051](https://github.com/microsoft/vscode/issues/119051)
+
 ### 2.0.0
  * New DiffComputer option: maxComputationTime. Specify maximum time that the diff computer should run. Specify 0 for no limit. For character changes (`charChanges`) there is a new hard coded maximum limit of 5 seconds.
  * New return type from diffComputer:  

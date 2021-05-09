@@ -1,4 +1,4 @@
-// Updated from commit e57a827 - vscode/src/vs/base/common/hash.ts
+// Updated from commit 673c1adcb0621ddc12e793c56be93d831fe7ff1d - vscode/src/vs/base/common/hash.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.

@@ -1,4 +1,4 @@
-// Updated from commit a71065a - vscode/src/vs/editor/common/editorCommon.ts
+// Updated from commit 0023a96cf1c191e3b7d1b872727655c34570348c - vscode/src/vs/editor/common/editorCommon.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -7,7 +7,7 @@
 /**
  * A change
  */
-export interface IChange {
+ export interface IChange {
 	readonly originalStartLineNumber: number;
 	readonly originalEndLineNumber: number;
 	readonly modifiedStartLineNumber: number;

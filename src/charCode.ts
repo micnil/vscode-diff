@@ -1,4 +1,4 @@
-// Updated from commit 8087b0a - vscode/src/vs/base/common/charCode.ts
+// Updated from commit 94428f89bf25e3df92827c5bc677da8452aa7d12 - vscode/src/vs/base/common/charCode.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -10,7 +10,7 @@
  * An inlined enum containing useful character codes (to be used with String.charCodeAt).
  * Please leave the const keyword such that it gets inlined when compiled to JavaScript!
  */
-export const enum CharCode {
+ export const enum CharCode {
 	Null = 0,
 	/**
 	 * The `\b` character.
@@ -343,7 +343,17 @@ export const enum CharCode {
 	 * Unicode Character 'LINE SEPARATOR' (U+2028)
 	 * http://www.fileformat.info/info/unicode/char/2028/index.htm
 	 */
-	LINE_SEPARATOR_2028 = 8232,
+	LINE_SEPARATOR = 0x2028,
+	/**
+	 * Unicode Character 'PARAGRAPH SEPARATOR' (U+2029)
+	 * http://www.fileformat.info/info/unicode/char/2029/index.htm
+	 */
+	PARAGRAPH_SEPARATOR = 0x2029,
+	/**
+	 * Unicode Character 'NEXT LINE' (U+0085)
+	 * http://www.fileformat.info/info/unicode/char/0085/index.htm
+	 */
+	NEXT_LINE = 0x0085,
 
 	// http://www.fileformat.info/info/unicode/category/Sk/list.htm
 	U_CIRCUMFLEX = 0x005E,									// U+005E	CIRCUMFLEX

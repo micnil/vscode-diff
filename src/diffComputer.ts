@@ -1,4 +1,4 @@
-// Updated from commit 7f29065 - vscode/src/vs/editor/common/diff/diffComputer.ts
+// Updated from commit 7e7775705ee17b178278eb4efade2d83ad8a676c - vscode/src/vs/editor/common/diff/diffComputer.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -314,6 +314,13 @@ export class DiffComputer {
 
 		if (this.original.lines.length === 1 && this.original.lines[0].length === 0) {
 			// empty original => fast path
+			if (this.modified.lines.length === 1 && this.modified.lines[0].length === 0) {
+				return {
+					quitEarly: false,
+					changes: []
+				};
+			}
+
 			return {
 				quitEarly: false,
 				changes: [{
