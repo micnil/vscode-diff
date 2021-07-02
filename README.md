@@ -8,7 +8,7 @@ The package includes typescript definitions.
 npm install vscode-diff --save
 ```
 ## Usage
-typescript (works without types aswell):
+Typescript:
 ```typescript
 import { DiffComputer, IDiffComputerOpts, ILineChange } from 'vscode-diff';
 
