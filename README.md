@@ -3,6 +3,9 @@ A small, zero-dependency text differencing library extracted from the open sourc
 The implementation is based on the difference algorithm described in "An O(ND) Difference Algorithm and its variations" by Eugene W. Myers.
 
 The package includes typescript definitions.
+
+![npm](https://img.shields.io/npm/v/vscode-diff?style=plastic)
+![GitHub](https://img.shields.io/github/license/micnil/vscode-diff)
 ## Installation
 ```bash
 npm install vscode-diff --save
