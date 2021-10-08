@@ -1,4 +1,4 @@
-// Updated from commit ff75a560bc968b4f80636f26aa1a546c4cb4613f - vscode/src/vs/base/common/strings.ts
+// Updated from commit 54ffd1db0841b5451d39b17bc62f1f86ab899cf5 - vscode/src/vs/base/common/strings.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.

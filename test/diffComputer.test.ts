@@ -1,4 +1,4 @@
-// Updated from commit af10c8f65b5fa04b96a83c3be40df2437d6c3d97 - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
+// Updated from commit 8d536ff24834507451ab1090e6d732a0f746ccf1 - vscode/src/vs/editor/test/common/diff/diffComputer.test.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -913,6 +913,57 @@ suite('Editor Diff - DiffComputer', () => {
 			),
 			createLineChange(
 				5, 0, 8, 9
+			)
+		];
+		assertDiff(original, modified, expected, false, false, false);
+	});
+
+	test('issue #121436: Diff chunk contains an unchanged line part 1', () => {
+		const original = [
+			'if (cond) {',
+			'    cmd',
+			'}',
+		];
+		const modified = [
+			'if (cond) {',
+			'    if (other_cond) {',
+			'        cmd',
+			'    }',
+			'}',
+		];
+		const expected = [
+			createLineChange(
+				1, 0, 2, 2
+			),
+			createLineChange(
+				2, 0, 4, 4
+			)
+		];
+		assertDiff(original, modified, expected, false, false, true);
+	});
+
+	test('issue #121436: Diff chunk contains an unchanged line part 2', () => {
+		const original = [
+			'if (cond) {',
+			'    cmd',
+			'}',
+		];
+		const modified = [
+			'if (cond) {',
+			'    if (other_cond) {',
+			'        cmd',
+			'    }',
+			'}',
+		];
+		const expected = [
+			createLineChange(
+				1, 0, 2, 2
+			),
+			createLineChange(
+				2, 2, 3, 3
+			),
+			createLineChange(
+				2, 0, 4, 4
 			)
 		];
 		assertDiff(original, modified, expected, false, false, false);

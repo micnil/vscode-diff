@@ -1,4 +1,4 @@
-// Updated from commit 990906a16554f59318e6c1fb65b45ea0c62d5ce0 - vscode/src/vs/base/test/common/diff/diff.test.ts
+// Updated from commit 494cbbd02d67e87727ec885f98d19551aa33aad1 - vscode/src/vs/base/test/common/diff/diff.test.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -179,4 +179,3 @@ suite('Diff - Ported from VS', () => {
 		assertAnswer(left, right, changes, 'abcdef');
 	});
 });
-

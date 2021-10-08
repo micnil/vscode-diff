@@ -1,4 +1,4 @@
-// Updated from commit 7e7775705ee17b178278eb4efade2d83ad8a676c - vscode/src/vs/editor/common/diff/diffComputer.ts
+// Updated from commit 8d536ff24834507451ab1090e6d732a0f746ccf1 - vscode/src/vs/editor/common/diff/diffComputer.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -44,6 +44,10 @@ class LineSequence implements ISequence {
 			elements[i] = this.lines[i].substring(this._startColumns[i] - 1, this._endColumns[i] - 1);
 		}
 		return elements;
+	}
+
+	public getStrictElement(index: number): string {
+		return this.lines[index];
 	}
 
 	public getStartLineNumber(i: number): number {
