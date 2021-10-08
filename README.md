@@ -79,6 +79,9 @@ means that the 4th line in the original text was removed from after line 3 in th
 
 ## Changelog
 
+### 2.0.2
+* Fix issue [121436](https://github.com/microsoft/vscode/issues/121436)
+
 ### 2.0.1
 * Fix missing typescript types
 * Fix issue [119051](https://github.com/microsoft/vscode/issues/119051)
