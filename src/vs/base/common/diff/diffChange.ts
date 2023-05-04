@@ -1,4 +1,3 @@
-// Updated from commit d4edb9abcc261846cabee6702715fe2914ae42cb - vscode/src/vs/base/common/diff/diffChange.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -7,7 +6,7 @@
 /**
  * Represents information about a specific difference between two sequences.
  */
- export class DiffChange {
+export class DiffChange {
 
 	/**
 	 * The position of the first element in the original sequence which

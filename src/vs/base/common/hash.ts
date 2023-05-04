@@ -1,12 +1,7 @@
-// Updated from commit 21e201869104e7bb9452617b2d4fcccf9c0a9a83 - vscode/src/vs/base/common/hash.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-
-function numberHash(val: number, initialHashVal: number): number {
-	return (((initialHashVal << 5) - initialHashVal) + val) | 0;  // hashVal * 31 + ch, keep as int32
-}
 
 export function stringHash(s: string, hashVal: number) {
 	hashVal = numberHash(149417, hashVal);
@@ -14,4 +9,7 @@ export function stringHash(s: string, hashVal: number) {
 		hashVal = numberHash(s.charCodeAt(i), hashVal);
 	}
 	return hashVal;
+}
+export function numberHash(val: number, initialHashVal: number): number {
+	return (((initialHashVal << 5) - initialHashVal) + val) | 0;  // hashVal * 31 + ch, keep as int32
 }

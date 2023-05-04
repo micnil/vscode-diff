@@ -1,4 +1,3 @@
-// Updated from commit 94428f89bf25e3df92827c5bc677da8452aa7d12 - vscode/src/vs/base/common/charCode.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
@@ -10,7 +9,7 @@
  * An inlined enum containing useful character codes (to be used with String.charCodeAt).
  * Please leave the const keyword such that it gets inlined when compiled to JavaScript!
  */
- export const enum CharCode {
+export const enum CharCode {
 	Null = 0,
 	/**
 	 * The `\b` character.
@@ -226,6 +225,12 @@
 	 */
 	Tilde = 126,
 
+	/**
+	 * The &nbsp; (no-break space) character.
+	 * Unicode Character 'NO-BREAK SPACE' (U+00A0)
+	 */
+	NoBreakSpace = 160,
+
 	U_Combining_Grave_Accent = 0x0300,								//	U+0300	Combining Grave Accent
 	U_Combining_Acute_Accent = 0x0301,								//	U+0301	Combining Acute Accent
 	U_Combining_Circumflex_Accent = 0x0302,							//	U+0302	Combining Circumflex Accent
@@ -424,6 +429,12 @@
 	U_GREEK_OXIA = 0x1FFD,									// U+1FFD	GREEK OXIA
 	U_GREEK_DASIA = 0x1FFE,									// U+1FFE	GREEK DASIA
 
+	U_IDEOGRAPHIC_FULL_STOP = 0x3002,						// U+3002	IDEOGRAPHIC FULL STOP
+	U_LEFT_CORNER_BRACKET = 0x300C,							// U+300C	LEFT CORNER BRACKET
+	U_RIGHT_CORNER_BRACKET = 0x300D,						// U+300D	RIGHT CORNER BRACKET
+	U_LEFT_BLACK_LENTICULAR_BRACKET = 0x3010,				// U+3010	LEFT BLACK LENTICULAR BRACKET
+	U_RIGHT_BLACK_LENTICULAR_BRACKET = 0x3011,				// U+3011	RIGHT BLACK LENTICULAR BRACKET
+
 
 	U_OVERLINE = 0x203E, // Unicode Character 'OVERLINE'
 
@@ -432,5 +443,8 @@
 	 * Unicode Character 'ZERO WIDTH NO-BREAK SPACE' (U+FEFF)
 	 * http://www.fileformat.info/info/unicode/char/feff/index.htm
 	 */
-	UTF8_BOM = 65279
+	UTF8_BOM = 65279,
+
+	U_FULLWIDTH_SEMICOLON = 0xFF1B,							// U+FF1B	FULLWIDTH SEMICOLON
+	U_FULLWIDTH_COMMA = 0xFF0C,								// U+FF0C	FULLWIDTH COMMA
 }

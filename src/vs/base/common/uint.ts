@@ -1,4 +1,3 @@
-// Updated from commit 3fbc4687b2569b1f14aad14dcede350d770851f0 - src/vs/base/common/uint.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.

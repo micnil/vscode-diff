@@ -1,12 +1,11 @@
-// Updated from commit 77905c850e170eab00cac5ca190c7b1fe5ad43ba - vscode/src/vs/base/common/diff/diff.ts
 /*---------------------------------------------------------------------------------------------
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { DiffChange } from './diffChange';
-import { stringHash } from './hash';
-import { Constants } from './uint';
+import { DiffChange } from 'vs/base/common/diff/diffChange';
+import { stringHash } from 'vs/base/common/hash';
+import { Constants } from 'vs/base/common/uint';
 
 export class StringDiffSequence implements ISequence {
 
@@ -70,7 +69,7 @@ export interface IDiffResult {
 // The code below has been ported from a C# implementation in VS
 //
 
-export class Debug {
+class Debug {
 
 	public static Assert(condition: boolean, message: string): void {
 		if (!condition) {
@@ -79,7 +78,7 @@ export class Debug {
 	}
 }
 
-export class MyArray {
+class MyArray {
 	/**
 	 * Copies a range of elements from an Array starting at the specified source index and pastes
 	 * them to another Array starting at the specified destination index. The length and the indexes
@@ -852,7 +851,7 @@ export class LcsDiff {
 				change.modifiedStart++;
 			}
 
-			let mergedChangeArr: Array<DiffChange | null> = [null];
+			const mergedChangeArr: Array<DiffChange | null> = [null];
 			if (i < changes.length - 1 && this.ChangesOverlap(changes[i], changes[i + 1], mergedChangeArr)) {
 				changes[i] = mergedChangeArr[0]!;
 				changes.splice(i + 1, 1);
@@ -1048,7 +1047,7 @@ export class LcsDiff {
 	 * @returns The concatenated list
 	 */
 	private ConcatenateChanges(left: DiffChange[], right: DiffChange[]): DiffChange[] {
-		let mergedChangeArr: DiffChange[] = [];
+		const mergedChangeArr: DiffChange[] = [];
 
 		if (left.length === 0 || right.length === 0) {
 			return (right.length > 0) ? right : left;
