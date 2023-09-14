@@ -1,0 +1,7 @@
+{
+  "entry": ["src/index.ts"],
+  "rootDir": "./src",
+  "aliases": {
+    "vs/*": ["./vs/*"]
+  }
+}
