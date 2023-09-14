@@ -11,7 +11,12 @@ The package includes typescript definitions.
 npm install vscode-diff --save
 ```
 ## Usage
-Typescript:
+
+Starting from version 1.71.0 VS Code introduced new diffing algorithm that can also detect code moves. It is currently used by default in VS Code and can be accessed in this library as `AdvancedLinesDiffComputer`.
+The legacy algorithm can be accessed as `DiffComputer`.
+
+### Example of legacy algorithm usage:
+
 ```typescript
 import { DiffComputer, IDiffComputerOpts, ILineChange } from 'vscode-diff';
 
@@ -28,38 +33,40 @@ let diffComputer = new DiffComputer(originalLines, modifiedLines, options);
 let lineChanges: ILineChange[] = diffComputer.computeDiff().changes;
 
 console.log(JSON.stringify(lineChanges, null, 2));
-// =>
-// [
-//   {
-//     "originalStartLineNumber": 2,
-//     "originalEndLineNumber": 2,
-//     "modifiedStartLineNumber": 2,
-//     "modifiedEndLineNumber": 2,
-//     "charChanges": [
-//       {
-//         "originalStartLineNumber": 2,
-//         "originalStartColumn": 1,
-//         "originalEndLineNumber": 2,
-//         "originalEndColumn": 9,
-//         "modifiedStartLineNumber": 2,
-//         "modifiedStartColumn": 1,
-//         "modifiedEndLineNumber": 2,
-//         "modifiedEndColumn": 9
-//       }
-//     ]
-//   },
-//   {
-//     "originalStartLineNumber": 3,
-//     "originalEndLineNumber": 0,
-//     "modifiedStartLineNumber": 4,
-//     "modifiedEndLineNumber": 4
-//   }
-// ]
 ```
-Each element in the produced lineChanges array corresponds to a change from the original lines to the modified lines.
+Output:
+```json
+[
+  {
+    "originalStartLineNumber": 2,
+    "originalEndLineNumber": 2,
+    "modifiedStartLineNumber": 2,
+    "modifiedEndLineNumber": 2,
+    "charChanges": [
+      {
+        "originalStartLineNumber": 2,
+        "originalStartColumn": 1,
+        "originalEndLineNumber": 2,
+        "originalEndColumn": 9,
+        "modifiedStartLineNumber": 2,
+        "modifiedStartColumn": 1,
+        "modifiedEndLineNumber": 2,
+        "modifiedEndColumn": 9
+      }
+    ]
+  },
+  {
+    "originalStartLineNumber": 3,
+    "originalEndLineNumber": 0,
+    "modifiedStartLineNumber": 4,
+    "modifiedEndLineNumber": 4
+  }
+]
+```
+Each element in the produced `lineChanges` array corresponds to a change from the original lines to the modified lines.
 
 The column and row indices are 1-based. If a 0 index is present, it means that a row has been added/removed, eg:
-```
+```json
 {
   "originalStartLineNumber": 3,
   "originalEndLineNumber": 0,
@@ -70,7 +77,7 @@ The column and row indices are 1-based. If a 0 index is present, it means that a
 means that the 4th line in the modified text was added after line 3 in the original text. 
 
 The opposite:
-```
+```json
 {
   "originalStartLineNumber": 4,
   "originalEndLineNumber": 4,
@@ -80,7 +87,96 @@ The opposite:
 ```
 means that the 4th line in the original text was removed from after line 3 in the modified text.
 
+### Example of new algorithm usage:
+```typescript
+let advOptions: ILinesDiffComputerOptions = {
+    ignoreTrimWhitespace: true,
+    computeMoves: true,
+    maxComputationTimeMs: 0
+}
+let advDiffComputer = new AdvancedLinesDiffComputer()
+let advLineChanges = advDiffComputer.computeDiff(originalLines, modifiedLines, advOptions).changes;
+
+console.log(JSON.stringify(advLineChanges, null, 2));
+```
+
+Output:
+```json
+[
+  {
+    "originalRange": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "modifiedRange": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "innerChanges": [
+      {
+        "originalRange": {
+          "startLineNumber": 2,
+          "startColumn": 1,
+          "endLineNumber": 2,
+          "endColumn": 9
+        },
+        "modifiedRange": {
+          "startLineNumber": 2,
+          "startColumn": 1,
+          "endLineNumber": 2,
+          "endColumn": 9
+        }
+      }
+    ]
+  },
+  {
+    "originalRange": {
+      "startLineNumber": 4,
+      "endLineNumberExclusive": 4
+    },
+    "modifiedRange": {
+      "startLineNumber": 4,
+      "endLineNumberExclusive": 5
+    },
+    "innerChanges": [
+      {
+        "originalRange": {
+          "startLineNumber": 3,
+          "startColumn": 6,
+          "endLineNumber": 3,
+          "endColumn": 6
+        },
+        "modifiedRange": {
+          "startLineNumber": 3,
+          "startColumn": 6,
+          "endLineNumber": 4,
+          "endColumn": 7
+        }
+      }
+    ]
+  }
+]
+```
+
+The format of the result mapping is similar to that returned by `DiffComputer` but beware that then ending line number in line range is exclusive, e.g.
+```json
+"originalRange": {
+  "startLineNumber": 2,
+  "endLineNumberExclusive": 3
+}
+```
+
+as opposed to
+```json
+"originalStartLineNumber": 2,
+"originalEndLineNumber": 2,
+```
+
+
 ## Changelog
+
+### 2.1.0
+* Update to VS Code 1.82.1 that introduces new diffing algorithm `AdvancedLinesDiffComputer`.
 
 ### 2.0.2
 * Fix issue [121436](https://github.com/microsoft/vscode/issues/121436)
@@ -105,12 +201,14 @@ Initial release
 ## Contribute
 Since we do not want this package to differ from the original implementation in VS Code, no changes that differs from the [source repository](https://github.com/Microsoft/vscode) will be merged. Any changes that only affect this npm package (like changes to this README) are welcome via pull requests. 
 
-If you want to help keep the diff algorithm up to date, you'll find from which commit and what file the code comes from in the top of the file, e.g:
-
-_src/diffComputer.ts_
-```javascript
-// Updated from commit 46d1426 - vscode/src/vs/editor/common/diff/diffComputer.ts
-```
+Steps for updating diff algorithm:
+* Copy all necessary files from VS Code repo.
+* Verify with `npm run build` that all code is self-contained.
+* Verify with `npm run unimported` that there are no unused files.
+* Run `npm test` to run all the tests.
+* Update [src/example.ts] on any API changes.
+* Run `npm run example` and update this README with example usage code and output.
+* Include VS Code version and commit hash in commit message.
 
 Any help documenting the diff API is very welcome.
 
