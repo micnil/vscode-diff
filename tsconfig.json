@@ -1,15 +1,15 @@
 {
     "compilerOptions": {
-      "target": "ES2015",
+      "target": "es2021",
       "lib": [
-        "es2019",
+        "es2021",
         "DOM"
       ],
       "module": "commonjs",
       "declaration": true,
       "outDir": "./dist",
       "strict": true,
-      "strictNullChecks": false,
+      "useUnknownInCatchVariables": false,
       "paths": {
         "vs/*": [
           "./src/vs/*"
