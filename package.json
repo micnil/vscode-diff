@@ -10,14 +10,16 @@
     "assert": "^2.0.0",
     "mocha": "^9.2.2",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.4",
     "unimported": "^1.29.2"
   },
   "scripts": {
-    "test": "mocha -u tdd --require ts-node/register test/**/*.ts",
+    "test": "mocha -u tdd --require ts-node/register src/**/test/**/*.ts",
     "watch": "tsc --watch",
     "build": "tsc",
-    "unimported": "unimported"
+    "unimported": "unimported",
+    "example": "ts-node src/example.ts"
   },
   "keywords": [
     "diff",

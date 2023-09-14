@@ -1,7 +1,16 @@
 {
-  "entry": ["src/index.ts"],
+  "entry": [
+    "src/index.ts"
+  ],
   "rootDir": "./src",
   "aliases": {
-    "vs/*": ["./vs/*"]
-  }
+    "vs/*": [
+      "./vs/*"
+    ]
+  },
+  "ignoreUnresolved": [],
+  "ignoreUnused": [],
+  "ignoreUnimported": [
+    "src/example.ts"
+  ]
 }
