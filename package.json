@@ -17,7 +17,7 @@
   "scripts": {
     "test": "mocha -u tdd --require ts-node/register src/**/test/**/*.ts",
     "watch": "tsc --watch",
-    "build": "tsc",
+    "build": "tsc --project tsconfig.build.json",
     "knip": "knip",
     "example": "ts-node src/example.ts"
   },

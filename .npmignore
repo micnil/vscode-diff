@@ -1,4 +1,7 @@
 src/
 test/
 tsconfig.json
+tsconfig.build.json
+.editorconfig
+knip.json
 node_modules/
