@@ -1,0 +1,16 @@
+{
+  "entry": [
+    "src/index.ts"
+  ],
+  "rootDir": "./src",
+  "aliases": {
+    "vs/*": [
+      "./vs/*"
+    ]
+  },
+  "ignoreUnresolved": [],
+  "ignoreUnused": [],
+  "ignoreUnimported": [
+    "src/example.ts"
+  ]
+}
