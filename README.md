@@ -74,7 +74,7 @@ The column and row indices are 1-based. If a 0 index is present, it means that a
   "modifiedEndLineNumber": 4
 }
 ```
-means that the 4th line in the modified text was added after line 3 in the original text. 
+means that the 4th line in the modified text was added after line 3 in the original text.
 
 The opposite:
 ```json
@@ -187,7 +187,7 @@ as opposed to
 
 ### 2.0.0
  * New DiffComputer option: maxComputationTime. Specify maximum time that the diff computer should run. Specify 0 for no limit. For character changes (`charChanges`) there is a new hard coded maximum limit of 5 seconds.
- * New return type from diffComputer:  
+ * New return type from diffComputer:
  ```
  interface IDiffComputerResult {
 	quitEarly: boolean;
@@ -199,12 +199,12 @@ as opposed to
 Initial release
 
 ## Contribute
-Since we do not want this package to differ from the original implementation in VS Code, no changes that differs from the [source repository](https://github.com/Microsoft/vscode) will be merged. Any changes that only affect this npm package (like changes to this README) are welcome via pull requests. 
+Since we do not want this package to differ from the original implementation in VS Code, no changes that differs from the [source repository](https://github.com/Microsoft/vscode) will be merged. Any changes that only affect this npm package (like changes to this README) are welcome via pull requests.
 
 Steps for updating diff algorithm:
 * Copy all necessary files from VS Code repo.
 * Verify with `npm run build` that all code is self-contained.
-* Verify with `npm run unimported` that there are no unused files.
+* Verify with `npm run knip` that there are no unused files or exports.
 * Run `npm test` to run all the tests.
 * Update [src/example.ts] on any API changes.
 * Run `npm run example` and update this README with example usage code and output.
