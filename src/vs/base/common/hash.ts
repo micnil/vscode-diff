@@ -5,13 +5,6 @@
 
 import * as strings from 'vs/base/common/strings';
 
-/**
- * Return a hash value for an object.
- */
-export function hash(obj: any): number {
-	return doHash(obj, 0);
-}
-
 export function doHash(obj: any, hashVal: number): number {
 	switch (typeof obj) {
 		case 'object':
@@ -61,20 +54,6 @@ function objectHash(obj: any, initialHashVal: number): number {
 		hashVal = stringHash(key, hashVal);
 		return doHash(obj[key], hashVal);
 	}, initialHashVal);
-}
-
-export class Hasher {
-
-	private _value = 0;
-
-	get value(): number {
-		return this._value;
-	}
-
-	hash(obj: any): number {
-		this._value = doHash(obj, this._value);
-		return this._value;
-	}
 }
 
 const enum SHA1Constant {

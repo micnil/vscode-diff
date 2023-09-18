@@ -74,25 +74,6 @@ export class ErrorHandler {
 
 export const errorHandler = new ErrorHandler();
 
-/** @skipMangle */
-export function setUnexpectedErrorHandler(newUnexpectedErrorHandler: (e: any) => void): void {
-	errorHandler.setUnexpectedErrorHandler(newUnexpectedErrorHandler);
-}
-
-/**
- * Returns if the error is a SIGPIPE error. SIGPIPE errors should generally be
- * logged at most once, to avoid a loop.
- *
- * @see https://github.com/microsoft/vscode-remote-release/issues/6481
- */
-export function isSigPipeError(e: unknown): e is Error {
-	if (!e || typeof e !== 'object') {
-		return false;
-	}
-
-	const cast = e as Record<string, string | undefined>;
-	return cast.code === 'EPIPE' && cast.syscall?.toUpperCase() === 'WRITE';
-}
 
 export function onUnexpectedError(e: any): undefined {
 	// ignore errors from cancelled promises
@@ -100,59 +81,6 @@ export function onUnexpectedError(e: any): undefined {
 		errorHandler.onUnexpectedError(e);
 	}
 	return undefined;
-}
-
-export function onUnexpectedExternalError(e: any): undefined {
-	// ignore errors from cancelled promises
-	if (!isCancellationError(e)) {
-		errorHandler.onUnexpectedExternalError(e);
-	}
-	return undefined;
-}
-
-export interface SerializedError {
-	readonly $isError: true;
-	readonly name: string;
-	readonly message: string;
-	readonly stack: string;
-	readonly noTelemetry: boolean;
-}
-
-export function transformErrorForSerialization(error: Error): SerializedError;
-export function transformErrorForSerialization(error: any): any;
-export function transformErrorForSerialization(error: any): any {
-	if (error instanceof Error) {
-		const { name, message } = error;
-		const stack: string = (<any>error).stacktrace || (<any>error).stack;
-		return {
-			$isError: true,
-			name,
-			message,
-			stack,
-			noTelemetry: ErrorNoTelemetry.isErrorNoTelemetry(error)
-		};
-	}
-
-	// return as is
-	return error;
-}
-
-// see https://github.com/v8/v8/wiki/Stack%20Trace%20API#basic-stack-traces
-export interface V8CallSite {
-	getThis(): unknown;
-	getTypeName(): string | null;
-	getFunction(): Function | undefined;
-	getFunctionName(): string | null;
-	getMethodName(): string | null;
-	getFileName(): string | null;
-	getLineNumber(): number | null;
-	getColumnNumber(): number | null;
-	getEvalOrigin(): string | undefined;
-	isToplevel(): boolean;
-	isEval(): boolean;
-	isNative(): boolean;
-	isConstructor(): boolean;
-	toString(): string;
 }
 
 const canceledName = 'Canceled';
@@ -174,81 +102,6 @@ export class CancellationError extends Error {
 		super(canceledName);
 		this.name = this.message;
 	}
-}
-
-/**
- * @deprecated use {@link CancellationError `new CancellationError()`} instead
- */
-export function canceled(): Error {
-	const error = new Error(canceledName);
-	error.name = error.message;
-	return error;
-}
-
-export function illegalArgument(name?: string): Error {
-	if (name) {
-		return new Error(`Illegal argument: ${name}`);
-	} else {
-		return new Error('Illegal argument');
-	}
-}
-
-export function illegalState(name?: string): Error {
-	if (name) {
-		return new Error(`Illegal state: ${name}`);
-	} else {
-		return new Error('Illegal state');
-	}
-}
-
-export function readonly(name?: string): Error {
-	return name
-		? new Error(`readonly property '${name} cannot be changed'`)
-		: new Error('readonly property cannot be changed');
-}
-
-export function disposed(what: string): Error {
-	const result = new Error(`${what} has been disposed`);
-	result.name = 'DISPOSED';
-	return result;
-}
-
-export function getErrorMessage(err: any): string {
-	if (!err) {
-		return 'Error';
-	}
-
-	if (err.message) {
-		return err.message;
-	}
-
-	if (err.stack) {
-		return err.stack.split('\n')[0];
-	}
-
-	return String(err);
-}
-
-export class NotImplementedError extends Error {
-	constructor(message?: string) {
-		super('NotImplemented');
-		if (message) {
-			this.message = message;
-		}
-	}
-}
-
-export class NotSupportedError extends Error {
-	constructor(message?: string) {
-		super('NotSupported');
-		if (message) {
-			this.message = message;
-		}
-	}
-}
-
-export class ExpectedError extends Error {
-	readonly isExpected = true;
 }
 
 /**
