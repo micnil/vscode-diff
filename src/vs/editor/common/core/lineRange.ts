@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { BugIndicatingError } from 'vs/base/common/errors';
-import { OffsetRange } from 'vs/editor/common/core/offsetRange';
-import { Range } from 'vs/editor/common/core/range';
+import { BugIndicatingError } from '../../../base/common/errors';
+import { OffsetRange } from './offsetRange';
+import { Range } from './range';
 
 /**
  * A range of lines (1-based).

@@ -19,7 +19,7 @@
     "watch": "tsc --watch",
     "build": "tsc --project tsconfig.build.json",
     "knip": "knip",
-    "example": "ts-node src/example.ts"
+    "example": "yarn build && ts-node ./example/example.ts"
   },
   "keywords": [
     "diff",

@@ -206,7 +206,7 @@ Steps for updating diff algorithm:
 * Verify with `npm run build` that all code is self-contained.
 * Verify with `npm run knip` that there are no unused files or exports.
 * Run `npm test` to run all the tests.
-* Update [src/example.ts] on any API changes.
+* Update [example/example.ts] on any API changes.
 * Run `npm run example` and update this README with example usage code and output.
 * Include VS Code version and commit hash in commit message.
 

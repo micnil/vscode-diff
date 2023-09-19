@@ -4,4 +4,5 @@ tsconfig.json
 tsconfig.build.json
 .editorconfig
 knip.json
+example
 node_modules/

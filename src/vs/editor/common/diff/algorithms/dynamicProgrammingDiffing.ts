@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { OffsetRange } from 'vs/editor/common/core/offsetRange';
-import { IDiffAlgorithm, SequenceDiff, ISequence, ITimeout, InfiniteTimeout, DiffAlgorithmResult } from 'vs/editor/common/diff/algorithms/diffAlgorithm';
-import { Array2D } from 'vs/editor/common/diff/algorithms/utils';
+import { OffsetRange } from '../../core/offsetRange';
+import { DiffAlgorithmResult, IDiffAlgorithm, ISequence, ITimeout, InfiniteTimeout, SequenceDiff } from './diffAlgorithm';
+import { Array2D } from './utils';
 
 /**
  * A O(MN) diffing algorithm that supports a score function.

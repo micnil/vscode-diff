@@ -3,20 +3,20 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Comparator, CompareResult, compareBy, equals, findLastIndex, numberComparator, reverseOrder } from 'vs/base/common/arrays';
-import { assertFn, checkAdjacentItems } from 'vs/base/common/assert';
-import { CharCode } from 'vs/base/common/charCode';
-import { SetMap } from 'vs/base/common/collections';
-import { BugIndicatingError } from 'vs/base/common/errors';
-import { LineRange } from 'vs/editor/common/core/lineRange';
-import { OffsetRange } from 'vs/editor/common/core/offsetRange';
-import { Position } from 'vs/editor/common/core/position';
-import { Range } from 'vs/editor/common/core/range';
-import { DateTimeout, ISequence, ITimeout, InfiniteTimeout, SequenceDiff } from 'vs/editor/common/diff/algorithms/diffAlgorithm';
-import { DynamicProgrammingDiffing } from 'vs/editor/common/diff/algorithms/dynamicProgrammingDiffing';
-import { optimizeSequenceDiffs, removeRandomLineMatches, removeRandomMatches, smoothenSequenceDiffs } from 'vs/editor/common/diff/algorithms/joinSequenceDiffs';
-import { MyersDiffAlgorithm } from 'vs/editor/common/diff/algorithms/myersDiffAlgorithm';
-import { ILinesDiffComputer, ILinesDiffComputerOptions, LineRangeMapping, LinesDiff, MovedText, RangeMapping, SimpleLineRangeMapping } from 'vs/editor/common/diff/linesDiffComputer';
+import { Comparator, CompareResult, compareBy, equals, findLastIndex, numberComparator, reverseOrder } from '../../../base/common/arrays';
+import { assertFn, checkAdjacentItems } from '../../../base/common/assert';
+import { CharCode } from '../../../base/common/charCode';
+import { SetMap } from '../../../base/common/collections';
+import { BugIndicatingError } from '../../../base/common/errors';
+import { LineRange } from '../core/lineRange';
+import { OffsetRange } from '../core/offsetRange';
+import { Position } from '../core/position';
+import { Range } from '../core/range';
+import { DateTimeout, ISequence, ITimeout, InfiniteTimeout, SequenceDiff } from '../diff/algorithms/diffAlgorithm';
+import { DynamicProgrammingDiffing } from '../diff/algorithms/dynamicProgrammingDiffing';
+import { optimizeSequenceDiffs, removeRandomLineMatches, removeRandomMatches, smoothenSequenceDiffs } from '../diff/algorithms/joinSequenceDiffs';
+import { MyersDiffAlgorithm } from '../diff/algorithms/myersDiffAlgorithm';
+import { ILinesDiffComputer, ILinesDiffComputerOptions, LineRangeMapping, LinesDiff, MovedText, RangeMapping, SimpleLineRangeMapping } from './linesDiffComputer';
 
 export class AdvancedLinesDiffComputer implements ILinesDiffComputer {
 	private readonly dynamicProgrammingDiffing = new DynamicProgrammingDiffing();

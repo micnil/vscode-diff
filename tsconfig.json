@@ -1,27 +1,25 @@
 {
-    "compilerOptions": {
-      "target": "es2021",
-      "lib": [
-        "es2021",
-        "DOM"
-      ],
-      "module": "commonjs",
-      "declaration": true,
-      "outDir": "./dist",
-      "strict": true,
-      "useUnknownInCatchVariables": false,
-      "baseUrl": "./src",
-      "paths": {
-        "vscode-diff": ["./"],
-      }
-    },
-    "ts-node": {
-      "require": ["tsconfig-paths/register"]
-    },
-    "include": [
-      "src/**/*"
-    ],
-    "exclude": [
-      "node_modules"
-    ]
+	"compilerOptions": {
+		"target": "es2021",
+		"lib": [
+			"es2021",
+			"DOM"
+		],
+		"module": "commonjs",
+		"declaration": true,
+		"outDir": "./dist",
+		"strict": true,
+		"useUnknownInCatchVariables": false,
+	},
+	"ts-node": {
+		"require": [
+			"tsconfig-paths/register"
+		]
+	},
+	"include": [
+		"src/**/*",
+	],
+	"exclude": [
+		"node_modules"
+	]
 }

@@ -3,8 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { LineRange } from 'vs/editor/common/core/lineRange';
-import { Range } from 'vs/editor/common/core/range';
+import { LineRange } from "../core/lineRange";
+import { Range } from "../core/range";
+
 
 export interface ILinesDiffComputer {
 	computeDiff(originalLines: string[], modifiedLines: string[], options: ILinesDiffComputerOptions): LinesDiff;

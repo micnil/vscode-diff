@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { BugIndicatingError } from 'vs/base/common/errors';
+import { BugIndicatingError } from '../../../base/common/errors';
 
 /**
  * A range of offsets (0-based).

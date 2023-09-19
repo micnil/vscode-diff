@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { OffsetRange } from 'vs/editor/common/core/offsetRange';
-import { ISequence, SequenceDiff } from 'vs/editor/common/diff/algorithms/diffAlgorithm';
-import { LineSequence, LinesSliceCharSequence } from 'vs/editor/common/diff/advancedLinesDiffComputer';
+import { OffsetRange } from '../../core/offsetRange';
+import { LineSequence, LinesSliceCharSequence } from '../advancedLinesDiffComputer';
+import { ISequence, SequenceDiff } from '../algorithms/diffAlgorithm';
 
 export function optimizeSequenceDiffs(sequence1: ISequence, sequence2: ISequence, sequenceDiffs: SequenceDiff[]): SequenceDiff[] {
 	let result = sequenceDiffs;

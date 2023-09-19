@@ -3,8 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { BugIndicatingError } from 'vs/base/common/errors';
-import { OffsetRange } from 'vs/editor/common/core/offsetRange';
+import { BugIndicatingError } from '../../../../base/common/errors';
+import { OffsetRange } from '../../core/offsetRange';
 
 /**
  * Represents a synchronous diff algorithm. Should be executed in a worker.
