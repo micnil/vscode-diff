@@ -11,11 +11,6 @@
 		"strict": true,
 		"useUnknownInCatchVariables": false,
 	},
-	"ts-node": {
-		"require": [
-			"tsconfig-paths/register"
-		]
-	},
 	"include": [
 		"src/**/*",
 	],
