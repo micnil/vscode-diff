@@ -175,6 +175,9 @@ as opposed to
 
 ## Changelog
 
+### 2.1.1
+* Fix build errors in 2.1.0 [#3](https://github.com/micnil/vscode-diff/issues/3)
+
 ### 2.1.0
 * Update to VS Code 1.82.1 that introduces new diffing algorithm `AdvancedLinesDiffComputer`.
 
