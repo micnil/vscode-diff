@@ -536,57 +536,6 @@ export class LinkedMap<K, V> implements Map<K, V> {
 	}
 }
 
-abstract class Cache<K, V> extends LinkedMap<K, V> {
-
-	protected _limit: number;
-	protected _ratio: number;
-
-	constructor(limit: number, ratio: number = 1) {
-		super();
-		this._limit = limit;
-		this._ratio = Math.min(Math.max(0, ratio), 1);
-	}
-
-	get limit(): number {
-		return this._limit;
-	}
-
-	set limit(limit: number) {
-		this._limit = limit;
-		this.checkTrim();
-	}
-
-	get ratio(): number {
-		return this._ratio;
-	}
-
-	set ratio(ratio: number) {
-		this._ratio = Math.min(Math.max(0, ratio), 1);
-		this.checkTrim();
-	}
-
-	override get(key: K, touch: Touch = Touch.AsNew): V | undefined {
-		return super.get(key, touch);
-	}
-
-	peek(key: K): V | undefined {
-		return super.get(key, Touch.None);
-	}
-
-	override set(key: K, value: V): this {
-		super.set(key, value, Touch.AsNew);
-		return this;
-	}
-
-	protected checkTrim() {
-		if (this.size > this._limit) {
-			this.trim(Math.round(this._limit * this._ratio));
-		}
-	}
-
-	protected abstract trim(newSize: number): void;
-}
-
 export class CounterSet<T> {
 
 	private map = new Map<T, number>();

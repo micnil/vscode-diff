@@ -6,8 +6,6 @@
 import { encodeHex, VSBuffer } from './buffer.js';
 import * as strings from './strings.js';
 
-type NotSyncHashable = ArrayBufferLike | ArrayBufferView;
-
 export function doHash(obj: unknown, hashVal: number): number {
 	switch (typeof obj) {
 		case 'object':

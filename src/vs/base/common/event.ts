@@ -1479,9 +1479,3 @@ export interface IValueWithChangeEvent<T> {
 	readonly onDidChange: Event<void>;
 	get value(): T;
 }
-
-class ConstValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
-	public readonly onDidChange: Event<void> = Event.None;
-
-	constructor(readonly value: T) { }
-}

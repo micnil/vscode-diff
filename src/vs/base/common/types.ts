@@ -134,8 +134,6 @@ export function assertReturnsAllDefined(...args: (unknown | null | undefined)[])
 	return result;
 }
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
-
 /**
  * @returns whether the provided parameter is a JavaScript Function or not.
  */
@@ -170,13 +168,6 @@ export function validateConstraint(arg: unknown, constraint: TypeConstraint | un
 	}
 }
 
-type AddFirstParameterToFunction<T, TargetFunctionsReturnType, FirstParameter> = T extends (...args: any[]) => TargetFunctionsReturnType ?
-	// Function: add param to function
-	(firstArg: FirstParameter, ...args: Parameters<T>) => ReturnType<T> :
-
-	// Else: just leave as is
-	T;
-
 /**
  * A type that adds readonly to all properties of T, recursively.
  */
@@ -209,8 +200,3 @@ export type DeepRequiredNonNullable<T> = {
 export type DeepPartial<T> = {
 	[P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : Partial<T[P]>;
 };
-
-
-type KeysOfUnionType<T> = T extends T ? keyof T : never;
-type FilterType<T, TTest> = T extends TTest ? T : never;
-type MakeOptionalAndBool<T extends object> = { [K in keyof T]?: boolean };

@@ -86,29 +86,3 @@ export function structuralEquals<T>(a: T, b: T): boolean {
 
 let objectId = 0;
 const objIds = new WeakMap<object, number>();
-
-function toNormalizedJsonStructure(t: unknown): unknown {
-	if (Array.isArray(t)) {
-		return t.map(toNormalizedJsonStructure);
-	}
-
-	if (t && typeof t === 'object') {
-		if (Object.getPrototypeOf(t) === Object.prototype) {
-			const tObj = t as Record<string, unknown>;
-			const res: Record<string, unknown> = Object.create(null);
-			for (const key of Object.keys(tObj).sort()) {
-				res[key] = toNormalizedJsonStructure(tObj[key]);
-			}
-			return res;
-		} else {
-			let objId = objIds.get(t);
-			if (objId === undefined) {
-				objId = objectId++;
-				objIds.set(t, objId);
-			}
-			// Random string to prevent collisions
-			return objId + '----2b76a038c20c4bcc';
-		}
-	}
-	return t;
-}

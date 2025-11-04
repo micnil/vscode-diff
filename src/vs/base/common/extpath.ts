@@ -110,11 +110,6 @@ export function getRoot(path: string, sep: string = posix.sep): string {
 	return '';
 }
 
-// Reference: https://en.wikipedia.org/wiki/Filename
-const WINDOWS_INVALID_FILE_CHARS = /[\\/:\*\?"<>\|]/g;
-const UNIX_INVALID_FILE_CHARS = /[/]/g;
-const WINDOWS_FORBIDDEN_NAMES = /^(con|prn|aux|clock\$|nul|lpt[0-9]|com[0-9])(\.(.*?))?$/i;
-
 /**
  * @deprecated please use `IUriIdentityService.extUri.isEqualOrParent` instead. If
  * you are in a context without services, consider to pass down the `extUri` from the
@@ -196,6 +191,3 @@ export interface IPathWithLineAndColumn {
 	line?: number;
 	column?: number;
 }
-
-const pathChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-const windowsSafePathFirstChars = 'BDEFGHIJKMOQRSTUVWXYZbdefghijkmoqrstuvwxyz0123456789';

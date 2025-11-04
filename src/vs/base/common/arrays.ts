@@ -193,17 +193,6 @@ export function sortedDiff<T>(before: ReadonlyArray<T>, after: ReadonlyArray<T>,
 	return result;
 }
 
-function topStep<T>(array: ReadonlyArray<T>, compare: (a: T, b: T) => number, result: T[], i: number, m: number): void {
-	for (const n = result.length; i < m; i++) {
-		const element = array[i];
-		if (compare(element, result[n - 1]) < 0) {
-			result.pop();
-			const j = findFirstIdxMonotonousOrArrLen(result, e => compare(element, e) < 0);
-			result.splice(j, 0, element);
-		}
-	}
-}
-
 /**
  * @returns True if the provided object is an array and has at least one element.
  */
