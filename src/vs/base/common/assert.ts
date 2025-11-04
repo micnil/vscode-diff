@@ -32,7 +32,6 @@ export function assert(
  */
 export function assertFn(condition: () => boolean): void {
 	if (!condition()) {
-		// eslint-disable-next-line no-debugger
 		debugger;
 		// Reevaluate `condition` again to make debugging easier
 		condition();

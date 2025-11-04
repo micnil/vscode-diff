@@ -4,7 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 export { assertFn } from '../../assert.js';
-export { type EqualityComparer, strictEquals } from '../../equals.js';
-export { BugIndicatingError, onBugIndicatingError, onUnexpectedError } from '../../errors.js';
+export { strictEquals, type EqualityComparer } from '../../equals.js';
+export { BugIndicatingError, onUnexpectedError } from '../../errors.js';
 export { Event, type IValueWithChangeEvent } from '../../event.js';
-export { DisposableStore, type IDisposable, markAsDisposed, toDisposable, trackDisposable } from '../../lifecycle.js';
+export { DisposableStore, markAsDisposed, toDisposable, trackDisposable, type IDisposable } from '../../lifecycle.js';
+

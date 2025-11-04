@@ -5,4 +5,5 @@
 
 // This is a facade for the observable implementation. Only import from here!
 
-export { type IObservable, type IObservableWithChange, type IObserver, type IReader, type ISettable, type ISettableObservable, type ITransaction } from './base.js';
+export { type IObservable, type IObservableWithChange, type IObserver, type IReader, type ISettable, type ITransaction } from './base.js';
+

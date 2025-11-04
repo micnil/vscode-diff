@@ -57,6 +57,7 @@ export class MyersDiffAlgorithm implements IDiffAlgorithm {
 				step++;
 				const x = Math.min(Math.max(maxXofDLineTop, maxXofDLineLeft), seqX.length);
 				const y = x - k;
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				step++;
 				if (x > seqX.length || y > seqY.length) {
 					// This diagonal is irrelevant for the result.
