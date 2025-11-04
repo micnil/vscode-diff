@@ -67,11 +67,6 @@ class Deps {
 	}
 }
 
-/** This is to break circular module dependencies. */
-function _setPositionOffsetTransformerDependencies(deps: IDeps): void {
-	Deps._deps = deps;
-}
-
 export class PositionOffsetTransformer extends PositionOffsetTransformerBase {
 	private readonly lineStartOffsetByLineIdx: number[];
 	private readonly lineEndOffsetByLineIdx: number[];

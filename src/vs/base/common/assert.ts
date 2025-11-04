@@ -6,30 +6,6 @@
 import { BugIndicatingError, onUnexpectedError } from './errors.js';
 
 /**
- * Throws an error with the provided message if the provided value does not evaluate to a true Javascript value.
- *
- * @deprecated Use `assert(...)` instead.
- * This method is usually used like this:
- * ```ts
- * import * as assert from 'vs/base/common/assert';
- * assert.ok(...);
- * ```
- *
- * However, `assert` in that example is a user chosen name.
- * There is no tooling for generating such an import statement.
- * Thus, the `assert(...)` function should be used instead.
- */
-function ok(value?: unknown, message?: string) {
-	if (!value) {
-		throw new Error(message ? `Assertion failed (${message})` : 'Assertion Failed');
-	}
-}
-
-function assertNever(value: never, message = 'Unreachable'): never {
-	throw new Error(message);
-}
-
-/**
  * Asserts that a condition is `truthy`.
  *
  * @throws provided {@linkcode messageOrError} if the {@linkcode condition} is `falsy`.
@@ -48,15 +24,6 @@ export function assert(
 			: messageOrError;
 
 		throw errorToThrow;
-	}
-}
-
-/**
- * Like assert, but doesn't throw.
- */
-function softAssert(condition: boolean, message = 'Soft Assertion Failed'): void {
-	if (!condition) {
-		onUnexpectedError(new BugIndicatingError(message));
 	}
 }
 

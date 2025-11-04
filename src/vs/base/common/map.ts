@@ -5,34 +5,6 @@
 
 import { URI } from './uri.js';
 
-function getOrSet<K, V>(map: Map<K, V>, key: K, value: V): V {
-	let result = map.get(key);
-	if (result === undefined) {
-		result = value;
-		map.set(key, result);
-	}
-
-	return result;
-}
-
-function mapToString<K, V>(map: Map<K, V>): string {
-	const entries: string[] = [];
-	map.forEach((value, key) => {
-		entries.push(`${key} => ${value}`);
-	});
-
-	return `Map(${map.size}) {${entries.join(', ')}}`;
-}
-
-function setToString<K>(set: Set<K>): string {
-	const entries: K[] = [];
-	set.forEach(value => {
-		entries.push(value);
-	});
-
-	return `Set(${set.size}) {${entries.join(', ')}}`;
-}
-
 interface ResourceMapKeyFn {
 	(resource: URI): string;
 }
@@ -147,66 +119,6 @@ export class ResourceMap<T> implements Map<URI, T> {
 		for (const [, entry] of this.map) {
 			yield [entry.uri, entry.value];
 		}
-	}
-}
-
-class ResourceSet implements Set<URI> {
-
-	readonly [Symbol.toStringTag]: string = 'ResourceSet';
-
-	private readonly _map: ResourceMap<URI>;
-
-	constructor(toKey?: ResourceMapKeyFn);
-	constructor(entries: readonly URI[], toKey?: ResourceMapKeyFn);
-	constructor(entriesOrKey?: readonly URI[] | ResourceMapKeyFn, toKey?: ResourceMapKeyFn) {
-		if (!entriesOrKey || typeof entriesOrKey === 'function') {
-			this._map = new ResourceMap(entriesOrKey);
-		} else {
-			this._map = new ResourceMap(toKey);
-			entriesOrKey.forEach(this.add, this);
-		}
-	}
-
-
-	get size(): number {
-		return this._map.size;
-	}
-
-	add(value: URI): this {
-		this._map.set(value, value);
-		return this;
-	}
-
-	clear(): void {
-		this._map.clear();
-	}
-
-	delete(value: URI): boolean {
-		return this._map.delete(value);
-	}
-
-	forEach(callbackfn: (value: URI, value2: URI, set: Set<URI>) => void, thisArg?: any): void {
-		this._map.forEach((_value, key) => callbackfn.call(thisArg, key, key, this));
-	}
-
-	has(value: URI): boolean {
-		return this._map.has(value);
-	}
-
-	entries(): IterableIterator<[URI, URI]> {
-		return this._map.entries();
-	}
-
-	keys(): IterableIterator<URI> {
-		return this._map.keys();
-	}
-
-	values(): IterableIterator<URI> {
-		return this._map.keys();
-	}
-
-	[Symbol.iterator](): IterableIterator<URI> {
-		return this.keys();
 	}
 }
 
@@ -675,43 +587,6 @@ abstract class Cache<K, V> extends LinkedMap<K, V> {
 	protected abstract trim(newSize: number): void;
 }
 
-class LRUCache<K, V> extends Cache<K, V> {
-
-	constructor(limit: number, ratio: number = 1) {
-		super(limit, ratio);
-	}
-
-	protected override trim(newSize: number) {
-		this.trimOld(newSize);
-	}
-
-	override set(key: K, value: V): this {
-		super.set(key, value);
-		this.checkTrim();
-		return this;
-	}
-}
-
-class MRUCache<K, V> extends Cache<K, V> {
-
-	constructor(limit: number, ratio: number = 1) {
-		super(limit, ratio);
-	}
-
-	protected override trim(newSize: number) {
-		this.trimNew(newSize);
-	}
-
-	override set(key: K, value: V): this {
-		if (this._limit <= this.size && !this.has(key)) {
-			this.trim(Math.round(this._limit * this._ratio) - 1);
-		}
-
-		super.set(key, value);
-		return this;
-	}
-}
-
 export class CounterSet<T> {
 
 	private map = new Map<T, number>();
@@ -849,104 +724,5 @@ export class SetMap<K, V> {
 			return new Set<V>();
 		}
 		return values;
-	}
-}
-
-function mapsStrictEqualIgnoreOrder(a: Map<unknown, unknown>, b: Map<unknown, unknown>): boolean {
-	if (a === b) {
-		return true;
-	}
-
-	if (a.size !== b.size) {
-		return false;
-	}
-
-	for (const [key, value] of a) {
-		if (!b.has(key) || b.get(key) !== value) {
-			return false;
-		}
-	}
-
-	for (const [key] of b) {
-		if (!a.has(key)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/**
- * A map that is addressable with an arbitrary number of keys. This is useful in high performance
- * scenarios where creating a composite key whenever the data is accessed is too expensive. For
- * example for a very hot function, constructing a string like `first-second-third` for every call
- * will cause a significant hit to performance.
- */
-class NKeyMap<TValue, TKeys extends (string | boolean | number)[]> {
-	private _data: Map<any, any> = new Map();
-
-	/**
-	 * Sets a value on the map. Note that unlike a standard `Map`, the first argument is the value.
-	 * This is because the spread operator is used for the keys and must be last..
-	 * @param value The value to set.
-	 * @param keys The keys for the value.
-	 */
-	public set(value: TValue, ...keys: [...TKeys]): void {
-		let currentMap = this._data;
-		for (let i = 0; i < keys.length - 1; i++) {
-			if (!currentMap.has(keys[i])) {
-				currentMap.set(keys[i], new Map());
-			}
-			currentMap = currentMap.get(keys[i]);
-		}
-		currentMap.set(keys[keys.length - 1], value);
-	}
-
-	public get(...keys: [...TKeys]): TValue | undefined {
-		let currentMap = this._data;
-		for (let i = 0; i < keys.length - 1; i++) {
-			if (!currentMap.has(keys[i])) {
-				return undefined;
-			}
-			currentMap = currentMap.get(keys[i]);
-		}
-		return currentMap.get(keys[keys.length - 1]);
-	}
-
-	public clear(): void {
-		this._data.clear();
-	}
-
-	public *values(): IterableIterator<TValue> {
-		function* iterate(map: Map<any, any>): IterableIterator<TValue> {
-			for (const value of map.values()) {
-				if (value instanceof Map) {
-					yield* iterate(value);
-				} else {
-					yield value;
-				}
-			}
-		}
-		yield* iterate(this._data);
-	}
-
-	/**
-	 * Get a textual representation of the map for debugging purposes.
-	 */
-	public toString(): string {
-		const printMap = (map: Map<any, any>, depth: number): string => {
-			let result = '';
-			for (const [key, value] of map) {
-				result += `${'  '.repeat(depth)}${key}: `;
-				if (value instanceof Map) {
-					result += '\n' + printMap(value, depth + 1);
-				} else {
-					result += `${value}\n`;
-				}
-			}
-			return result;
-		};
-
-		return printMap(this._data, 0);
 	}
 }

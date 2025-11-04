@@ -6,12 +6,11 @@
 import { groupAdjacentBy } from '../../../base/common/arrays.js';
 import { assertFn, checkAdjacentItems } from '../../../base/common/assert.js';
 import { BugIndicatingError } from '../../../base/common/errors.js';
-import { LineRange } from '../core/ranges/lineRange.js';
+import { TextEdit, TextReplacement } from '../core/edits/textEdit.js';
 import { Position } from '../core/position.js';
 import { Range } from '../core/range.js';
-import { TextReplacement, TextEdit } from '../core/edits/textEdit.js';
+import { LineRange } from '../core/ranges/lineRange.js';
 import { AbstractText } from '../core/text/abstractText.js';
-import { IChange } from './legacyLinesDiffComputer.js';
 
 /**
  * Maps a line range in the original text model to a line range in the modified text model.
@@ -393,24 +392,4 @@ export function getLineRangeMapping(rangeMapping: RangeMapping, originalLines: A
 	);
 
 	return new DetailedLineRangeMapping(originalLineRange, modifiedLineRange, [rangeMapping]);
-}
-
-function lineRangeMappingFromChange(change: IChange): LineRangeMapping {
-	let originalRange: LineRange;
-	if (change.originalEndLineNumber === 0) {
-		// Insertion
-		originalRange = new LineRange(change.originalStartLineNumber + 1, change.originalStartLineNumber + 1);
-	} else {
-		originalRange = new LineRange(change.originalStartLineNumber, change.originalEndLineNumber + 1);
-	}
-
-	let modifiedRange: LineRange;
-	if (change.modifiedEndLineNumber === 0) {
-		// Deletion
-		modifiedRange = new LineRange(change.modifiedStartLineNumber + 1, change.modifiedStartLineNumber + 1);
-	} else {
-		modifiedRange = new LineRange(change.modifiedStartLineNumber, change.modifiedEndLineNumber + 1);
-	}
-
-	return new LineRangeMapping(originalRange, modifiedRange);
 }

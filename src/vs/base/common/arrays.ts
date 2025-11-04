@@ -4,26 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { findFirstIdxMonotonousOrArrLen } from './arraysFind.js';
-import { CancellationToken } from './cancellation.js';
-import { CancellationError } from './errors.js';
 import { ISplice } from './sequence.js';
-
-/**
- * Returns the last entry and the initial N-1 entries of the array, as a tuple of [rest, last].
- *
- * The array must have at least one element.
- *
- * @param arr The input array
- * @returns A tuple of [rest, last] where rest is all but the last element and last is the last element
- * @throws Error if the array is empty
- */
-function tail<T>(arr: T[]): [T[], T] {
-	if (arr.length === 0) {
-		throw new Error('Invalid tail call');
-	}
-
-	return [arr.slice(0, arr.length - 1), arr[arr.length - 1]];
-}
 
 export function equals<T>(one: ReadonlyArray<T> | undefined, other: ReadonlyArray<T> | undefined, itemEquals: (a: T, b: T) => boolean = (a, b) => a === b): boolean {
 	if (one === other) {
@@ -45,33 +26,6 @@ export function equals<T>(one: ReadonlyArray<T> | undefined, other: ReadonlyArra
 	}
 
 	return true;
-}
-
-/**
- * Remove the element at `index` by replacing it with the last element. This is faster than `splice`
- * but changes the order of the array
- */
-function removeFastWithoutKeepingOrder<T>(array: T[], index: number) {
-	const last = array.length - 1;
-	if (index < last) {
-		array[index] = array[last];
-	}
-	array.pop();
-}
-
-/**
- * Performs a binary search algorithm over a sorted array.
- *
- * @param array The array being searched.
- * @param key The value we search for.
- * @param comparator A function that takes two array elements and returns zero
- *   if they are equal, a negative number if the first element precedes the
- *   second one in the sorting order, or a positive number if the second element
- *   precedes the first one.
- * @return See {@link binarySearch2}
- */
-function binarySearch<T>(array: ReadonlyArray<T>, key: T, comparator: (op1: T, op2: T) => number): number {
-	return binarySearch2(array.length, i => comparator(array[i], key));
 }
 
 /**
@@ -143,20 +97,6 @@ export function quickSelect<T>(nth: number, data: T[], compare: Compare<T>): T {
 	}
 }
 
-function groupBy<T>(data: ReadonlyArray<T>, compare: (a: T, b: T) => number): T[][] {
-	const result: T[][] = [];
-	let currentGroup: T[] | undefined = undefined;
-	for (const element of data.slice(0).sort(compare)) {
-		if (!currentGroup || compare(currentGroup[0], element) !== 0) {
-			currentGroup = [element];
-			result.push(currentGroup);
-		} else {
-			currentGroup.push(element);
-		}
-	}
-	return result;
-}
-
 /**
  * Splits the given items into a list of (non-empty) groups.
  * `shouldBeGrouped` is used to decide if two consecutive items should be in the same group.
@@ -191,10 +131,6 @@ export function forEachWithNeighbors<T>(arr: T[], f: (before: T | undefined, ele
 	for (let i = 0; i < arr.length; i++) {
 		f(i === 0 ? undefined : arr[i - 1], arr[i], i + 1 === arr.length ? undefined : arr[i + 1]);
 	}
-}
-
-function concatArrays<TArr extends any[]>(...arrays: TArr): TArr[number][number][] {
-	return ([] as any[]).concat(...arrays);
 }
 
 interface IMutableSplice<T> extends ISplice<T> {
@@ -257,79 +193,6 @@ export function sortedDiff<T>(before: ReadonlyArray<T>, after: ReadonlyArray<T>,
 	return result;
 }
 
-/**
- * Takes two *sorted* arrays and computes their delta (removed, added elements).
- * Finishes in `Math.min(before.length, after.length)` steps.
- */
-function delta<T>(before: ReadonlyArray<T>, after: ReadonlyArray<T>, compare: (a: T, b: T) => number): { removed: T[]; added: T[] } {
-	const splices = sortedDiff(before, after, compare);
-	const removed: T[] = [];
-	const added: T[] = [];
-
-	for (const splice of splices) {
-		removed.push(...before.slice(splice.start, splice.start + splice.deleteCount));
-		added.push(...splice.toInsert);
-	}
-
-	return { removed, added };
-}
-
-/**
- * Returns the top N elements from the array.
- *
- * Faster than sorting the entire array when the array is a lot larger than N.
- *
- * @param array The unsorted array.
- * @param compare A sort function for the elements.
- * @param n The number of elements to return.
- * @return The first n elements from array when sorted with compare.
- */
-function top<T>(array: ReadonlyArray<T>, compare: (a: T, b: T) => number, n: number): T[] {
-	if (n === 0) {
-		return [];
-	}
-	const result = array.slice(0, n).sort(compare);
-	topStep(array, compare, result, n, array.length);
-	return result;
-}
-
-/**
- * Asynchronous variant of `top()` allowing for splitting up work in batches between which the event loop can run.
- *
- * Returns the top N elements from the array.
- *
- * Faster than sorting the entire array when the array is a lot larger than N.
- *
- * @param array The unsorted array.
- * @param compare A sort function for the elements.
- * @param n The number of elements to return.
- * @param batch The number of elements to examine before yielding to the event loop.
- * @return The first n elements from array when sorted with compare.
- */
-function topAsync<T>(array: T[], compare: (a: T, b: T) => number, n: number, batch: number, token?: CancellationToken): Promise<T[]> {
-	if (n === 0) {
-		return Promise.resolve([]);
-	}
-
-	return new Promise((resolve, reject) => {
-		(async () => {
-			const o = array.length;
-			const result = array.slice(0, n).sort(compare);
-			for (let i = n, m = Math.min(n + batch, o); i < o; i = m, m = Math.min(m + batch, o)) {
-				if (i > n) {
-					await new Promise(resolve => setTimeout(resolve)); // any other delay function would starve I/O
-				}
-				if (token && token.isCancellationRequested) {
-					throw new CancellationError();
-				}
-				topStep(array, compare, result, i, m);
-			}
-			return result;
-		})()
-			.then(resolve, reject);
-	});
-}
-
 function topStep<T>(array: ReadonlyArray<T>, compare: (a: T, b: T) => number, result: T[], i: number, m: number): void {
 	for (const n = result.length; i < m; i++) {
 		const element = array[i];
@@ -342,89 +205,12 @@ function topStep<T>(array: ReadonlyArray<T>, compare: (a: T, b: T) => number, re
 }
 
 /**
- * @returns New array with all falsy values removed. The original array IS NOT modified.
- */
-function coalesce<T>(array: ReadonlyArray<T | undefined | null>): T[] {
-	return array.filter((e): e is T => !!e);
-}
-
-/**
- * Remove all falsy values from `array`. The original array IS modified.
- */
-function coalesceInPlace<T>(array: Array<T | undefined | null>): asserts array is Array<T> {
-	let to = 0;
-	for (let i = 0; i < array.length; i++) {
-		if (!!array[i]) {
-			array[to] = array[i];
-			to += 1;
-		}
-	}
-	array.length = to;
-}
-
-/**
- * @deprecated Use `Array.copyWithin` instead
- */
-function move(array: unknown[], from: number, to: number): void {
-	array.splice(to, 0, array.splice(from, 1)[0]);
-}
-
-/**
- * @returns false if the provided object is an array and not empty.
- */
-function isFalsyOrEmpty(obj: unknown): boolean {
-	return !Array.isArray(obj) || obj.length === 0;
-}
-
-/**
  * @returns True if the provided object is an array and has at least one element.
  */
 export function isNonEmptyArray<T>(obj: T[] | undefined | null): obj is T[];
 export function isNonEmptyArray<T>(obj: readonly T[] | undefined | null): obj is readonly T[];
 export function isNonEmptyArray<T>(obj: T[] | readonly T[] | undefined | null): obj is T[] | readonly T[] {
 	return Array.isArray(obj) && obj.length > 0;
-}
-
-/**
- * Removes duplicates from the given array. The optional keyFn allows to specify
- * how elements are checked for equality by returning an alternate value for each.
- */
-function distinct<T>(array: ReadonlyArray<T>, keyFn: (value: T) => unknown = value => value): T[] {
-	const seen = new Set<any>();
-
-	return array.filter(element => {
-		const key = keyFn(element);
-		if (seen.has(key)) {
-			return false;
-		}
-		seen.add(key);
-		return true;
-	});
-}
-
-function uniqueFilter<T, R>(keyFn: (t: T) => R): (t: T) => boolean {
-	const seen = new Set<R>();
-
-	return element => {
-		const key = keyFn(element);
-
-		if (seen.has(key)) {
-			return false;
-		}
-
-		seen.add(key);
-		return true;
-	};
-}
-
-function commonPrefixLength<T>(one: ReadonlyArray<T>, other: ReadonlyArray<T>, equals: (a: T, b: T) => boolean = (a, b) => a === b): number {
-	let result = 0;
-
-	for (let i = 0, len = Math.min(one.length, other.length); i < len && equals(one[i], other[i]); i++) {
-		result++;
-	}
-
-	return result;
 }
 
 export function range(to: number): number[];
@@ -464,18 +250,6 @@ export function index<T, R>(array: ReadonlyArray<T>, indexer: (t: T) => string, 
 }
 
 /**
- * Inserts an element into an array. Returns a function which, when
- * called, will remove that element from the array.
- *
- * @deprecated In almost all cases, use a `Set<T>` instead.
- */
-function insert<T>(array: T[], element: T): () => void {
-	array.push(element);
-
-	return () => remove(array, element);
-}
-
-/**
  * Removes an element from an array if it can be found.
  *
  * @deprecated In almost all cases, use a `Set<T>` instead.
@@ -491,102 +265,16 @@ export function remove<T>(array: T[], element: T): T | undefined {
 	return undefined;
 }
 
-/**
- * Insert `insertArr` inside `target` at `insertIndex`.
- * Please don't touch unless you understand https://jsperf.com/inserting-an-array-within-an-array
- */
-function arrayInsert<T>(target: T[], insertIndex: number, insertArr: T[]): T[] {
-	const before = target.slice(0, insertIndex);
-	const after = target.slice(insertIndex);
-	return before.concat(insertArr, after);
-}
-
-/**
- * Uses Fisher-Yates shuffle to shuffle the given array
- */
-function shuffle<T>(array: T[], _seed?: number): void {
-	let rand: () => number;
-
-	if (typeof _seed === 'number') {
-		let seed = _seed;
-		// Seeded random number generator in JS. Modified from:
-		// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-		rand = () => {
-			const x = Math.sin(seed++) * 179426549; // throw away most significant digits and reduce any potential bias
-			return x - Math.floor(x);
-		};
-	} else {
-		rand = Math.random;
-	}
-
-	for (let i = array.length - 1; i > 0; i -= 1) {
-		const j = Math.floor(rand() * (i + 1));
-		const temp = array[i];
-		array[i] = array[j];
-		array[j] = temp;
-	}
-}
-
-/**
- * Pushes an element to the start of the array, if found.
- */
-function pushToStart<T>(arr: T[], value: T): void {
-	const index = arr.indexOf(value);
-
-	if (index > -1) {
-		arr.splice(index, 1);
-		arr.unshift(value);
-	}
-}
-
-/**
- * Pushes an element to the end of the array, if found.
- */
-function pushToEnd<T>(arr: T[], value: T): void {
-	const index = arr.indexOf(value);
-
-	if (index > -1) {
-		arr.splice(index, 1);
-		arr.push(value);
-	}
-}
-
 export function pushMany<T>(arr: T[], items: ReadonlyArray<T>): void {
 	for (const item of items) {
 		arr.push(item);
 	}
 }
 
-function mapArrayOrNot<T, U>(items: T | T[], fn: (_: T) => U): U | U[] {
-	return Array.isArray(items) ?
-		items.map(fn) :
-		fn(items);
-}
-
-function mapFilter<T, U>(array: ReadonlyArray<T>, fn: (t: T) => U | undefined): U[] {
-	const result: U[] = [];
-	for (const item of array) {
-		const mapped = fn(item);
-		if (mapped !== undefined) {
-			result.push(mapped);
-		}
-	}
-	return result;
-}
-
-function withoutDuplicates<T>(array: ReadonlyArray<T>): T[] {
-	const s = new Set(array);
-	return Array.from(s);
-}
-
 export function asArray<T>(x: T | T[]): T[];
 export function asArray<T>(x: T | readonly T[]): readonly T[];
 export function asArray<T>(x: T | T[]): T[] {
 	return Array.isArray(x) ? x : [x];
-}
-
-function getRandomElement<T>(arr: T[]): T | undefined {
-	return arr[Math.floor(Math.random() * arr.length)];
 }
 
 /**
@@ -608,25 +296,6 @@ export function insertInto<T>(array: T[], start: number, newItems: T[]): void {
 	for (let i = 0; i < newItemsLength; i++) {
 		array[i + startIdx] = newItems[i];
 	}
-}
-
-/**
- * Removes elements from an array and inserts new elements in their place, returning the deleted elements. Alternative to the native Array.splice method, it
- * can only support limited number of items due to the maximum call stack size limit.
- * @param array The original array.
- * @param start The zero-based location in the array from which to start removing elements.
- * @param deleteCount The number of elements to remove.
- * @returns An array containing the elements that were deleted.
- */
-function splice<T>(array: T[], start: number, deleteCount: number, newItems: T[]): T[] {
-	const index = getActualStartIndex(array, start);
-	let result = array.splice(index, deleteCount);
-	if (result === undefined) {
-		// see https://bugs.webkit.org/show_bug.cgi?id=261140
-		result = [];
-	}
-	insertInto(array, index, newItems);
-	return result;
 }
 
 /**
@@ -683,128 +352,13 @@ export function compareBy<TItem, TCompareBy>(selector: (item: TItem) => TCompare
 	return (a, b) => comparator(selector(a), selector(b));
 }
 
-function tieBreakComparators<TItem>(...comparators: Comparator<TItem>[]): Comparator<TItem> {
-	return (item1, item2) => {
-		for (const comparator of comparators) {
-			const result = comparator(item1, item2);
-			if (!CompareResult.isNeitherLessOrGreaterThan(result)) {
-				return result;
-			}
-		}
-		return CompareResult.neitherLessOrGreaterThan;
-	};
-}
-
 /**
  * The natural order on numbers.
 */
 export const numberComparator: Comparator<number> = (a, b) => a - b;
 
-const booleanComparator: Comparator<boolean> = (a, b) => numberComparator(a ? 1 : 0, b ? 1 : 0);
-
 export function reverseOrder<TItem>(comparator: Comparator<TItem>): Comparator<TItem> {
 	return (a, b) => -comparator(a, b);
-}
-
-/**
- * Returns a new comparator that treats `undefined` as the smallest value.
- * All other values are compared using the given comparator.
-*/
-function compareUndefinedSmallest<T>(comparator: Comparator<T>): Comparator<T | undefined> {
-	return (a, b) => {
-		if (a === undefined) {
-			return b === undefined ? CompareResult.neitherLessOrGreaterThan : CompareResult.lessThan;
-		} else if (b === undefined) {
-			return CompareResult.greaterThan;
-		}
-
-		return comparator(a, b);
-	};
-}
-
-class ArrayQueue<T> {
-	private readonly items: readonly T[];
-	private firstIdx = 0;
-	private lastIdx: number;
-
-	/**
-	 * Constructs a queue that is backed by the given array. Runtime is O(1).
-	*/
-	constructor(items: readonly T[]) {
-		this.items = items;
-		this.lastIdx = this.items.length - 1;
-	}
-
-	get length(): number {
-		return this.lastIdx - this.firstIdx + 1;
-	}
-
-	/**
-	 * Consumes elements from the beginning of the queue as long as the predicate returns true.
-	 * If no elements were consumed, `null` is returned. Has a runtime of O(result.length).
-	*/
-	takeWhile(predicate: (value: T) => boolean): T[] | null {
-		// P(k) := k <= this.lastIdx && predicate(this.items[k])
-		// Find s := min { k | k >= this.firstIdx && !P(k) } and return this.data[this.firstIdx...s)
-
-		let startIdx = this.firstIdx;
-		while (startIdx < this.items.length && predicate(this.items[startIdx])) {
-			startIdx++;
-		}
-		const result = startIdx === this.firstIdx ? null : this.items.slice(this.firstIdx, startIdx);
-		this.firstIdx = startIdx;
-		return result;
-	}
-
-	/**
-	 * Consumes elements from the end of the queue as long as the predicate returns true.
-	 * If no elements were consumed, `null` is returned.
-	 * The result has the same order as the underlying array!
-	*/
-	takeFromEndWhile(predicate: (value: T) => boolean): T[] | null {
-		// P(k) := this.firstIdx >= k && predicate(this.items[k])
-		// Find s := max { k | k <= this.lastIdx && !P(k) } and return this.data(s...this.lastIdx]
-
-		let endIdx = this.lastIdx;
-		while (endIdx >= 0 && predicate(this.items[endIdx])) {
-			endIdx--;
-		}
-		const result = endIdx === this.lastIdx ? null : this.items.slice(endIdx + 1, this.lastIdx + 1);
-		this.lastIdx = endIdx;
-		return result;
-	}
-
-	peek(): T | undefined {
-		if (this.length === 0) {
-			return undefined;
-		}
-		return this.items[this.firstIdx];
-	}
-
-	peekLast(): T | undefined {
-		if (this.length === 0) {
-			return undefined;
-		}
-		return this.items[this.lastIdx];
-	}
-
-	dequeue(): T | undefined {
-		const result = this.items[this.firstIdx];
-		this.firstIdx++;
-		return result;
-	}
-
-	removeLast(): T | undefined {
-		const result = this.items[this.lastIdx];
-		this.lastIdx--;
-		return result;
-	}
-
-	takeCount(count: number): T[] {
-		const result = this.items.slice(this.firstIdx, this.firstIdx + count);
-		this.firstIdx += count;
-		return result;
-	}
 }
 
 /**
@@ -914,25 +468,6 @@ export class Permutation {
 		}
 		return new Permutation(inverseIndexMap);
 	}
-}
-
-/**
- * Asynchronous variant of `Array.find()`, returning the first element in
- * the array for which the predicate returns true.
- *
- * This implementation does not bail early and waits for all promises to
- * resolve before returning.
- */
-async function findAsync<T>(array: readonly T[], predicate: (element: T, index: number) => Promise<boolean>): Promise<T | undefined> {
-	const results = await Promise.all(array.map(
-		async (element, index) => ({ element, ok: await predicate(element, index) })
-	));
-
-	return results.find(r => r.ok)?.element;
-}
-
-function sum(array: readonly number[]): number {
-	return array.reduce((acc, value) => acc + value, 0);
 }
 
 export function sumBy<T>(array: readonly T[], selector: (value: T) => number): number {

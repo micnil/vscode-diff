@@ -237,5 +237,3 @@ export interface ILanguagePack {
 	}[];
 	readonly translations: Record<string, string | undefined>;
 }
-
-type ILanguagePacks = Record<string, ILanguagePack | undefined>;

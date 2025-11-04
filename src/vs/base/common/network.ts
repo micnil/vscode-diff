@@ -160,12 +160,6 @@ export function matchesScheme(target: URI | string, scheme: string): boolean {
 		return startsWithIgnoreCase(target, scheme + ':');
 	}
 }
-
-function matchesSomeScheme(target: URI | string, ...schemes: string[]): boolean {
-	return schemes.some(scheme => matchesScheme(target, scheme));
-}
-
-const connectionTokenCookieName = 'vscode-tkn';
 export const connectionTokenQueryName = 'tkn';
 
 class RemoteAuthoritiesImpl {
@@ -254,11 +248,6 @@ export type AppResourcePath = (
 	| `s${string}` | `t${string}` | `u${string}` | `v${string}` | `w${string}` | `x${string}`
 	| `y${string}` | `z${string}`
 );
-
-const builtinExtensionsPath: AppResourcePath = 'vs/../../extensions';
-const nodeModulesPath: AppResourcePath = 'vs/../../node_modules';
-const nodeModulesAsarPath: AppResourcePath = 'vs/../../node_modules.asar';
-const nodeModulesAsarUnpackedPath: AppResourcePath = 'vs/../../node_modules.asar.unpacked';
 
 export const VSCODE_AUTHORITY = 'vscode-app';
 
@@ -366,16 +355,6 @@ class FileAccessImpl {
 		throw new Error('Cannot determine URI for module id!');
 	}
 }
-
-const FileAccess = new FileAccessImpl();
-
-const CacheControlheaders: Record<string, string> = Object.freeze({
-	'Cache-Control': 'no-cache, no-store'
-});
-
-const DocumentPolicyheaders: Record<string, string> = Object.freeze({
-	'Document-Policy': 'include-js-call-stacks-in-crash-reports'
-});
 
 export namespace COI {
 

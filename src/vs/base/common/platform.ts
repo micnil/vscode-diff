@@ -121,15 +121,6 @@ export const enum Platform {
 }
 export type PlatformName = 'Web' | 'Windows' | 'Mac' | 'Linux';
 
-function PlatformToString(platform: Platform): PlatformName {
-	switch (platform) {
-		case Platform.Web: return 'Web';
-		case Platform.Mac: return 'Mac';
-		case Platform.Linux: return 'Linux';
-		case Platform.Windows: return 'Windows';
-	}
-}
-
 let _platform: Platform = Platform.Web;
 if (_isMacintosh) {
 	_platform = Platform.Mac;
@@ -142,20 +133,10 @@ if (_isMacintosh) {
 export const isWindows = _isWindows;
 export const isMacintosh = _isMacintosh;
 export const isLinux = _isLinux;
-const isLinuxSnap = _isLinuxSnap;
 export const isNative = _isNative;
-const isElectron = _isElectron;
 export const isWeb = _isWeb;
 export const isWebWorker = (_isWeb && typeof $globalThis.importScripts === 'function');
 export const webWorkerOrigin = isWebWorker ? $globalThis.origin : undefined;
-const isIOS = _isIOS;
-const isMobile = _isMobile;
-/**
- * Whether we run inside a CI environment, such as
- * GH actions or Azure Pipelines.
- */
-const isCI = _isCI;
-const platform = _platform;
 export const userAgent = _userAgent;
 
 /**
@@ -185,27 +166,6 @@ export namespace Language {
 		return language === 'en';
 	}
 }
-
-/**
- * Desktop: The OS locale or the locale specified by --locale or `argv.json`.
- * Web: matches `platformLocale`.
- *
- * The UI is not necessarily shown in the provided locale.
- */
-const locale = _locale;
-
-/**
- * This will always be set to the OS/browser's locale regardless of
- * what was specified otherwise. The format of the string is all
- * lower case (e.g. zh-tw for Traditional Chinese). The UI is not
- * necessarily shown in the provided locale.
- */
-const platformLocale = _platformLocale;
-
-/**
- * The translations that are available through language packs.
- */
-const translationsConfigFile = _translationsConfigFile;
 
 export const setTimeout0IsFaster = (typeof $globalThis.postMessage === 'function' && !$globalThis.importScripts);
 
@@ -253,32 +213,8 @@ export const enum OperatingSystem {
 	Macintosh = 2,
 	Linux = 3
 }
-const OS = (_isMacintosh || _isIOS ? OperatingSystem.Macintosh : (_isWindows ? OperatingSystem.Windows : OperatingSystem.Linux));
 
 let _isLittleEndian = true;
 let _isLittleEndianComputed = false;
-function isLittleEndian(): boolean {
-	if (!_isLittleEndianComputed) {
-		_isLittleEndianComputed = true;
-		const test = new Uint8Array(2);
-		test[0] = 1;
-		test[1] = 2;
-		const view = new Uint16Array(test.buffer);
-		_isLittleEndian = (view[0] === (2 << 8) + 1);
-	}
-	return _isLittleEndian;
-}
 
 export const isChrome = !!(userAgent && userAgent.indexOf('Chrome') >= 0);
-const isFirefox = !!(userAgent && userAgent.indexOf('Firefox') >= 0);
-const isSafari = !!(!isChrome && (userAgent && userAgent.indexOf('Safari') >= 0));
-const isEdge = !!(userAgent && userAgent.indexOf('Edg/') >= 0);
-const isAndroid = !!(userAgent && userAgent.indexOf('Android') >= 0);
-
-function isBigSurOrNewer(osVersion: string): boolean {
-	return parseFloat(osVersion) >= 20;
-}
-
-function isTahoeOrNewer(osVersion: string): boolean {
-	return parseFloat(osVersion) >= 25;
-}

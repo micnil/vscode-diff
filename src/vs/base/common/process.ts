@@ -67,10 +67,3 @@ export const env = safeProcess.env;
  * environments.
  */
 export const platform = safeProcess.platform;
-
-/**
- * Provides safe access to the `arch` method in node.js, sandboxed or web
- * environments.
- * Note: `arch` is `undefined` in web
- */
-const arch = safeProcess.arch;

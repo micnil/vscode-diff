@@ -7,8 +7,8 @@ import { CharCode } from './charCode.js';
 import * as extpath from './extpath.js';
 import { Schemas } from './network.js';
 import * as paths from './path.js';
-import { isLinux, isWindows } from './platform.js';
-import { compare as strCompare, equalsIgnoreCase } from './strings.js';
+import { isWindows } from './platform.js';
+import { equalsIgnoreCase, compare as strCompare } from './strings.js';
 import { URI, uriToFsPath } from './uri.js';
 
 export function originalFSPath(uri: URI): string {
@@ -325,76 +325,10 @@ export class ExtUri implements IExtUri {
  * ```
  */
 export const extUri = new ExtUri(() => false);
-
-/**
- * BIASED utility that _mostly_ ignored the case of urs paths. ONLY use this util if you
- * understand what you are doing.
- *
- * This utility is INCOMPATIBLE with `uri.toString()`-usages and both CANNOT be used interchanged.
- *
- * When dealing with uris from files or documents, `extUri` (the unbiased friend)is sufficient
- * because those uris come from a "trustworthy source". When creating unknown uris it's always
- * better to use `IUriIdentityService` which exposes an `IExtUri`-instance which knows when path
- * casing matters.
- */
-const extUriBiasedIgnorePathCase = new ExtUri(uri => {
-	// A file scheme resource is in the same platform as code, so ignore case for non linux platforms
-	// Resource can be from another platform. Lowering the case as an hack. Should come from File system provider
-	return uri.scheme === Schemas.file ? !isLinux : true;
-});
-
-
-/**
- * BIASED utility that always ignores the casing of uris paths. ONLY use this util if you
- * understand what you are doing.
- *
- * This utility is INCOMPATIBLE with `uri.toString()`-usages and both CANNOT be used interchanged.
- *
- * When dealing with uris from files or documents, `extUri` (the unbiased friend)is sufficient
- * because those uris come from a "trustworthy source". When creating unknown uris it's always
- * better to use `IUriIdentityService` which exposes an `IExtUri`-instance which knows when path
- * casing matters.
- */
-const extUriIgnorePathCase = new ExtUri(_ => true);
-
-const isEqual = extUri.isEqual.bind(extUri);
 export const isEqualOrParent = extUri.isEqualOrParent.bind(extUri);
-const getComparisonKey = extUri.getComparisonKey.bind(extUri);
-const basenameOrAuthority = extUri.basenameOrAuthority.bind(extUri);
 export const basename = extUri.basename.bind(extUri);
-const extname = extUri.extname.bind(extUri);
-const dirname = extUri.dirname.bind(extUri);
-const joinPath = extUri.joinPath.bind(extUri);
-const normalizePath = extUri.normalizePath.bind(extUri);
-const relativePath = extUri.relativePath.bind(extUri);
-const resolvePath = extUri.resolvePath.bind(extUri);
-const isAbsolutePath = extUri.isAbsolutePath.bind(extUri);
 export const isEqualAuthority = extUri.isEqualAuthority.bind(extUri);
 export const hasTrailingPathSeparator = extUri.hasTrailingPathSeparator.bind(extUri);
-const removeTrailingPathSeparator = extUri.removeTrailingPathSeparator.bind(extUri);
-const addTrailingPathSeparator = extUri.addTrailingPathSeparator.bind(extUri);
-
-//#endregion
-
-function distinctParents<T>(items: T[], resourceAccessor: (item: T) => URI): T[] {
-	const distinctParents: T[] = [];
-	for (let i = 0; i < items.length; i++) {
-		const candidateResource = resourceAccessor(items[i]);
-		if (items.some((otherItem, index) => {
-			if (index === i) {
-				return false;
-			}
-
-			return isEqualOrParent(candidateResource, resourceAccessor(otherItem));
-		})) {
-			continue;
-		}
-
-		distinctParents.push(items[i]);
-	}
-
-	return distinctParents;
-}
 
 /**
  * Data URI related helpers.
@@ -428,17 +362,4 @@ export namespace DataUri {
 
 		return metadata;
 	}
-}
-
-function toLocalResource(resource: URI, authority: string | undefined, localScheme: string): URI {
-	if (authority) {
-		let path = resource.path;
-		if (path && path[0] !== paths.posix.sep) {
-			path = paths.posix.sep + path;
-		}
-
-		return resource.with({ scheme: localScheme, authority, path });
-	}
-
-	return resource.with({ scheme: localScheme });
 }

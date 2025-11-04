@@ -5,10 +5,9 @@
 
 import { CancelablePromise } from './async.js';
 import { CancellationToken } from './cancellation.js';
-import { diffSets } from './collections.js';
 import { onUnexpectedError } from './errors.js';
 import { createSingleCallFunction } from './functional.js';
-import { combinedDisposable, Disposable, DisposableMap, DisposableStore, IDisposable, toDisposable } from './lifecycle.js';
+import { combinedDisposable, Disposable, DisposableStore, IDisposable, toDisposable } from './lifecycle.js';
 import { LinkedList } from './linkedList.js';
 import { IObservable, IObservableWithChange, IObserver } from './observable.js';
 import { StopWatch } from './stopwatch.js';
@@ -1248,8 +1247,6 @@ export interface EventDeliveryQueue {
 	_isEventDeliveryQueue: true;
 }
 
-const createEventDeliveryQueue = (): EventDeliveryQueue => new EventDeliveryQueuePrivate();
-
 class EventDeliveryQueuePrivate implements EventDeliveryQueue {
 	declare _isEventDeliveryQueue: true;
 
@@ -1292,63 +1289,6 @@ export interface IWaitUntil {
 }
 
 export type IWaitUntilData<T> = Omit<Omit<T, 'waitUntil'>, 'token'>;
-
-class AsyncEmitter<T extends IWaitUntil> extends Emitter<T> {
-
-	private _asyncDeliveryQueue?: LinkedList<[(ev: T) => void, IWaitUntilData<T>]>;
-
-	async fireAsync(data: IWaitUntilData<T>, token: CancellationToken, promiseJoin?: (p: Promise<unknown>, listener: Function) => Promise<unknown>): Promise<void> {
-		if (!this._listeners) {
-			return;
-		}
-
-		if (!this._asyncDeliveryQueue) {
-			this._asyncDeliveryQueue = new LinkedList();
-		}
-
-		forEachListener(this._listeners, listener => this._asyncDeliveryQueue!.push([listener.value, data]));
-
-		while (this._asyncDeliveryQueue.size > 0 && !token.isCancellationRequested) {
-
-			const [listener, data] = this._asyncDeliveryQueue.shift()!;
-			const thenables: Promise<unknown>[] = [];
-
-			// eslint-disable-next-line local/code-no-dangerous-type-assertions
-			const event = <T>{
-				...data,
-				token,
-				waitUntil: (p: Promise<unknown>): void => {
-					if (Object.isFrozen(thenables)) {
-						throw new Error('waitUntil can NOT be called asynchronous');
-					}
-					if (promiseJoin) {
-						p = promiseJoin(p, listener);
-					}
-					thenables.push(p);
-				}
-			};
-
-			try {
-				listener(event);
-			} catch (e) {
-				onUnexpectedError(e);
-				continue;
-			}
-
-			// freeze thenables-collection to enforce sync-calls to
-			// wait until and then wait for all thenables to resolve
-			Object.freeze(thenables);
-
-			await Promise.allSettled(thenables).then(values => {
-				for (const value of values) {
-					if (value.status === 'rejected') {
-						onUnexpectedError(value.reason);
-					}
-				}
-			});
-		}
-	}
-}
 
 
 export class PauseableEmitter<T> extends Emitter<T> {
@@ -1398,60 +1338,6 @@ export class PauseableEmitter<T> extends Emitter<T> {
 			} else {
 				super.fire(event);
 			}
-		}
-	}
-}
-
-class DebounceEmitter<T> extends PauseableEmitter<T> {
-
-	private readonly _delay: number;
-	private _handle: Timeout | undefined;
-
-	constructor(options: EmitterOptions & { merge: (input: T[]) => T; delay?: number }) {
-		super(options);
-		this._delay = options.delay ?? 100;
-	}
-
-	override fire(event: T): void {
-		if (!this._handle) {
-			this.pause();
-			this._handle = setTimeout(() => {
-				this._handle = undefined;
-				this.resume();
-			}, this._delay);
-		}
-		super.fire(event);
-	}
-}
-
-/**
- * An emitter which queue all events and then process them at the
- * end of the event loop.
- */
-class MicrotaskEmitter<T> extends Emitter<T> {
-	private _queuedEvents: T[] = [];
-	private _mergeFn?: (input: T[]) => T;
-
-	constructor(options?: EmitterOptions & { merge?: (input: T[]) => T }) {
-		super(options);
-		this._mergeFn = options?.merge;
-	}
-	override fire(event: T): void {
-
-		if (!this.hasListeners()) {
-			return;
-		}
-
-		this._queuedEvents.push(event);
-		if (this._queuedEvents.length === 1) {
-			queueMicrotask(() => {
-				if (this._mergeFn) {
-					super.fire(this._mergeFn(this._queuedEvents));
-				} else {
-					this._queuedEvents.forEach(e => super.fire(e));
-				}
-				this._queuedEvents = [];
-			});
 		}
 	}
 }
@@ -1548,136 +1434,6 @@ export class EventMultiplexer<T> implements IDisposable {
 export interface IDynamicListEventMultiplexer<TEventType> extends IDisposable {
 	readonly event: Event<TEventType>;
 }
-class DynamicListEventMultiplexer<TItem, TEventType> implements IDynamicListEventMultiplexer<TEventType> {
-	private readonly _store = new DisposableStore();
-
-	readonly event: Event<TEventType>;
-
-	constructor(
-		items: TItem[],
-		onAddItem: Event<TItem>,
-		onRemoveItem: Event<TItem>,
-		getEvent: (item: TItem) => Event<TEventType>
-	) {
-		const multiplexer = this._store.add(new EventMultiplexer<TEventType>());
-		const itemListeners = this._store.add(new DisposableMap<TItem, IDisposable>());
-
-		function addItem(instance: TItem) {
-			itemListeners.set(instance, multiplexer.add(getEvent(instance)));
-		}
-
-		// Existing items
-		for (const instance of items) {
-			addItem(instance);
-		}
-
-		// Added items
-		this._store.add(onAddItem(instance => {
-			addItem(instance);
-		}));
-
-		// Removed items
-		this._store.add(onRemoveItem(instance => {
-			itemListeners.deleteAndDispose(instance);
-		}));
-
-		this.event = multiplexer.event;
-	}
-
-	dispose() {
-		this._store.dispose();
-	}
-}
-
-/**
- * The EventBufferer is useful in situations in which you want
- * to delay firing your events during some code.
- * You can wrap that code and be sure that the event will not
- * be fired during that wrap.
- *
- * ```
- * const emitter: Emitter;
- * const delayer = new EventDelayer();
- * const delayedEvent = delayer.wrapEvent(emitter.event);
- *
- * delayedEvent(console.log);
- *
- * delayer.bufferEvents(() => {
- *   emitter.fire(); // event will not be fired yet
- * });
- *
- * // event will only be fired at this point
- * ```
- */
-class EventBufferer {
-
-	private data: { buffers: Function[] }[] = [];
-
-	wrapEvent<T>(event: Event<T>): Event<T>;
-	wrapEvent<T>(event: Event<T>, reduce: (last: T | undefined, event: T) => T): Event<T>;
-	wrapEvent<T, O>(event: Event<T>, reduce: (last: O | undefined, event: T) => O, initial: O): Event<O>;
-	wrapEvent<T, O>(event: Event<T>, reduce?: (last: T | O | undefined, event: T) => T | O, initial?: O): Event<O | T> {
-		return (listener, thisArgs?, disposables?) => {
-			return event(i => {
-				const data = this.data[this.data.length - 1];
-
-				// Non-reduce scenario
-				if (!reduce) {
-					// Buffering case
-					if (data) {
-						data.buffers.push(() => listener.call(thisArgs, i));
-					} else {
-						// Not buffering case
-						listener.call(thisArgs, i);
-					}
-					return;
-				}
-
-				// Reduce scenario
-				const reduceData = data as typeof data & {
-					/**
-					 * The accumulated items that will be reduced.
-					 */
-					items?: T[];
-					/**
-					 * The reduced result cached to be shared with other listeners.
-					 */
-					reducedResult?: T | O;
-				};
-
-				// Not buffering case
-				if (!reduceData) {
-					// TODO: Is there a way to cache this reduce call for all listeners?
-					listener.call(thisArgs, reduce(initial, i));
-					return;
-				}
-
-				// Buffering case
-				reduceData.items ??= [];
-				reduceData.items.push(i);
-				if (reduceData.buffers.length === 0) {
-					// Include a single buffered function that will reduce all events when we're done buffering events
-					data.buffers.push(() => {
-						// cache the reduced result so that the value can be shared across all listeners
-						reduceData.reducedResult ??= initial
-							? reduceData.items!.reduce(reduce as (last: O | undefined, event: T) => O, initial)
-							: reduceData.items!.reduce(reduce as (last: T | undefined, event: T) => T);
-						listener.call(thisArgs, reduceData.reducedResult);
-					});
-				}
-			}, undefined, disposables);
-		};
-	}
-
-	bufferEvents<R = void>(fn: () => R): R {
-		const data = { buffers: new Array<Function>() };
-		this.data.push(data);
-		const r = fn();
-		this.data.pop();
-		data.buffers.forEach(flush => flush());
-		return r;
-	}
-}
 
 /**
  * A Relay is an event forwarder which functions as a replugabble event pipe.
@@ -1724,57 +1480,8 @@ export interface IValueWithChangeEvent<T> {
 	get value(): T;
 }
 
-class ValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
-	public static const<T>(value: T): IValueWithChangeEvent<T> {
-		return new ConstValueWithChangeEvent(value);
-	}
-
-	private readonly _onDidChange = new Emitter<void>();
-	readonly onDidChange: Event<void> = this._onDidChange.event;
-
-	constructor(private _value: T) { }
-
-	get value(): T {
-		return this._value;
-	}
-
-	set value(value: T) {
-		if (value !== this._value) {
-			this._value = value;
-			this._onDidChange.fire(undefined);
-		}
-	}
-}
-
 class ConstValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
 	public readonly onDidChange: Event<void> = Event.None;
 
 	constructor(readonly value: T) { }
-}
-
-/**
- * @param handleItem Is called for each item in the set (but only the first time the item is seen in the set).
- * 	The returned disposable is disposed if the item is no longer in the set.
- */
-function trackSetChanges<T>(getData: () => ReadonlySet<T>, onDidChangeData: Event<unknown>, handleItem: (d: T) => IDisposable): IDisposable {
-	const map = new DisposableMap<T, IDisposable>();
-	let oldData = new Set(getData());
-	for (const d of oldData) {
-		map.set(d, handleItem(d));
-	}
-
-	const store = new DisposableStore();
-	store.add(onDidChangeData(() => {
-		const newData = getData();
-		const diff = diffSets(oldData, newData);
-		for (const r of diff.removed) {
-			map.deleteAndDispose(r);
-		}
-		for (const a of diff.added) {
-			map.set(a, handleItem(a));
-		}
-		oldData = new Set(newData);
-	}));
-	store.add(map);
-	return store;
 }

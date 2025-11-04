@@ -427,17 +427,6 @@ export interface UriComponents {
 	fragment?: string;
 }
 
-function isUriComponents(thing: unknown): thing is UriComponents {
-	if (!thing || typeof thing !== 'object') {
-		return false;
-	}
-	return typeof (<UriComponents>thing).scheme === 'string'
-		&& (typeof (<UriComponents>thing).authority === 'string' || typeof (<UriComponents>thing).authority === 'undefined')
-		&& (typeof (<UriComponents>thing).path === 'string' || typeof (<UriComponents>thing).path === 'undefined')
-		&& (typeof (<UriComponents>thing).query === 'string' || typeof (<UriComponents>thing).query === 'undefined')
-		&& (typeof (<UriComponents>thing).fragment === 'string' || typeof (<UriComponents>thing).fragment === 'undefined');
-}
-
 interface UriState extends UriComponents {
 	$mid: MarshalledId.Uri;
 	external?: string;

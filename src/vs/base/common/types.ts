@@ -13,13 +13,6 @@ export function isString(str: unknown): str is string {
 }
 
 /**
- * @returns whether the provided parameter is a JavaScript Array and each element in the array is a string.
- */
-function isStringArray(value: unknown): value is string[] {
-	return isArrayOf(value, isString);
-}
-
-/**
  * @returns whether the provided parameter is a JavaScript Array and each element in the array satisfies the provided type guard.
  */
 export function isArrayOf<T>(value: unknown, check: (item: unknown) => item is T): value is T[] {
@@ -42,15 +35,6 @@ export function isObject(obj: unknown): obj is Object {
 }
 
 /**
- * @returns whether the provided parameter is of type `Buffer` or Uint8Array dervived type
- */
-function isTypedArray(obj: unknown): obj is Object {
-	const TypedArray = Object.getPrototypeOf(Uint8Array);
-	return typeof obj === 'object'
-		&& obj instanceof TypedArray;
-}
-
-/**
  * In **contrast** to just checking `typeof` this will return `false` for `NaN`.
  * @returns whether the provided parameter is a JavaScript Number or not.
  */
@@ -67,21 +51,6 @@ export function isIterable<T>(obj: unknown): obj is Iterable<T> {
 }
 
 /**
- * @returns whether the provided parameter is an Iterable, casting to the given generic
- */
-function isAsyncIterable<T>(obj: unknown): obj is AsyncIterable<T> {
-	// eslint-disable-next-line local/code-no-any-casts
-	return !!obj && typeof (obj as any)[Symbol.asyncIterator] === 'function';
-}
-
-/**
- * @returns whether the provided parameter is a JavaScript Boolean or not.
- */
-function isBoolean(obj: unknown): obj is boolean {
-	return (obj === true || obj === false);
-}
-
-/**
  * @returns whether the provided parameter is undefined.
  */
 export function isUndefined(obj: unknown): obj is undefined {
@@ -89,24 +58,10 @@ export function isUndefined(obj: unknown): obj is undefined {
 }
 
 /**
- * @returns whether the provided parameter is defined.
- */
-function isDefined<T>(arg: T | null | undefined): arg is T {
-	return !isUndefinedOrNull(arg);
-}
-
-/**
  * @returns whether the provided parameter is undefined or null.
  */
 export function isUndefinedOrNull(obj: unknown): obj is undefined | null {
 	return (isUndefined(obj) || obj === null);
-}
-
-
-function assertType(condition: unknown, type?: string): asserts condition {
-	if (!condition) {
-		throw new Error(type ? `Unexpected type, expected '${type}'` : 'Unexpected type');
-	}
 }
 
 /**
@@ -179,61 +134,7 @@ export function assertReturnsAllDefined(...args: (unknown | null | undefined)[])
 	return result;
 }
 
-/**
- * Checks if the provided value is one of the vales in the provided list.
- *
- * ## Examples
- *
- * ```typescript
- * // note! item type is a `subset of string`
- * type TItem = ':' | '.' | '/';
- *
- * // note! item is type of `string` here
- * const item: string = ':';
- * // list of the items to check against
- * const list: TItem[] = [':', '.'];
- *
- * // ok
- * assert(
- *   isOneOf(item, list),
- *   'Must succeed.',
- * );
- *
- * // `item` is of `TItem` type now
- * ```
- */
-const isOneOf = <TType, TSubtype extends TType>(
-	value: TType,
-	validValues: readonly TSubtype[],
-): value is TSubtype => {
-	// note! it is OK to type cast here, because we rely on the includes
-	//       utility to check if the value is present in the provided list
-	return validValues.includes(<TSubtype>value);
-};
-
-/**
- * Compile-time type check of a variable.
- */
-function typeCheck<T = never>(_thing: NoInfer<T>): void { }
-
 const hasOwnProperty = Object.prototype.hasOwnProperty;
-
-/**
- * @returns whether the provided parameter is an empty JavaScript Object or not.
- */
-function isEmptyObject(obj: unknown): obj is object {
-	if (!isObject(obj)) {
-		return false;
-	}
-
-	for (const key in obj) {
-		if (hasOwnProperty.call(obj, key)) {
-			return false;
-		}
-	}
-
-	return true;
-}
 
 /**
  * @returns whether the provided parameter is a JavaScript Function or not.
@@ -242,21 +143,7 @@ export function isFunction(obj: unknown): obj is Function {
 	return (typeof obj === 'function');
 }
 
-/**
- * @returns whether the provided parameters is are JavaScript Function or not.
- */
-function areFunctions(...objects: unknown[]): boolean {
-	return objects.length > 0 && objects.every(isFunction);
-}
-
 export type TypeConstraint = string | Function;
-
-function validateConstraints(args: unknown[], constraints: Array<TypeConstraint | undefined>): void {
-	const len = Math.min(args.length, constraints.length);
-	for (let i = 0; i < len; i++) {
-		validateConstraint(args[i], constraints[i]);
-	}
-}
 
 export function validateConstraint(arg: unknown, constraint: TypeConstraint | undefined): void {
 
@@ -283,48 +170,12 @@ export function validateConstraint(arg: unknown, constraint: TypeConstraint | un
 	}
 }
 
-/**
- * Helper type assertion that safely upcasts a type to a supertype.
- *
- * This can be used to make sure the argument correctly conforms to the subtype while still being able to pass it
- * to contexts that expects the supertype.
- */
-function upcast<Base, Sub extends Base = Base>(x: Sub): Base {
-	return x;
-}
-
 type AddFirstParameterToFunction<T, TargetFunctionsReturnType, FirstParameter> = T extends (...args: any[]) => TargetFunctionsReturnType ?
 	// Function: add param to function
 	(firstArg: FirstParameter, ...args: Parameters<T>) => ReturnType<T> :
 
 	// Else: just leave as is
 	T;
-
-/**
- * Allows to add a first parameter to functions of a type.
- */
-type AddFirstParameterToFunctions<Target, TargetFunctionsReturnType, FirstParameter> = {
-	// For every property
-	[K in keyof Target]: AddFirstParameterToFunction<Target[K], TargetFunctionsReturnType, FirstParameter>;
-};
-
-/**
- * Given an object with all optional properties, requires at least one to be defined.
- * i.e. AtLeastOne<MyObject>;
- */
-type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
-
-/**
- * Only picks the non-optional properties of a type.
- */
-type OmitOptional<T> = { [K in keyof T as T[K] extends Required<T>[K] ? K : never]: T[K] };
-
-/**
- * A type that removed readonly-less from all properties of `T`
- */
-type Mutable<T> = {
-	-readonly [P in keyof T]: T[P]
-};
 
 /**
  * A type that adds readonly to all properties of T, recursively.
@@ -343,11 +194,6 @@ export type DeepImmutable<T> = T extends (infer U)[]
 	}
 	: T;
 
-/**
- * A single object or an array of the objects.
- */
-type SingleOrMany<T> = T | T[];
-
 
 /**
  * A type that recursively makes all properties of `T` required
@@ -364,40 +210,7 @@ export type DeepPartial<T> = {
 	[P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : Partial<T[P]>;
 };
 
-/**
- * Represents a type that is a partial version of a given type `T`, except a subset.
- */
-type PartialExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<T, K>;
-
 
 type KeysOfUnionType<T> = T extends T ? keyof T : never;
 type FilterType<T, TTest> = T extends TTest ? T : never;
 type MakeOptionalAndBool<T extends object> = { [K in keyof T]?: boolean };
-
-/**
- * Type guard that checks if an object has specific keys and narrows the type accordingly.
- *
- * @param x - The object to check
- * @param key - An object with boolean values indicating which keys to check for
- * @returns true if all specified keys exist in the object, false otherwise
- *
- * @example
- * ```typescript
- * type A = { a: string };
- * type B = { b: number };
- * const obj: A | B = getObject();
- *
- * if (hasKey(obj, { a: true })) {
- *   // obj is now narrowed to type A
- *   console.log(obj.a);
- * }
- * ```
- */
-function hasKey<T extends object, TKeys>(x: T, key: TKeys & MakeOptionalAndBool<T>): x is FilterType<T, { [K in KeysOfUnionType<T> & keyof TKeys]: unknown }> {
-	for (const k in key) {
-		if (!(k in x)) {
-			return false;
-		}
-	}
-	return true;
-}

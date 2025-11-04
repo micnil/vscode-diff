@@ -3,36 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as arrays from './arrays.js';
-
 export type EqualityComparer<T> = (a: T, b: T) => boolean;
 
 /**
  * Compares two items for equality using strict equality.
 */
 export const strictEquals: EqualityComparer<any> = (a, b) => a === b;
-
-/**
- * Checks if the items of two arrays are equal.
- * By default, strict equality is used to compare elements, but a custom equality comparer can be provided.
- */
-function itemsEquals<T>(itemEquals: EqualityComparer<T> = strictEquals): EqualityComparer<readonly T[]> {
-	return (a, b) => arrays.equals(a, b, itemEquals);
-}
-
-/**
- * Two items are considered equal, if their stringified representations are equal.
-*/
-function jsonStringifyEquals<T>(): EqualityComparer<T> {
-	return (a, b) => JSON.stringify(a) === JSON.stringify(b);
-}
-
-/**
- * Uses `item.equals(other)` to determine equality.
- */
-function itemEquals<T extends { equals(other: T): boolean }>(): EqualityComparer<T> {
-	return (a, b) => a.equals(b);
-}
 
 /**
  * Checks if two items are both null or undefined, or are equal according to the provided equality comparer.
@@ -106,14 +82,6 @@ export function structuralEquals<T>(a: T, b: T): boolean {
 	}
 
 	return false;
-}
-
-/**
- * `getStructuralKey(a) === getStructuralKey(b) <=> structuralEquals(a, b)`
- * (assuming that a and b are not cyclic structures and nothing extends globalThis Array).
-*/
-function getStructuralKey(t: unknown): string {
-	return JSON.stringify(toNormalizedJsonStructure(t));
 }
 
 let objectId = 0;

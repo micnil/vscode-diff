@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { DisposableStore, onUnexpectedError } from './commonFacade/deps.js';
+import { DisposableStore } from './commonFacade/deps.js';
 
 /**
  * Represents an observable value.
@@ -177,35 +177,4 @@ export interface ITransaction {
 	 * and {@link Observer.endUpdate} when the transaction ends.
 	 */
 	updateObserver(observer: IObserver, observable: IObservableWithChange<any, any>): void;
-}
-
-/**
- * This function is used to indicate that the caller recovered from an error that indicates a bug.
-*/
-function handleBugIndicatingErrorRecovery(message: string) {
-	const err = new Error('BugIndicatingErrorRecovery: ' + message);
-	onUnexpectedError(err);
-	console.error('recovered from an error that indicates a bug', err);
-}
-
-/**
- * A settable observable.
- */
-interface ISettableObservable<T, TChange = void> extends IObservableWithChange<T, TChange>, ISettable<T, TChange> {
-}
-
-interface IReaderWithStore extends IReader {
-	/**
-	 * Items in this store get disposed just before the observable recomputes/reruns or when it becomes unobserved.
-	*/
-	get store(): DisposableStore;
-
-	/**
-	 * Items in this store get disposed just after the observable recomputes/reruns or when it becomes unobserved.
-	 * This is important if the current run needs the undisposed result from the last run.
-	 *
-	 * Warning: Items in this store might still get disposed before dependents (that read the now disposed value in the past) are recomputed with the new (undisposed) value!
-	 * A clean solution for this is ref counting.
-	*/
-	get delayedStore(): DisposableStore;
 }

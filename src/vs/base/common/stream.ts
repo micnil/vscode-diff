@@ -5,12 +5,6 @@
 
 import { CancellationToken } from './cancellation.js';
 import { onUnexpectedError } from './errors.js';
-import { DisposableStore, toDisposable } from './lifecycle.js';
-
-/**
- * The payload that flows in readable stream events.
- */
-type ReadableStreamEventPayload<T> = T | Error | 'end';
 
 export interface ReadableStreamEvents<T> {
 
@@ -78,15 +72,6 @@ export interface Readable<T> {
 	 * null to indicate that no more data can be read.
 	 */
 	read(): T | null;
-}
-
-function isReadable<T>(obj: unknown): obj is Readable<T> {
-	const candidate = obj as Readable<T> | undefined;
-	if (!candidate) {
-		return false;
-	}
-
-	return typeof candidate.read === 'function';
 }
 
 /**
@@ -158,15 +143,6 @@ export function isReadableStream<T>(obj: unknown): obj is ReadableStream<T> {
 	}
 
 	return [candidate.on, candidate.pause, candidate.resume, candidate.destroy].every(fn => typeof fn === 'function');
-}
-
-function isReadableBufferedStream<T>(obj: unknown): obj is ReadableBufferedStream<T> {
-	const candidate = obj as ReadableBufferedStream<T> | undefined;
-	if (!candidate) {
-		return false;
-	}
-
-	return isReadableStream(candidate.stream) && Array.isArray(candidate.buffer) && typeof candidate.ended === 'boolean';
 }
 
 export interface IReducer<T, R = T> {
@@ -480,54 +456,6 @@ export function consumeReadable<T>(readable: Readable<T>, reducer: IReducer<T>):
 }
 
 /**
- * Helper to read a T readable up to a maximum of chunks. If the limit is
- * reached, will return a readable instead to ensure all data can still
- * be read.
- */
-function peekReadable<T>(readable: Readable<T>, reducer: IReducer<T>, maxChunks: number): T | Readable<T> {
-	const chunks: T[] = [];
-
-	let chunk: T | null | undefined = undefined;
-	while ((chunk = readable.read()) !== null && chunks.length < maxChunks) {
-		chunks.push(chunk);
-	}
-
-	// If the last chunk is null, it means we reached the end of
-	// the readable and return all the data at once
-	if (chunk === null && chunks.length > 0) {
-		return reducer(chunks);
-	}
-
-	// Otherwise, we still have a chunk, it means we reached the maxChunks
-	// value and as such we return a new Readable that first returns
-	// the existing read chunks and then continues with reading from
-	// the underlying readable.
-	return {
-		read: () => {
-
-			// First consume chunks from our array
-			if (chunks.length > 0) {
-				return chunks.shift()!;
-			}
-
-			// Then ensure to return our last read chunk
-			if (typeof chunk !== 'undefined') {
-				const lastReadChunk = chunk;
-
-				// explicitly use undefined here to indicate that we consumed
-				// the chunk, which could have either been null or valued.
-				chunk = undefined;
-
-				return lastReadChunk;
-			}
-
-			// Finally delegate back to the Readable
-			return readable.read();
-		}
-	};
-}
-
-/**
  * Helper to fully read a T stream into a T or consuming
  * a stream fully, awaiting all the events without caring
  * about the data.
@@ -611,78 +539,12 @@ export function listenStream<T>(stream: ReadableStreamEvents<T>, listener: IStre
 }
 
 /**
- * Helper to peek up to `maxChunks` into a stream. The return type signals if
- * the stream has ended or not. If not, caller needs to add a `data` listener
- * to continue reading.
- */
-function peekStream<T>(stream: ReadableStream<T>, maxChunks: number): Promise<ReadableBufferedStream<T>> {
-	return new Promise((resolve, reject) => {
-		const streamListeners = new DisposableStore();
-		const buffer: T[] = [];
-
-		// Data Listener
-		const dataListener = (chunk: T) => {
-
-			// Add to buffer
-			buffer.push(chunk);
-
-			// We reached maxChunks and thus need to return
-			if (buffer.length > maxChunks) {
-
-				// Dispose any listeners and ensure to pause the
-				// stream so that it can be consumed again by caller
-				streamListeners.dispose();
-				stream.pause();
-
-				return resolve({ stream, buffer, ended: false });
-			}
-		};
-
-		// Error Listener
-		const errorListener = (error: Error) => {
-			streamListeners.dispose();
-
-			return reject(error);
-		};
-
-		// End Listener
-		const endListener = () => {
-			streamListeners.dispose();
-
-			return resolve({ stream, buffer, ended: true });
-		};
-
-		streamListeners.add(toDisposable(() => stream.removeListener('error', errorListener)));
-		stream.on('error', errorListener);
-
-		streamListeners.add(toDisposable(() => stream.removeListener('end', endListener)));
-		stream.on('end', endListener);
-
-		// Important: leave the `data` listener last because
-		// this can turn the stream into flowing mode and we
-		// want `error` events to be received as well.
-		streamListeners.add(toDisposable(() => stream.removeListener('data', dataListener)));
-		stream.on('data', dataListener);
-	});
-}
-
-/**
  * Helper to create a readable stream from an existing T.
  */
 export function toStream<T>(t: T, reducer: IReducer<T>): ReadableStream<T> {
 	const stream = newWriteableStream<T>(reducer);
 
 	stream.end(t);
-
-	return stream;
-}
-
-/**
- * Helper to create an empty stream
- */
-function emptyStream(): ReadableStream<never> {
-	const stream = newWriteableStream<never>(() => { throw new Error('not supported'); });
-	stream.end();
 
 	return stream;
 }
