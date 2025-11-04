@@ -1,3 +1,7 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
 
 /**
@@ -15,20 +19,4 @@ export function groupBy<K extends string | number | symbol, V>(data: readonly V[
 		target.push(element);
 	}
 	return result;
-}
-
-export function diffSets<T>(before: ReadonlySet<T>, after: ReadonlySet<T>): { removed: T[]; added: T[] } {
-	const removed: T[] = [];
-	const added: T[] = [];
-	for (const element of before) {
-		if (!after.has(element)) {
-			removed.push(element);
-		}
-	}
-	for (const element of after) {
-		if (!before.has(element)) {
-			added.push(element);
-		}
-	}
-	return { removed, added };
 }

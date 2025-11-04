@@ -225,13 +225,3 @@ export interface INLSConfiguration {
 	/** @deprecated */
 	readonly _corruptedFile?: string;
 }
-
-export interface ILanguagePack {
-	readonly hash: string;
-	readonly label: string | undefined;
-	readonly extensions: {
-		readonly extensionIdentifier: { readonly id: string; readonly uuid?: string };
-		readonly version: string;
-	}[];
-	readonly translations: Record<string, string | undefined>;
-}

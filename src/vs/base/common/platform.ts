@@ -119,7 +119,6 @@ export const enum Platform {
 	Linux,
 	Windows
 }
-export type PlatformName = 'Web' | 'Windows' | 'Mac' | 'Linux';
 
 let _platform: Platform = Platform.Web;
 if (_isMacintosh) {
@@ -132,11 +131,7 @@ if (_isMacintosh) {
 
 export const isWindows = _isWindows;
 export const isMacintosh = _isMacintosh;
-export const isLinux = _isLinux;
-export const isNative = _isNative;
-export const isWeb = _isWeb;
 export const isWebWorker = (_isWeb && typeof $globalThis.importScripts === 'function');
-export const webWorkerOrigin = isWebWorker ? $globalThis.origin : undefined;
 export const userAgent = _userAgent;
 
 /**
@@ -208,13 +203,5 @@ export const setTimeout0 = (() => {
 	return (callback: () => void) => setTimeout(callback);
 })();
 
-export const enum OperatingSystem {
-	Windows = 1,
-	Macintosh = 2,
-	Linux = 3
-}
-
 let _isLittleEndian = true;
 let _isLittleEndianComputed = false;
-
-export const isChrome = !!(userAgent && userAgent.indexOf('Chrome') >= 0);

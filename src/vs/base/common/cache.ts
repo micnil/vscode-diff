@@ -3,12 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { IDisposable } from './lifecycle.js';
-
-export interface CacheResult<T> extends IDisposable {
-	promise: Promise<T>;
-}
-
 export function identity<T>(t: T): T {
 	return t;
 }

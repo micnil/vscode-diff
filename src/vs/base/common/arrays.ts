@@ -1,5 +1,8 @@
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
-import { ISplice } from './sequence.js';
 
 export function equals<T>(one: ReadonlyArray<T> | undefined, other: ReadonlyArray<T> | undefined, itemEquals: (a: T, b: T) => boolean = (a, b) => a === b): boolean {
 	if (one === other) {
@@ -21,39 +24,6 @@ export function equals<T>(one: ReadonlyArray<T> | undefined, other: ReadonlyArra
 	}
 
 	return true;
-}
-
-/**
- * Performs a binary search algorithm over a sorted collection. Useful for cases
- * when we need to perform a binary search over something that isn't actually an
- * array, and converting data to an array would defeat the use of binary search
- * in the first place.
- *
- * @param length The collection length.
- * @param compareToKey A function that takes an index of an element in the
- *   collection and returns zero if the value at this index is equal to the
- *   search key, a negative number if the value precedes the search key in the
- *   sorting order, or a positive number if the search key precedes the value.
- * @return A non-negative index of an element, if found. If not found, the
- *   result is -(n+1) (or ~n, using bitwise notation), where n is the index
- *   where the key should be inserted to maintain the sorting order.
- */
-export function binarySearch2(length: number, compareToKey: (index: number) => number): number {
-	let low = 0,
-		high = length - 1;
-
-	while (low <= high) {
-		const mid = ((low + high) / 2) | 0;
-		const comp = compareToKey(mid);
-		if (comp < 0) {
-			low = mid + 1;
-		} else if (comp > 0) {
-			high = mid - 1;
-		} else {
-			return mid;
-		}
-	}
-	return -(low + 1);
 }
 
 type Compare<T> = (a: T, b: T) => number;
@@ -128,66 +98,6 @@ export function forEachWithNeighbors<T>(arr: T[], f: (before: T | undefined, ele
 	}
 }
 
-interface IMutableSplice<T> extends ISplice<T> {
-	readonly toInsert: T[];
-	deleteCount: number;
-}
-
-/**
- * Diffs two *sorted* arrays and computes the splices which apply the diff.
- */
-export function sortedDiff<T>(before: ReadonlyArray<T>, after: ReadonlyArray<T>, compare: (a: T, b: T) => number): ISplice<T>[] {
-	const result: IMutableSplice<T>[] = [];
-
-	function pushSplice(start: number, deleteCount: number, toInsert: T[]): void {
-		if (deleteCount === 0 && toInsert.length === 0) {
-			return;
-		}
-
-		const latest = result[result.length - 1];
-
-		if (latest && latest.start + latest.deleteCount === start) {
-			latest.deleteCount += deleteCount;
-			latest.toInsert.push(...toInsert);
-		} else {
-			result.push({ start, deleteCount, toInsert });
-		}
-	}
-
-	let beforeIdx = 0;
-	let afterIdx = 0;
-
-	while (true) {
-		if (beforeIdx === before.length) {
-			pushSplice(beforeIdx, 0, after.slice(afterIdx));
-			break;
-		}
-		if (afterIdx === after.length) {
-			pushSplice(beforeIdx, before.length - beforeIdx, []);
-			break;
-		}
-
-		const beforeElement = before[beforeIdx];
-		const afterElement = after[afterIdx];
-		const n = compare(beforeElement, afterElement);
-		if (n === 0) {
-			// equal
-			beforeIdx += 1;
-			afterIdx += 1;
-		} else if (n < 0) {
-			// beforeElement is smaller -> before element removed
-			pushSplice(beforeIdx, 1, []);
-			beforeIdx += 1;
-		} else if (n > 0) {
-			// beforeElement is greater -> after element added
-			pushSplice(beforeIdx, 0, [afterElement]);
-			afterIdx += 1;
-		}
-	}
-
-	return result;
-}
-
 /**
  * @returns True if the provided object is an array and has at least one element.
  */
@@ -233,22 +143,6 @@ export function index<T, R>(array: ReadonlyArray<T>, indexer: (t: T) => string, 
 	}, Object.create(null));
 }
 
-/**
- * Removes an element from an array if it can be found.
- *
- * @deprecated In almost all cases, use a `Set<T>` instead.
- */
-export function remove<T>(array: T[], element: T): T | undefined {
-	const index = array.indexOf(element);
-	if (index > -1) {
-		array.splice(index, 1);
-
-		return element;
-	}
-
-	return undefined;
-}
-
 export function pushMany<T>(arr: T[], items: ReadonlyArray<T>): void {
 	for (const item of items) {
 		arr.push(item);
@@ -259,38 +153,6 @@ export function asArray<T>(x: T | T[]): T[];
 export function asArray<T>(x: T | readonly T[]): readonly T[];
 export function asArray<T>(x: T | T[]): T[] {
 	return Array.isArray(x) ? x : [x];
-}
-
-/**
- * Insert the new items in the array.
- * @param array The original array.
- * @param start The zero-based location in the array from which to start inserting elements.
- * @param newItems The items to be inserted
- */
-export function insertInto<T>(array: T[], start: number, newItems: T[]): void {
-	const startIdx = getActualStartIndex(array, start);
-	const originalLength = array.length;
-	const newItemsLength = newItems.length;
-	array.length = originalLength + newItemsLength;
-	// Move the items after the start index, start from the end so that we don't overwrite any value.
-	for (let i = originalLength - 1; i >= startIdx; i--) {
-		array[i + newItemsLength] = array[i];
-	}
-
-	for (let i = 0; i < newItemsLength; i++) {
-		array[i + startIdx] = newItems[i];
-	}
-}
-
-/**
- * Determine the actual start index (same logic as the native splice() or slice())
- * If greater than the length of the array, start will be set to the length of the array. In this case, no element will be deleted but the method will behave as an adding function, adding as many element as item[n*] provided.
- * If negative, it will begin that many elements from the end of the array. (In this case, the origin -1, meaning -n is the index of the nth last element, and is therefore equivalent to the index of array.length - n.) If array.length + start is less than 0, it will begin from index 0.
- * @param array The target array.
- * @param start The operation index.
- */
-function getActualStartIndex<T>(array: T[], start: number): number {
-	return start < 0 ? Math.max(start + array.length, 0) : Math.min(start, array.length);
 }
 
 

@@ -6,11 +6,6 @@
 export type EqualityComparer<T> = (a: T, b: T) => boolean;
 
 /**
- * Compares two items for equality using strict equality.
-*/
-export const strictEquals: EqualityComparer<any> = (a, b) => a === b;
-
-/**
  * Checks if two items are both null or undefined, or are equal according to the provided equality comparer.
 */
 export function equalsIfDefined<T>(v1: T | undefined | null, v2: T | undefined | null, equals: EqualityComparer<T>): boolean;

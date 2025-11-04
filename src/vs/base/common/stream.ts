@@ -111,40 +111,6 @@ export interface WriteableStream<T> extends ReadableStream<T> {
 	end(result?: T): void;
 }
 
-/**
- * A stream that has a buffer already read. Returns the original stream
- * that was read as well as the chunks that got read.
- *
- * The `ended` flag indicates if the stream has been fully consumed.
- */
-export interface ReadableBufferedStream<T> {
-
-	/**
-	 * The original stream that is being read.
-	 */
-	stream: ReadableStream<T>;
-
-	/**
-	 * An array of chunks already read from this stream.
-	 */
-	buffer: T[];
-
-	/**
-	 * Signals if the stream has ended or not. If not, consumers
-	 * should continue to read from the stream until consumed.
-	 */
-	ended: boolean;
-}
-
-export function isReadableStream<T>(obj: unknown): obj is ReadableStream<T> {
-	const candidate = obj as ReadableStream<T> | undefined;
-	if (!candidate) {
-		return false;
-	}
-
-	return [candidate.on, candidate.pause, candidate.resume, candidate.destroy].every(fn => typeof fn === 'function');
-}
-
 export interface IReducer<T, R = T> {
 	(data: T[]): R;
 }
@@ -442,20 +408,6 @@ class WriteableStreamImpl<T> implements WriteableStream<T> {
 }
 
 /**
- * Helper to fully read a T readable into a T.
- */
-export function consumeReadable<T>(readable: Readable<T>, reducer: IReducer<T>): T {
-	const chunks: T[] = [];
-
-	let chunk: T | null;
-	while ((chunk = readable.read()) !== null) {
-		chunks.push(chunk);
-	}
-
-	return reducer(chunks);
-}
-
-/**
  * Helper to fully read a T stream into a T or consuming
  * a stream fully, awaiting all the events without caring
  * about the data.
@@ -536,117 +488,4 @@ export function listenStream<T>(stream: ReadableStreamEvents<T>, listener: IStre
 			listener.onData(data);
 		}
 	});
-}
-
-/**
- * Helper to create a readable stream from an existing T.
- */
-export function toStream<T>(t: T, reducer: IReducer<T>): ReadableStream<T> {
-	const stream = newWriteableStream<T>(reducer);
-
-	stream.end(t);
-
-	return stream;
-}
-
-/**
- * Helper to convert a T into a Readable<T>.
- */
-export function toReadable<T>(t: T): Readable<T> {
-	let consumed = false;
-
-	return {
-		read: () => {
-			if (consumed) {
-				return null;
-			}
-
-			consumed = true;
-
-			return t;
-		}
-	};
-}
-
-/**
- * Helper to transform a readable stream into another stream.
- */
-export function transform<Original, Transformed>(stream: ReadableStreamEvents<Original>, transformer: ITransformer<Original, Transformed>, reducer: IReducer<Transformed>): ReadableStream<Transformed> {
-	const target = newWriteableStream<Transformed>(reducer);
-
-	listenStream(stream, {
-		onData: data => target.write(transformer.data(data)),
-		onError: error => target.error(transformer.error ? transformer.error(error) : error),
-		onEnd: () => target.end()
-	});
-
-	return target;
-}
-
-/**
- * Helper to take an existing readable that will
- * have a prefix injected to the beginning.
- */
-export function prefixedReadable<T>(prefix: T, readable: Readable<T>, reducer: IReducer<T>): Readable<T> {
-	let prefixHandled = false;
-
-	return {
-		read: () => {
-			const chunk = readable.read();
-
-			// Handle prefix only once
-			if (!prefixHandled) {
-				prefixHandled = true;
-
-				// If we have also a read-result, make
-				// sure to reduce it to a single result
-				if (chunk !== null) {
-					return reducer([prefix, chunk]);
-				}
-
-				// Otherwise, just return prefix directly
-				return prefix;
-			}
-
-			return chunk;
-		}
-	};
-}
-
-/**
- * Helper to take an existing stream that will
- * have a prefix injected to the beginning.
- */
-export function prefixedStream<T>(prefix: T, stream: ReadableStream<T>, reducer: IReducer<T>): ReadableStream<T> {
-	let prefixHandled = false;
-
-	const target = newWriteableStream<T>(reducer);
-
-	listenStream(stream, {
-		onData: data => {
-
-			// Handle prefix only once
-			if (!prefixHandled) {
-				prefixHandled = true;
-
-				return target.write(reducer([prefix, data]));
-			}
-
-			return target.write(data);
-		},
-		onError: error => target.error(error),
-		onEnd: () => {
-
-			// Handle prefix only once
-			if (!prefixHandled) {
-				prefixHandled = true;
-
-				target.write(prefix);
-			}
-
-			target.end();
-		}
-	});
-
-	return target;
 }

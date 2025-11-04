@@ -160,17 +160,6 @@ export interface IReader {
 	readObservable<T>(observable: IObservableWithChange<T, any>): T;
 }
 
-export interface ISettable<T, TChange = void> {
-	/**
-	 * Sets the value of the observable.
-	 * Use a transaction to batch multiple changes (with a transaction, observers only react at the end of the transaction).
-	 *
-	 * @param transaction When given, value changes are handled on demand or when the transaction ends.
-	 * @param change Describes how or why the value changed.
-	 */
-	set(value: T, transaction: ITransaction | undefined, change: TChange): void;
-}
-
 export interface ITransaction {
 	/**
 	 * Calls {@link Observer.beginUpdate} immediately

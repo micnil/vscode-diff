@@ -13,36 +13,6 @@ export function isString(str: unknown): str is string {
 }
 
 /**
- * @returns whether the provided parameter is a JavaScript Array and each element in the array satisfies the provided type guard.
- */
-export function isArrayOf<T>(value: unknown, check: (item: unknown) => item is T): value is T[] {
-	return Array.isArray(value) && value.every(check);
-}
-
-/**
- * @returns whether the provided parameter is of type `object` but **not**
- *	`null`, an `array`, a `regexp`, nor a `date`.
- */
-export function isObject(obj: unknown): obj is Object {
-	// The method can't do a type cast since there are type (like strings) which
-	// are subclasses of any put not positvely matched by the function. Hence type
-	// narrowing results in wrong results.
-	return typeof obj === 'object'
-		&& obj !== null
-		&& !Array.isArray(obj)
-		&& !(obj instanceof RegExp)
-		&& !(obj instanceof Date);
-}
-
-/**
- * In **contrast** to just checking `typeof` this will return `false` for `NaN`.
- * @returns whether the provided parameter is a JavaScript Number or not.
- */
-export function isNumber(obj: unknown): obj is number {
-	return (typeof obj === 'number' && !isNaN(obj));
-}
-
-/**
  * @returns whether the provided parameter is an Iterable, casting to the given generic
  */
 export function isIterable<T>(obj: unknown): obj is Iterable<T> {
@@ -141,30 +111,6 @@ export function isFunction(obj: unknown): obj is Function {
 }
 
 export type TypeConstraint = string | Function;
-
-export function validateConstraint(arg: unknown, constraint: TypeConstraint | undefined): void {
-
-	if (isString(constraint)) {
-		if (typeof arg !== constraint) {
-			throw new Error(`argument does not match constraint: typeof ${constraint}`);
-		}
-	} else if (isFunction(constraint)) {
-		try {
-			if (arg instanceof constraint) {
-				return;
-			}
-		} catch {
-			// ignore
-		}
-		if (!isUndefinedOrNull(arg) && (arg as any).constructor === constraint) {
-			return;
-		}
-		if (constraint.length === 1 && constraint.call(undefined, arg) === true) {
-			return;
-		}
-		throw new Error(`argument does not match one of these constraints: arg instanceof constraint, arg.constructor === constraint, nor constraint(arg) === true`);
-	}
-}
 
 /**
  * A type that adds readonly to all properties of T, recursively.

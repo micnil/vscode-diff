@@ -12,78 +12,6 @@ const _formatRegexp = /{(\d+)}/g;
 
 const _format2Regexp = /{([^}]+)}/g;
 
-/**
- * Escapes regular expression characters in a given string
- */
-export function escapeRegExpCharacters(value: string): string {
-	return value.replace(/[\\\{\}\*\+\?\|\^\$\.\[\]\(\)]/g, '\\$&');
-}
-
-/**
- * Removes all occurrences of needle from the beginning of haystack.
- * @param haystack string to trim
- * @param needle the thing to trim
- */
-export function ltrim(haystack: string, needle: string): string {
-	if (!haystack || !needle) {
-		return haystack;
-	}
-
-	const needleLen = needle.length;
-	if (needleLen === 0 || haystack.length === 0) {
-		return haystack;
-	}
-
-	let offset = 0;
-
-	while (haystack.indexOf(needle, offset) === offset) {
-		offset = offset + needleLen;
-	}
-	return haystack.substring(offset);
-}
-
-/**
- * Removes all occurrences of needle from the end of haystack.
- * @param haystack string to trim
- * @param needle the thing to trim
- */
-export function rtrim(haystack: string, needle: string): string {
-	if (!haystack || !needle) {
-		return haystack;
-	}
-
-	const needleLen = needle.length,
-		haystackLen = haystack.length;
-
-	if (needleLen === 0 || haystackLen === 0) {
-		return haystack;
-	}
-
-	let offset = haystackLen,
-		idx = -1;
-
-	while (true) {
-		idx = haystack.lastIndexOf(needle, offset - 1);
-		if (idx === -1 || idx + needleLen !== offset) {
-			break;
-		}
-		if (idx === 0) {
-			return '';
-		}
-		offset = idx;
-	}
-
-	return haystack.substring(0, offset);
-}
-
-export interface RegExpOptions {
-	matchCase?: boolean;
-	wholeWord?: boolean;
-	multiline?: boolean;
-	global?: boolean;
-	unicode?: boolean;
-}
-
 export function splitLines(str: string): string[] {
 	return str.split(/\r\n|\r|\n/);
 }
@@ -114,16 +42,6 @@ export function lastNonWhitespaceIndex(str: string, startIndex: number = str.len
 		}
 	}
 	return -1;
-}
-
-export function compare(a: string, b: string): number {
-	if (a < b) {
-		return -1;
-	} else if (a > b) {
-		return 1;
-	} else {
-		return 0;
-	}
 }
 
 export function compareSubstring(a: string, b: string, aStart: number = 0, aEnd: number = a.length, bStart: number = 0, bEnd: number = b.length): number {
@@ -195,15 +113,6 @@ export function compareSubstringIgnoreCase(a: string, b: string, aStart: number 
 
 export function isLowerAsciiLetter(code: number): boolean {
 	return code >= CharCode.a && code <= CharCode.z;
-}
-
-export function equalsIgnoreCase(a: string, b: string): boolean {
-	return a.length === b.length && compareSubstringIgnoreCase(a, b) === 0;
-}
-
-export function startsWithIgnoreCase(str: string, candidate: string): boolean {
-	const len = candidate.length;
-	return len <= str.length && compareSubstringIgnoreCase(str, candidate, 0, len) === 0;
 }
 
 /**
@@ -382,62 +291,6 @@ export class GraphemeIterator {
 	public eol(): boolean {
 		return this._iterator.eol();
 	}
-}
-
-export function nextCharLength(str: string, initialOffset: number): number {
-	const iterator = new GraphemeIterator(str, initialOffset);
-	return iterator.nextGraphemeLength();
-}
-
-export function prevCharLength(str: string, initialOffset: number): number {
-	const iterator = new GraphemeIterator(str, initialOffset);
-	return iterator.prevGraphemeLength();
-}
-
-export const UNUSUAL_LINE_TERMINATORS = /[\u2028\u2029]/;
-
-/**
- * A fast function (therefore imprecise) to check if code points are emojis.
- * Generated using https://github.com/alexdima/unicode-utils/blob/main/emoji-test.js
- */
-export function isEmojiImprecise(x: number): boolean {
-	return (
-		(x >= 0x1F1E6 && x <= 0x1F1FF) || (x === 8986) || (x === 8987) || (x === 9200)
-		|| (x === 9203) || (x >= 9728 && x <= 10175) || (x === 11088) || (x === 11093)
-		|| (x >= 127744 && x <= 128591) || (x >= 128640 && x <= 128764)
-		|| (x >= 128992 && x <= 129008) || (x >= 129280 && x <= 129535)
-		|| (x >= 129648 && x <= 129782)
-	);
-}
-
-// Defacto standard: https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-const CSI_SEQUENCE = /(?:\x1b\[|\x9b)[=?>!]?[\d;:]*["$#'* ]?[a-zA-Z@^`{}|~]/;
-const OSC_SEQUENCE = /(?:\x1b\]|\x9d).*?(?:\x1b\\|\x07|\x9c)/;
-const ESC_SEQUENCE = /\x1b(?:[ #%\(\)\*\+\-\.\/]?[a-zA-Z0-9\|}~@])/;
-const CONTROL_SEQUENCES = new RegExp('(?:' + [
-	CSI_SEQUENCE.source,
-	OSC_SEQUENCE.source,
-	ESC_SEQUENCE.source,
-].join('|') + ')', 'g');
-
-/**
- * Strips ANSI escape sequences from a string.
- * @param str The dastringa stringo strip the ANSI escape sequences from.
- *
- * @example
- * removeAnsiEscapeCodes('\u001b[31mHello, World!\u001b[0m');
- * // 'Hello, World!'
- */
-export function removeAnsiEscapeCodes(str: string): string {
-	if (str) {
-		str = str.replace(CONTROL_SEQUENCES, '');
-	}
-
-	return str;
-}
-
-export function startsWithUTF8BOM(str: string): boolean {
-	return !!(str && str.length > 0 && str.charCodeAt(0) === CharCode.UTF8_BOM);
 }
 
 function breakBetweenGraphemeBreakType(breakTypeA: GraphemeBreakType, breakTypeB: GraphemeBreakType): boolean {
@@ -762,6 +615,4 @@ export class InvisibleCharacters {
 		return InvisibleCharacters.getData();
 	}
 }
-
-export const Ellipsis = '\u2026';
 

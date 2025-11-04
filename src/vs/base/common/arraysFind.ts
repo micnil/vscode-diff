@@ -3,8 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Comparator } from './arrays.js';
-
 export function findLast<T, R extends T>(array: readonly T[], predicate: (item: T, index: number) => item is R, fromIndex?: number): R | undefined;
 export function findLast<T>(array: readonly T[], predicate: (item: T, index: number) => unknown, fromIndex?: number): T | undefined;
 export function findLast<T>(array: readonly T[], predicate: (item: T, index: number) => unknown, fromIndex = array.length - 1): T | undefined {
@@ -146,22 +144,4 @@ export class MonotonousArray<T> {
 		this._findLastMonotonousLastIdx = idx + 1;
 		return idx === -1 ? undefined : this._array[idx];
 	}
-}
-
-/**
- * Returns the first item that is equal to or greater than every other item.
-*/
-export function findFirstMax<T>(array: readonly T[], comparator: Comparator<T>): T | undefined {
-	if (array.length === 0) {
-		return undefined;
-	}
-
-	let max = array[0];
-	for (let i = 1; i < array.length; i++) {
-		const item = array[i];
-		if (comparator(item, max) > 0) {
-			max = item;
-		}
-	}
-	return max;
 }

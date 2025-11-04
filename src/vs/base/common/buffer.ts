@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Lazy } from './lazy.js';
-import * as streams from './stream.js';
 
 interface NodeBuffer {
 	allocUnsafe(size: number): Uint8Array;
@@ -292,14 +291,6 @@ export function readUInt8(source: Uint8Array, offset: number): number {
 
 export function writeUInt8(destination: Uint8Array, value: number, offset: number): void {
 	destination[offset] = value;
-}
-
-export interface VSBufferReadable extends streams.Readable<VSBuffer> { }
-
-export interface VSBufferReadableStream extends streams.ReadableStream<VSBuffer> { }
-
-export function streamToBuffer(stream: streams.ReadableStream<VSBuffer>): Promise<VSBuffer> {
-	return streams.consumeStream<VSBuffer>(stream, chunks => VSBuffer.concat(chunks));
 }
 
 const hexChars = '0123456789abcdef';

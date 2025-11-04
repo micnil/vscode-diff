@@ -4,11 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { CancelablePromise } from './async.js';
-import { CancellationToken } from './cancellation.js';
 import { onUnexpectedError } from './errors.js';
-import { createSingleCallFunction } from './functional.js';
 import { combinedDisposable, Disposable, DisposableStore, IDisposable, toDisposable } from './lifecycle.js';
-import { LinkedList } from './linkedList.js';
 import { IObservable, IObservableWithChange, IObserver } from './observable.js';
 import { StopWatch } from './stopwatch.js';
 import { MicrotaskDelay } from './symbols.js';
@@ -1283,158 +1280,6 @@ class EventDeliveryQueuePrivate implements EventDeliveryQueue {
 	}
 }
 
-export interface IWaitUntil {
-	token: CancellationToken;
-	waitUntil(thenable: Promise<unknown>): void;
-}
-
-export type IWaitUntilData<T> = Omit<Omit<T, 'waitUntil'>, 'token'>;
-
-
-export class PauseableEmitter<T> extends Emitter<T> {
-
-	private _isPaused = 0;
-	protected _eventQueue = new LinkedList<T>();
-	private _mergeFn?: (input: T[]) => T;
-
-	public get isPaused(): boolean {
-		return this._isPaused !== 0;
-	}
-
-	constructor(options?: EmitterOptions & { merge?: (input: T[]) => T }) {
-		super(options);
-		this._mergeFn = options?.merge;
-	}
-
-	pause(): void {
-		this._isPaused++;
-	}
-
-	resume(): void {
-		if (this._isPaused !== 0 && --this._isPaused === 0) {
-			if (this._mergeFn) {
-				// use the merge function to create a single composite
-				// event. make a copy in case firing pauses this emitter
-				if (this._eventQueue.size > 0) {
-					const events = Array.from(this._eventQueue);
-					this._eventQueue.clear();
-					super.fire(this._mergeFn(events));
-				}
-
-			} else {
-				// no merging, fire each event individually and test
-				// that this emitter isn't paused halfway through
-				while (!this._isPaused && this._eventQueue.size !== 0) {
-					super.fire(this._eventQueue.shift()!);
-				}
-			}
-		}
-	}
-
-	override fire(event: T): void {
-		if (this._size) {
-			if (this._isPaused !== 0) {
-				this._eventQueue.push(event);
-			} else {
-				super.fire(event);
-			}
-		}
-	}
-}
-
-/**
- * An event emitter that multiplexes many events into a single event.
- *
- * @example Listen to the `onData` event of all `Thing`s, dynamically adding and removing `Thing`s
- * to the multiplexer as needed.
- *
- * ```typescript
- * const anythingDataMultiplexer = new EventMultiplexer<{ data: string }>();
- *
- * const thingListeners = DisposableMap<Thing, IDisposable>();
- *
- * thingService.onDidAddThing(thing => {
- *   thingListeners.set(thing, anythingDataMultiplexer.add(thing.onData);
- * });
- * thingService.onDidRemoveThing(thing => {
- *   thingListeners.deleteAndDispose(thing);
- * });
- *
- * anythingDataMultiplexer.event(e => {
- *   console.log('Something fired data ' + e.data)
- * });
- * ```
- */
-export class EventMultiplexer<T> implements IDisposable {
-
-	private readonly emitter: Emitter<T>;
-	private hasListeners = false;
-	private events: { event: Event<T>; listener: IDisposable | null }[] = [];
-
-	constructor() {
-		this.emitter = new Emitter<T>({
-			onWillAddFirstListener: () => this.onFirstListenerAdd(),
-			onDidRemoveLastListener: () => this.onLastListenerRemove()
-		});
-	}
-
-	get event(): Event<T> {
-		return this.emitter.event;
-	}
-
-	add(event: Event<T>): IDisposable {
-		const e = { event: event, listener: null };
-		this.events.push(e);
-
-		if (this.hasListeners) {
-			this.hook(e);
-		}
-
-		const dispose = () => {
-			if (this.hasListeners) {
-				this.unhook(e);
-			}
-
-			const idx = this.events.indexOf(e);
-			this.events.splice(idx, 1);
-		};
-
-		return toDisposable(createSingleCallFunction(dispose));
-	}
-
-	private onFirstListenerAdd(): void {
-		this.hasListeners = true;
-		this.events.forEach(e => this.hook(e));
-	}
-
-	private onLastListenerRemove(): void {
-		this.hasListeners = false;
-		this.events.forEach(e => this.unhook(e));
-	}
-
-	private hook(e: { event: Event<T>; listener: IDisposable | null }): void {
-		e.listener = e.event(r => this.emitter.fire(r));
-	}
-
-	private unhook(e: { event: Event<T>; listener: IDisposable | null }): void {
-		e.listener?.dispose();
-		e.listener = null;
-	}
-
-	dispose(): void {
-		this.emitter.dispose();
-
-		for (const e of this.events) {
-			e.listener?.dispose();
-		}
-		this.events = [];
-	}
-}
-
-export interface IDynamicListEventMultiplexer<TEventType> extends IDisposable {
-	readonly event: Event<TEventType>;
-}
-
 /**
  * A Relay is an event forwarder which functions as a replugabble event pipe.
  * Once created, you can connect an input event to it and it will simply forward
@@ -1473,9 +1318,4 @@ export class Relay<T> implements IDisposable {
 		this.inputEventListener.dispose();
 		this.emitter.dispose();
 	}
-}
-
-export interface IValueWithChangeEvent<T> {
-	readonly onDidChange: Event<void>;
-	get value(): T;
 }
