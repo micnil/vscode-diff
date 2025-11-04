@@ -6,7 +6,6 @@
 import { LRUCachedFunction } from './cache.js';
 import { CharCode } from './charCode.js';
 import { Lazy } from './lazy.js';
-import { Constants } from './uint.js';
 
 const _formatRegexp = /{(\d+)}/g;
 
@@ -42,30 +41,6 @@ export function lastNonWhitespaceIndex(str: string, startIndex: number = str.len
 		}
 	}
 	return -1;
-}
-
-export function compareSubstring(a: string, b: string, aStart: number = 0, aEnd: number = a.length, bStart: number = 0, bEnd: number = b.length): number {
-	for (; aStart < aEnd && bStart < bEnd; aStart++, bStart++) {
-		const codeA = a.charCodeAt(aStart);
-		const codeB = b.charCodeAt(bStart);
-		if (codeA < codeB) {
-			return -1;
-		} else if (codeA > codeB) {
-			return 1;
-		}
-	}
-	const aLen = aEnd - aStart;
-	const bLen = bEnd - bStart;
-	if (aLen < bLen) {
-		return -1;
-	} else if (aLen > bLen) {
-		return 1;
-	}
-	return 0;
-}
-
-export function isLowerAsciiLetter(code: number): boolean {
-	return code >= CharCode.a && code <= CharCode.z;
 }
 
 /**
@@ -138,75 +113,6 @@ export function getNextCodePoint(str: string, len: number, offset: number): numb
 		}
 	}
 	return charCode;
-}
-
-/**
- * get the code point that ends right before offset `offset`
- */
-function getPrevCodePoint(str: string, offset: number): number {
-	const charCode = str.charCodeAt(offset - 1);
-	if (isLowSurrogate(charCode) && offset > 1) {
-		const prevCharCode = str.charCodeAt(offset - 2);
-		if (isHighSurrogate(prevCharCode)) {
-			return computeCodePoint(prevCharCode, charCode);
-		}
-	}
-	return charCode;
-}
-
-export class CodePointIterator {
-
-	private readonly _str: string;
-	private readonly _len: number;
-	private _offset: number;
-
-	public get offset(): number {
-		return this._offset;
-	}
-
-	constructor(str: string, offset: number = 0) {
-		this._str = str;
-		this._len = str.length;
-		this._offset = offset;
-	}
-
-	public setOffset(offset: number): void {
-		this._offset = offset;
-	}
-
-	public prevCodePoint(): number {
-		const codePoint = getPrevCodePoint(this._str, this._offset);
-		this._offset -= (codePoint >= Constants.UNICODE_SUPPLEMENTARY_PLANE_BEGIN ? 2 : 1);
-		return codePoint;
-	}
-
-	public nextCodePoint(): number {
-		const codePoint = getNextCodePoint(this._str, this._len, this._offset);
-		this._offset += (codePoint >= Constants.UNICODE_SUPPLEMENTARY_PLANE_BEGIN ? 2 : 1);
-		return codePoint;
-	}
-
-	public eol(): boolean {
-		return (this._offset >= this._len);
-	}
-}
-
-export const enum GraphemeBreakType {
-	Other = 0,
-	Prepend = 1,
-	CR = 2,
-	LF = 3,
-	Control = 4,
-	Extend = 5,
-	Regional_Indicator = 6,
-	SpacingMark = 7,
-	L = 8,
-	V = 9,
-	T = 10,
-	LV = 11,
-	LVT = 12,
-	ZWJ = 13,
-	Extended_Pictographic = 14
 }
 
 const enum CodePoint {

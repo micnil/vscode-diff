@@ -160,7 +160,5 @@ export namespace Language {
 	}
 }
 
-export const setTimeout0IsFaster = (typeof $globalThis.postMessage === 'function' && !$globalThis.importScripts);
-
 let _isLittleEndian = true;
 let _isLittleEndianComputed = false;
