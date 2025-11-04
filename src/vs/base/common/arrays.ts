@@ -26,41 +26,6 @@ export function equals<T>(one: ReadonlyArray<T> | undefined, other: ReadonlyArra
 	return true;
 }
 
-type Compare<T> = (a: T, b: T) => number;
-
-
-export function quickSelect<T>(nth: number, data: T[], compare: Compare<T>): T {
-
-	nth = nth | 0;
-
-	if (nth >= data.length) {
-		throw new TypeError('invalid index');
-	}
-
-	const pivotValue = data[Math.floor(data.length * Math.random())];
-	const lower: T[] = [];
-	const higher: T[] = [];
-	const pivots: T[] = [];
-
-	for (const value of data) {
-		const val = compare(value, pivotValue);
-		if (val < 0) {
-			lower.push(value);
-		} else if (val > 0) {
-			higher.push(value);
-		} else {
-			pivots.push(value);
-		}
-	}
-
-	if (nth < lower.length) {
-		return quickSelect(nth, lower, compare);
-	} else if (nth < lower.length + pivots.length) {
-		return pivots[0];
-	} else {
-		return quickSelect(nth - (lower.length + pivots.length), higher, compare);
-	}
-}
 
 /**
  * Splits the given items into a list of (non-empty) groups.
@@ -98,63 +63,11 @@ export function forEachWithNeighbors<T>(arr: T[], f: (before: T | undefined, ele
 	}
 }
 
-/**
- * @returns True if the provided object is an array and has at least one element.
- */
-export function isNonEmptyArray<T>(obj: T[] | undefined | null): obj is T[];
-export function isNonEmptyArray<T>(obj: readonly T[] | undefined | null): obj is readonly T[];
-export function isNonEmptyArray<T>(obj: T[] | readonly T[] | undefined | null): obj is T[] | readonly T[] {
-	return Array.isArray(obj) && obj.length > 0;
-}
-
-export function range(to: number): number[];
-export function range(from: number, to: number): number[];
-export function range(arg: number, to?: number): number[] {
-	let from = typeof to === 'number' ? arg : 0;
-
-	if (typeof to === 'number') {
-		from = arg;
-	} else {
-		from = 0;
-		to = arg;
-	}
-
-	const result: number[] = [];
-
-	if (from <= to) {
-		for (let i = from; i < to; i++) {
-			result.push(i);
-		}
-	} else {
-		for (let i = from; i > to; i--) {
-			result.push(i);
-		}
-	}
-
-	return result;
-}
-
-export function index<T>(array: ReadonlyArray<T>, indexer: (t: T) => string): { [key: string]: T };
-export function index<T, R>(array: ReadonlyArray<T>, indexer: (t: T) => string, mapper: (t: T) => R): { [key: string]: R };
-export function index<T, R>(array: ReadonlyArray<T>, indexer: (t: T) => string, mapper?: (t: T) => R): { [key: string]: R } {
-	return array.reduce((r, t) => {
-		r[indexer(t)] = mapper ? mapper(t) : t;
-		return r;
-	}, Object.create(null));
-}
-
 export function pushMany<T>(arr: T[], items: ReadonlyArray<T>): void {
 	for (const item of items) {
 		arr.push(item);
 	}
 }
-
-export function asArray<T>(x: T | T[]): T[];
-export function asArray<T>(x: T | readonly T[]): readonly T[];
-export function asArray<T>(x: T | T[]): T[] {
-	return Array.isArray(x) ? x : [x];
-}
-
 
 
 /**
@@ -163,7 +76,7 @@ export function asArray<T>(x: T | T[]): T[] {
  * a positive number indicates that the first value is greater than the second,
  * and zero indicates that neither is the case.
 */
-export type CompareResult = number;
+type CompareResult = number;
 
 export namespace CompareResult {
 	export function isLessThan(result: CompareResult): boolean {

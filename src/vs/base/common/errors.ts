@@ -3,16 +3,16 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export interface ErrorListenerCallback {
+interface ErrorListenerCallback {
 	(error: any): void;
 }
 
-export interface ErrorListenerUnbind {
+interface ErrorListenerUnbind {
 	(): void;
 }
 
 // Avoid circular dependency on EventEmitter by implementing a subset of the interface.
-export class ErrorHandler {
+class ErrorHandler {
 	private unexpectedErrorHandler: (e: any) => void;
 	private listeners: ErrorListenerCallback[];
 
@@ -72,7 +72,7 @@ export class ErrorHandler {
 	}
 }
 
-export const errorHandler = new ErrorHandler();
+const errorHandler = new ErrorHandler();
 
 export function onUnexpectedError(e: any): undefined {
 	// ignore errors from cancelled promises
@@ -82,66 +82,12 @@ export function onUnexpectedError(e: any): undefined {
 	return undefined;
 }
 
-export interface SerializedError {
-	readonly $isError: true;
-	readonly name: string;
-	readonly message: string;
-	readonly stack: string;
-	readonly noTelemetry: boolean;
-	readonly code?: string;
-	readonly cause?: SerializedError;
-}
-
-type ErrorWithCode = Error & {
-	code: string | undefined;
-};
-
-export function transformErrorForSerialization(error: Error): SerializedError;
-export function transformErrorForSerialization(error: any): any;
-export function transformErrorForSerialization(error: any): any {
-	if (error instanceof Error) {
-		const { name, message, cause } = error;
-		const stack: string = (<any>error).stacktrace || (<any>error).stack;
-		return {
-			$isError: true,
-			name,
-			message,
-			stack,
-			noTelemetry: ErrorNoTelemetry.isErrorNoTelemetry(error),
-			cause: cause ? transformErrorForSerialization(cause) : undefined,
-			code: (<ErrorWithCode>error).code
-		};
-	}
-
-	// return as is
-	return error;
-}
-
-export function transformErrorFromSerialization(data: SerializedError): Error {
-	let error: Error;
-	if (data.noTelemetry) {
-		error = new ErrorNoTelemetry();
-	} else {
-		error = new Error();
-		error.name = data.name;
-	}
-	error.message = data.message;
-	error.stack = data.stack;
-	if (data.code) {
-		(<ErrorWithCode>error).code = data.code;
-	}
-	if (data.cause) {
-		error.cause = transformErrorFromSerialization(data.cause);
-	}
-	return error;
-}
-
-export const canceledName = 'Canceled';
+const canceledName = 'Canceled';
 
 /**
  * Checks if the given error is a promise in canceled state
  */
-export function isCancellationError(error: any): boolean {
+function isCancellationError(error: any): boolean {
 	if (error instanceof CancellationError) {
 		return true;
 	}
@@ -150,7 +96,7 @@ export function isCancellationError(error: any): boolean {
 
 // !!!IMPORTANT!!!
 // Do NOT change this class because it is also used as an API-type.
-export class CancellationError extends Error {
+class CancellationError extends Error {
 	constructor() {
 		super(canceledName);
 		this.name = this.message;

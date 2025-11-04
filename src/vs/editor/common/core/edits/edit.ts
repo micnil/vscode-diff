@@ -346,8 +346,6 @@ export abstract class BaseReplacement<TSelf extends BaseReplacement<TSelf>> {
 	}
 }
 
-export type AnyEdit = BaseEdit<AnyReplacement, AnyEdit>;
-export type AnyReplacement = BaseReplacement<AnyReplacement>;
 
 export class Edit<T extends BaseReplacement<T>> extends BaseEdit<T, Edit<T>> {
 	/**
