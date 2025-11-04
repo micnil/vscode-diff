@@ -74,6 +74,35 @@ export class ErrorHandler {
 
 export const errorHandler = new ErrorHandler();
 
+/** @skipMangle */
+export function setUnexpectedErrorHandler(newUnexpectedErrorHandler: (e: any) => void): void {
+	errorHandler.setUnexpectedErrorHandler(newUnexpectedErrorHandler);
+}
+
+/**
+ * Returns if the error is a SIGPIPE error. SIGPIPE errors should generally be
+ * logged at most once, to avoid a loop.
+ *
+ * @see https://github.com/microsoft/vscode-remote-release/issues/6481
+ */
+export function isSigPipeError(e: unknown): e is Error {
+	if (!e || typeof e !== 'object') {
+		return false;
+	}
+
+	const cast = e as Record<string, string | undefined>;
+	return cast.code === 'EPIPE' && cast.syscall?.toUpperCase() === 'WRITE';
+}
+
+/**
+ * This function should only be called with errors that indicate a bug in the product.
+ * E.g. buggy extensions/invalid user-input/network issues should not be able to trigger this code path.
+ * If they are, this indicates there is also a bug in the product.
+*/
+export function onBugIndicatingError(e: any): undefined {
+	errorHandler.onUnexpectedError(e);
+	return undefined;
+}
 
 export function onUnexpectedError(e: any): undefined {
 	// ignore errors from cancelled promises
@@ -83,7 +112,88 @@ export function onUnexpectedError(e: any): undefined {
 	return undefined;
 }
 
-const canceledName = 'Canceled';
+export function onUnexpectedExternalError(e: any): undefined {
+	// ignore errors from cancelled promises
+	if (!isCancellationError(e)) {
+		errorHandler.onUnexpectedExternalError(e);
+	}
+	return undefined;
+}
+
+export interface SerializedError {
+	readonly $isError: true;
+	readonly name: string;
+	readonly message: string;
+	readonly stack: string;
+	readonly noTelemetry: boolean;
+	readonly code?: string;
+	readonly cause?: SerializedError;
+}
+
+type ErrorWithCode = Error & {
+	code: string | undefined;
+};
+
+export function transformErrorForSerialization(error: Error): SerializedError;
+export function transformErrorForSerialization(error: any): any;
+export function transformErrorForSerialization(error: any): any {
+	if (error instanceof Error) {
+		const { name, message, cause } = error;
+		// eslint-disable-next-line local/code-no-any-casts
+		const stack: string = (<any>error).stacktrace || (<any>error).stack;
+		return {
+			$isError: true,
+			name,
+			message,
+			stack,
+			noTelemetry: ErrorNoTelemetry.isErrorNoTelemetry(error),
+			cause: cause ? transformErrorForSerialization(cause) : undefined,
+			code: (<ErrorWithCode>error).code
+		};
+	}
+
+	// return as is
+	return error;
+}
+
+export function transformErrorFromSerialization(data: SerializedError): Error {
+	let error: Error;
+	if (data.noTelemetry) {
+		error = new ErrorNoTelemetry();
+	} else {
+		error = new Error();
+		error.name = data.name;
+	}
+	error.message = data.message;
+	error.stack = data.stack;
+	if (data.code) {
+		(<ErrorWithCode>error).code = data.code;
+	}
+	if (data.cause) {
+		error.cause = transformErrorFromSerialization(data.cause);
+	}
+	return error;
+}
+
+// see https://github.com/v8/v8/wiki/Stack%20Trace%20API#basic-stack-traces
+export interface V8CallSite {
+	getThis(): unknown;
+	getTypeName(): string | null;
+	getFunction(): Function | undefined;
+	getFunctionName(): string | null;
+	getMethodName(): string | null;
+	getFileName(): string | null;
+	getLineNumber(): number | null;
+	getColumnNumber(): number | null;
+	getEvalOrigin(): string | undefined;
+	isToplevel(): boolean;
+	isEval(): boolean;
+	isNative(): boolean;
+	isConstructor(): boolean;
+	toString(): string;
+}
+
+export const canceledName = 'Canceled';
 
 /**
  * Checks if the given error is a promise in canceled state
@@ -102,6 +212,89 @@ export class CancellationError extends Error {
 		super(canceledName);
 		this.name = this.message;
 	}
+}
+
+export class PendingMigrationError extends Error {
+
+	private static readonly _name = 'PendingMigrationError';
+
+	static is(error: unknown): error is PendingMigrationError {
+		return error instanceof PendingMigrationError || (error instanceof Error && error.name === PendingMigrationError._name);
+	}
+
+	constructor(message: string) {
+		super(message);
+		this.name = PendingMigrationError._name;
+	}
+}
+
+/**
+ * @deprecated use {@link CancellationError `new CancellationError()`} instead
+ */
+export function canceled(): Error {
+	const error = new Error(canceledName);
+	error.name = error.message;
+	return error;
+}
+
+export function illegalArgument(name?: string): Error {
+	if (name) {
+		return new Error(`Illegal argument: ${name}`);
+	} else {
+		return new Error('Illegal argument');
+	}
+}
+
+export function illegalState(name?: string): Error {
+	if (name) {
+		return new Error(`Illegal state: ${name}`);
+	} else {
+		return new Error('Illegal state');
+	}
+}
+
+export class ReadonlyError extends TypeError {
+	constructor(name?: string) {
+		super(name ? `${name} is read-only and cannot be changed` : 'Cannot change read-only property');
+	}
+}
+
+export function getErrorMessage(err: any): string {
+	if (!err) {
+		return 'Error';
+	}
+
+	if (err.message) {
+		return err.message;
+	}
+
+	if (err.stack) {
+		return err.stack.split('\n')[0];
+	}
+
+	return String(err);
+}
+
+export class NotImplementedError extends Error {
+	constructor(message?: string) {
+		super('NotImplemented');
+		if (message) {
+			this.message = message;
+		}
+	}
+}
+
+export class NotSupportedError extends Error {
+	constructor(message?: string) {
+		super('NotSupported');
+		if (message) {
+			this.message = message;
+		}
+	}
+}
+
+export class ExpectedError extends Error {
+	readonly isExpected = true;
 }
 
 /**
@@ -143,7 +336,6 @@ export class BugIndicatingError extends Error {
 
 		// Because we know for sure only buggy code throws this,
 		// we definitely want to break here and fix the bug.
-		// eslint-disable-next-line no-debugger
 		// debugger;
 	}
 }

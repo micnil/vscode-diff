@@ -3,50 +3,152 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export class SetMap<K, V> {
+/**
+ * An interface for a JavaScript object that
+ * acts a dictionary. The keys are strings.
+ */
+export type IStringDictionary<V> = Record<string, V>;
 
-	private map = new Map<K, Set<V>>();
+/**
+ * An interface for a JavaScript object that
+ * acts a dictionary. The keys are numbers.
+ */
+export type INumberDictionary<V> = Record<number, V>;
 
-	add(key: K, value: V): void {
-		let values = this.map.get(key);
-
-		if (!values) {
-			values = new Set<V>();
-			this.map.set(key, values);
+/**
+ * Groups the collection into a dictionary based on the provided
+ * group function.
+ */
+export function groupBy<K extends string | number | symbol, V>(data: readonly V[], groupFn: (element: V) => K): Partial<Record<K, V[]>> {
+	const result: Partial<Record<K, V[]>> = Object.create(null);
+	for (const element of data) {
+		const key = groupFn(element);
+		let target = result[key];
+		if (!target) {
+			target = result[key] = [];
 		}
+		target.push(element);
+	}
+	return result;
+}
 
-		values.add(value);
+export function groupByMap<K, V>(data: V[], groupFn: (element: V) => K): Map<K, V[]> {
+	const result = new Map<K, V[]>();
+	for (const element of data) {
+		const key = groupFn(element);
+		let target = result.get(key);
+		if (!target) {
+			target = [];
+			result.set(key, target);
+		}
+		target.push(element);
+	}
+	return result;
+}
+
+export function diffSets<T>(before: ReadonlySet<T>, after: ReadonlySet<T>): { removed: T[]; added: T[] } {
+	const removed: T[] = [];
+	const added: T[] = [];
+	for (const element of before) {
+		if (!after.has(element)) {
+			removed.push(element);
+		}
+	}
+	for (const element of after) {
+		if (!before.has(element)) {
+			added.push(element);
+		}
+	}
+	return { removed, added };
+}
+
+export function diffMaps<K, V>(before: Map<K, V>, after: Map<K, V>): { removed: V[]; added: V[] } {
+	const removed: V[] = [];
+	const added: V[] = [];
+	for (const [index, value] of before) {
+		if (!after.has(index)) {
+			removed.push(value);
+		}
+	}
+	for (const [index, value] of after) {
+		if (!before.has(index)) {
+			added.push(value);
+		}
+	}
+	return { removed, added };
+}
+
+/**
+ * Computes the intersection of two sets.
+ *
+ * @param setA - The first set.
+ * @param setB - The second iterable.
+ * @returns A new set containing the elements that are in both `setA` and `setB`.
+ */
+export function intersection<T>(setA: Set<T>, setB: Iterable<T>): Set<T> {
+	const result = new Set<T>();
+	for (const elem of setB) {
+		if (setA.has(elem)) {
+			result.add(elem);
+		}
+	}
+	return result;
+}
+
+export class SetWithKey<T> implements Set<T> {
+	private _map = new Map<any, T>();
+
+	constructor(values: T[], private toKey: (t: T) => unknown) {
+		for (const value of values) {
+			this.add(value);
+		}
 	}
 
-	delete(key: K, value: V): void {
-		const values = this.map.get(key);
+	get size(): number {
+		return this._map.size;
+	}
 
-		if (!values) {
-			return;
-		}
+	add(value: T): this {
+		const key = this.toKey(value);
+		this._map.set(key, value);
+		return this;
+	}
 
-		values.delete(value);
+	delete(value: T): boolean {
+		return this._map.delete(this.toKey(value));
+	}
 
-		if (values.size === 0) {
-			this.map.delete(key);
+	has(value: T): boolean {
+		return this._map.has(this.toKey(value));
+	}
+
+	*entries(): IterableIterator<[T, T]> {
+		for (const entry of this._map.values()) {
+			yield [entry, entry];
 		}
 	}
 
-	forEach(key: K, fn: (value: V) => void): void {
-		const values = this.map.get(key);
-
-		if (!values) {
-			return;
-		}
-
-		values.forEach(fn);
+	keys(): IterableIterator<T> {
+		return this.values();
 	}
 
-	get(key: K): ReadonlySet<V> {
-		const values = this.map.get(key);
-		if (!values) {
-			return new Set<V>();
+	*values(): IterableIterator<T> {
+		for (const entry of this._map.values()) {
+			yield entry;
 		}
-		return values;
 	}
+
+	clear(): void {
+		this._map.clear();
+	}
+
+	forEach(callbackfn: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void {
+		this._map.forEach(entry => callbackfn.call(thisArg, entry, entry, this));
+	}
+
+	[Symbol.iterator](): IterableIterator<T> {
+		return this.values();
+	}
+
+	[Symbol.toStringTag]: string = 'SetWithKey';
 }

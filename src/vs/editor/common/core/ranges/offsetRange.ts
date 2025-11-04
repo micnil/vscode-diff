@@ -3,12 +3,21 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { BugIndicatingError } from '../../../base/common/errors';
+import { BugIndicatingError } from '../../../../base/common/errors.js';
+
+export interface IOffsetRange {
+	readonly start: number;
+	readonly endExclusive: number;
+}
 
 /**
  * A range of offsets (0-based).
 */
-export class OffsetRange {
+export class OffsetRange implements IOffsetRange {
+	public static fromTo(start: number, endExclusive: number): OffsetRange {
+		return new OffsetRange(start, endExclusive);
+	}
+
 	public static addRange(range: OffsetRange, sortedRanges: OffsetRange[]): void {
 		let i = 0;
 		while (i < sortedRanges.length && sortedRanges[i].endExclusive < range.start) {
@@ -36,6 +45,14 @@ export class OffsetRange {
 
 	public static ofLength(length: number): OffsetRange {
 		return new OffsetRange(0, length);
+	}
+
+	public static ofStartAndLength(start: number, length: number): OffsetRange {
+		return new OffsetRange(start, start + length);
+	}
+
+	public static emptyAt(offset: number): OffsetRange {
+		return new OffsetRange(offset, offset);
 	}
 
 	constructor(public readonly start: number, public readonly endExclusive: number) {
@@ -103,8 +120,38 @@ export class OffsetRange {
 		return undefined;
 	}
 
-	public slice<T>(arr: T[]): T[] {
+	public intersectionLength(range: OffsetRange): number {
+		const start = Math.max(this.start, range.start);
+		const end = Math.min(this.endExclusive, range.endExclusive);
+		return Math.max(0, end - start);
+	}
+
+	public intersects(other: OffsetRange): boolean {
+		const start = Math.max(this.start, other.start);
+		const end = Math.min(this.endExclusive, other.endExclusive);
+		return start < end;
+	}
+
+	public intersectsOrTouches(other: OffsetRange): boolean {
+		const start = Math.max(this.start, other.start);
+		const end = Math.min(this.endExclusive, other.endExclusive);
+		return start <= end;
+	}
+
+	public isBefore(other: OffsetRange): boolean {
+		return this.endExclusive <= other.start;
+	}
+
+	public isAfter(other: OffsetRange): boolean {
+		return this.start >= other.endExclusive;
+	}
+
+	public slice<T>(arr: readonly T[]): T[] {
 		return arr.slice(this.start, this.endExclusive);
+	}
+
+	public substring(str: string): string {
+		return str.substring(this.start, this.endExclusive);
 	}
 
 	/**
@@ -136,10 +183,39 @@ export class OffsetRange {
 		}
 		return value;
 	}
+
+	public map<T>(f: (offset: number) => T): T[] {
+		const result: T[] = [];
+		for (let i = this.start; i < this.endExclusive; i++) {
+			result.push(f(i));
+		}
+		return result;
+	}
+
+	public forEach(f: (offset: number) => void): void {
+		for (let i = this.start; i < this.endExclusive; i++) {
+			f(i);
+		}
+	}
+
+	/**
+	 * this: [ 5, 10), range: [10, 15) => [5, 15)]
+	 * Throws if the ranges are not touching.
+	*/
+	public joinRightTouching(range: OffsetRange): OffsetRange {
+		if (this.endExclusive !== range.start) {
+			throw new BugIndicatingError(`Invalid join: ${this.toString()} and ${range.toString()}`);
+		}
+		return new OffsetRange(this.start, range.endExclusive);
+	}
 }
 
 export class OffsetRangeSet {
 	private readonly _sortedRanges: OffsetRange[] = [];
+
+	public get ranges(): OffsetRange[] {
+		return [...this._sortedRanges];
+	}
 
 	public addRange(range: OffsetRange): void {
 		let i = 0;
