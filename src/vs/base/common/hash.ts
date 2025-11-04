@@ -14,7 +14,7 @@ type NotSyncHashable = ArrayBufferLike | ArrayBufferView;
  * Note that this should not be used for binary data types. Instead,
  * prefer {@link hashAsync}.
  */
-export function hash<T>(obj: T extends NotSyncHashable ? never : T): number {
+function hash<T>(obj: T extends NotSyncHashable ? never : T): number {
 	return doHash(obj, 0);
 }
 

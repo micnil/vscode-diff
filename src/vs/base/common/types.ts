@@ -15,7 +15,7 @@ export function isString(str: unknown): str is string {
 /**
  * @returns whether the provided parameter is a JavaScript Array and each element in the array is a string.
  */
-export function isStringArray(value: unknown): value is string[] {
+function isStringArray(value: unknown): value is string[] {
 	return isArrayOf(value, isString);
 }
 
@@ -44,7 +44,7 @@ export function isObject(obj: unknown): obj is Object {
 /**
  * @returns whether the provided parameter is of type `Buffer` or Uint8Array dervived type
  */
-export function isTypedArray(obj: unknown): obj is Object {
+function isTypedArray(obj: unknown): obj is Object {
 	const TypedArray = Object.getPrototypeOf(Uint8Array);
 	return typeof obj === 'object'
 		&& obj instanceof TypedArray;
@@ -69,7 +69,7 @@ export function isIterable<T>(obj: unknown): obj is Iterable<T> {
 /**
  * @returns whether the provided parameter is an Iterable, casting to the given generic
  */
-export function isAsyncIterable<T>(obj: unknown): obj is AsyncIterable<T> {
+function isAsyncIterable<T>(obj: unknown): obj is AsyncIterable<T> {
 	// eslint-disable-next-line local/code-no-any-casts
 	return !!obj && typeof (obj as any)[Symbol.asyncIterator] === 'function';
 }
@@ -77,7 +77,7 @@ export function isAsyncIterable<T>(obj: unknown): obj is AsyncIterable<T> {
 /**
  * @returns whether the provided parameter is a JavaScript Boolean or not.
  */
-export function isBoolean(obj: unknown): obj is boolean {
+function isBoolean(obj: unknown): obj is boolean {
 	return (obj === true || obj === false);
 }
 
@@ -91,7 +91,7 @@ export function isUndefined(obj: unknown): obj is undefined {
 /**
  * @returns whether the provided parameter is defined.
  */
-export function isDefined<T>(arg: T | null | undefined): arg is T {
+function isDefined<T>(arg: T | null | undefined): arg is T {
 	return !isUndefinedOrNull(arg);
 }
 
@@ -103,7 +103,7 @@ export function isUndefinedOrNull(obj: unknown): obj is undefined | null {
 }
 
 
-export function assertType(condition: unknown, type?: string): asserts condition {
+function assertType(condition: unknown, type?: string): asserts condition {
 	if (!condition) {
 		throw new Error(type ? `Unexpected type, expected '${type}'` : 'Unexpected type');
 	}
@@ -202,7 +202,7 @@ export function assertReturnsAllDefined(...args: (unknown | null | undefined)[])
  * // `item` is of `TItem` type now
  * ```
  */
-export const isOneOf = <TType, TSubtype extends TType>(
+const isOneOf = <TType, TSubtype extends TType>(
 	value: TType,
 	validValues: readonly TSubtype[],
 ): value is TSubtype => {
@@ -214,14 +214,14 @@ export const isOneOf = <TType, TSubtype extends TType>(
 /**
  * Compile-time type check of a variable.
  */
-export function typeCheck<T = never>(_thing: NoInfer<T>): void { }
+function typeCheck<T = never>(_thing: NoInfer<T>): void { }
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 /**
  * @returns whether the provided parameter is an empty JavaScript Object or not.
  */
-export function isEmptyObject(obj: unknown): obj is object {
+function isEmptyObject(obj: unknown): obj is object {
 	if (!isObject(obj)) {
 		return false;
 	}
@@ -245,13 +245,13 @@ export function isFunction(obj: unknown): obj is Function {
 /**
  * @returns whether the provided parameters is are JavaScript Function or not.
  */
-export function areFunctions(...objects: unknown[]): boolean {
+function areFunctions(...objects: unknown[]): boolean {
 	return objects.length > 0 && objects.every(isFunction);
 }
 
 export type TypeConstraint = string | Function;
 
-export function validateConstraints(args: unknown[], constraints: Array<TypeConstraint | undefined>): void {
+function validateConstraints(args: unknown[], constraints: Array<TypeConstraint | undefined>): void {
 	const len = Math.min(args.length, constraints.length);
 	for (let i = 0; i < len; i++) {
 		validateConstraint(args[i], constraints[i]);
@@ -289,7 +289,7 @@ export function validateConstraint(arg: unknown, constraint: TypeConstraint | un
  * This can be used to make sure the argument correctly conforms to the subtype while still being able to pass it
  * to contexts that expects the supertype.
  */
-export function upcast<Base, Sub extends Base = Base>(x: Sub): Base {
+function upcast<Base, Sub extends Base = Base>(x: Sub): Base {
 	return x;
 }
 
@@ -303,7 +303,7 @@ type AddFirstParameterToFunction<T, TargetFunctionsReturnType, FirstParameter> =
 /**
  * Allows to add a first parameter to functions of a type.
  */
-export type AddFirstParameterToFunctions<Target, TargetFunctionsReturnType, FirstParameter> = {
+type AddFirstParameterToFunctions<Target, TargetFunctionsReturnType, FirstParameter> = {
 	// For every property
 	[K in keyof Target]: AddFirstParameterToFunction<Target[K], TargetFunctionsReturnType, FirstParameter>;
 };
@@ -312,17 +312,17 @@ export type AddFirstParameterToFunctions<Target, TargetFunctionsReturnType, Firs
  * Given an object with all optional properties, requires at least one to be defined.
  * i.e. AtLeastOne<MyObject>;
  */
-export type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
+type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> & U[keyof U];
 
 /**
  * Only picks the non-optional properties of a type.
  */
-export type OmitOptional<T> = { [K in keyof T as T[K] extends Required<T>[K] ? K : never]: T[K] };
+type OmitOptional<T> = { [K in keyof T as T[K] extends Required<T>[K] ? K : never]: T[K] };
 
 /**
  * A type that removed readonly-less from all properties of `T`
  */
-export type Mutable<T> = {
+type Mutable<T> = {
 	-readonly [P in keyof T]: T[P]
 };
 
@@ -346,7 +346,7 @@ export type DeepImmutable<T> = T extends (infer U)[]
 /**
  * A single object or an array of the objects.
  */
-export type SingleOrMany<T> = T | T[];
+type SingleOrMany<T> = T | T[];
 
 
 /**
@@ -367,7 +367,7 @@ export type DeepPartial<T> = {
 /**
  * Represents a type that is a partial version of a given type `T`, except a subset.
  */
-export type PartialExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<T, K>;
+type PartialExcept<T, K extends keyof T> = Partial<Omit<T, K>> & Pick<T, K>;
 
 
 type KeysOfUnionType<T> = T extends T ? keyof T : never;
@@ -393,7 +393,7 @@ type MakeOptionalAndBool<T extends object> = { [K in keyof T]?: boolean };
  * }
  * ```
  */
-export function hasKey<T extends object, TKeys>(x: T, key: TKeys & MakeOptionalAndBool<T>): x is FilterType<T, { [K in KeysOfUnionType<T> & keyof TKeys]: unknown }> {
+function hasKey<T extends object, TKeys>(x: T, key: TKeys & MakeOptionalAndBool<T>): x is FilterType<T, { [K in KeysOfUnionType<T> & keyof TKeys]: unknown }> {
 	for (const k in key) {
 		if (!(k in x)) {
 			return false;

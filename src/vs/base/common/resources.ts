@@ -337,7 +337,7 @@ export const extUri = new ExtUri(() => false);
  * better to use `IUriIdentityService` which exposes an `IExtUri`-instance which knows when path
  * casing matters.
  */
-export const extUriBiasedIgnorePathCase = new ExtUri(uri => {
+const extUriBiasedIgnorePathCase = new ExtUri(uri => {
 	// A file scheme resource is in the same platform as code, so ignore case for non linux platforms
 	// Resource can be from another platform. Lowering the case as an hack. Should come from File system provider
 	return uri.scheme === Schemas.file ? !isLinux : true;
@@ -355,28 +355,28 @@ export const extUriBiasedIgnorePathCase = new ExtUri(uri => {
  * better to use `IUriIdentityService` which exposes an `IExtUri`-instance which knows when path
  * casing matters.
  */
-export const extUriIgnorePathCase = new ExtUri(_ => true);
+const extUriIgnorePathCase = new ExtUri(_ => true);
 
-export const isEqual = extUri.isEqual.bind(extUri);
+const isEqual = extUri.isEqual.bind(extUri);
 export const isEqualOrParent = extUri.isEqualOrParent.bind(extUri);
-export const getComparisonKey = extUri.getComparisonKey.bind(extUri);
-export const basenameOrAuthority = extUri.basenameOrAuthority.bind(extUri);
+const getComparisonKey = extUri.getComparisonKey.bind(extUri);
+const basenameOrAuthority = extUri.basenameOrAuthority.bind(extUri);
 export const basename = extUri.basename.bind(extUri);
-export const extname = extUri.extname.bind(extUri);
-export const dirname = extUri.dirname.bind(extUri);
-export const joinPath = extUri.joinPath.bind(extUri);
-export const normalizePath = extUri.normalizePath.bind(extUri);
-export const relativePath = extUri.relativePath.bind(extUri);
-export const resolvePath = extUri.resolvePath.bind(extUri);
-export const isAbsolutePath = extUri.isAbsolutePath.bind(extUri);
+const extname = extUri.extname.bind(extUri);
+const dirname = extUri.dirname.bind(extUri);
+const joinPath = extUri.joinPath.bind(extUri);
+const normalizePath = extUri.normalizePath.bind(extUri);
+const relativePath = extUri.relativePath.bind(extUri);
+const resolvePath = extUri.resolvePath.bind(extUri);
+const isAbsolutePath = extUri.isAbsolutePath.bind(extUri);
 export const isEqualAuthority = extUri.isEqualAuthority.bind(extUri);
 export const hasTrailingPathSeparator = extUri.hasTrailingPathSeparator.bind(extUri);
-export const removeTrailingPathSeparator = extUri.removeTrailingPathSeparator.bind(extUri);
-export const addTrailingPathSeparator = extUri.addTrailingPathSeparator.bind(extUri);
+const removeTrailingPathSeparator = extUri.removeTrailingPathSeparator.bind(extUri);
+const addTrailingPathSeparator = extUri.addTrailingPathSeparator.bind(extUri);
 
 //#endregion
 
-export function distinctParents<T>(items: T[], resourceAccessor: (item: T) => URI): T[] {
+function distinctParents<T>(items: T[], resourceAccessor: (item: T) => URI): T[] {
 	const distinctParents: T[] = [];
 	for (let i = 0; i < items.length; i++) {
 		const candidateResource = resourceAccessor(items[i]);
@@ -430,7 +430,7 @@ export namespace DataUri {
 	}
 }
 
-export function toLocalResource(resource: URI, authority: string | undefined, localScheme: string): URI {
+function toLocalResource(resource: URI, authority: string | undefined, localScheme: string): URI {
 	if (authority) {
 		let path = resource.path;
 		if (path && path[0] !== paths.posix.sep) {

@@ -1248,7 +1248,7 @@ export interface EventDeliveryQueue {
 	_isEventDeliveryQueue: true;
 }
 
-export const createEventDeliveryQueue = (): EventDeliveryQueue => new EventDeliveryQueuePrivate();
+const createEventDeliveryQueue = (): EventDeliveryQueue => new EventDeliveryQueuePrivate();
 
 class EventDeliveryQueuePrivate implements EventDeliveryQueue {
 	declare _isEventDeliveryQueue: true;
@@ -1293,7 +1293,7 @@ export interface IWaitUntil {
 
 export type IWaitUntilData<T> = Omit<Omit<T, 'waitUntil'>, 'token'>;
 
-export class AsyncEmitter<T extends IWaitUntil> extends Emitter<T> {
+class AsyncEmitter<T extends IWaitUntil> extends Emitter<T> {
 
 	private _asyncDeliveryQueue?: LinkedList<[(ev: T) => void, IWaitUntilData<T>]>;
 
@@ -1402,7 +1402,7 @@ export class PauseableEmitter<T> extends Emitter<T> {
 	}
 }
 
-export class DebounceEmitter<T> extends PauseableEmitter<T> {
+class DebounceEmitter<T> extends PauseableEmitter<T> {
 
 	private readonly _delay: number;
 	private _handle: Timeout | undefined;
@@ -1428,7 +1428,7 @@ export class DebounceEmitter<T> extends PauseableEmitter<T> {
  * An emitter which queue all events and then process them at the
  * end of the event loop.
  */
-export class MicrotaskEmitter<T> extends Emitter<T> {
+class MicrotaskEmitter<T> extends Emitter<T> {
 	private _queuedEvents: T[] = [];
 	private _mergeFn?: (input: T[]) => T;
 
@@ -1548,7 +1548,7 @@ export class EventMultiplexer<T> implements IDisposable {
 export interface IDynamicListEventMultiplexer<TEventType> extends IDisposable {
 	readonly event: Event<TEventType>;
 }
-export class DynamicListEventMultiplexer<TItem, TEventType> implements IDynamicListEventMultiplexer<TEventType> {
+class DynamicListEventMultiplexer<TItem, TEventType> implements IDynamicListEventMultiplexer<TEventType> {
 	private readonly _store = new DisposableStore();
 
 	readonly event: Event<TEventType>;
@@ -1609,7 +1609,7 @@ export class DynamicListEventMultiplexer<TItem, TEventType> implements IDynamicL
  * // event will only be fired at this point
  * ```
  */
-export class EventBufferer {
+class EventBufferer {
 
 	private data: { buffers: Function[] }[] = [];
 
@@ -1724,7 +1724,7 @@ export interface IValueWithChangeEvent<T> {
 	get value(): T;
 }
 
-export class ValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
+class ValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
 	public static const<T>(value: T): IValueWithChangeEvent<T> {
 		return new ConstValueWithChangeEvent(value);
 	}
@@ -1756,7 +1756,7 @@ class ConstValueWithChangeEvent<T> implements IValueWithChangeEvent<T> {
  * @param handleItem Is called for each item in the set (but only the first time the item is seen in the set).
  * 	The returned disposable is disposed if the item is no longer in the set.
  */
-export function trackSetChanges<T>(getData: () => ReadonlySet<T>, onDidChangeData: Event<unknown>, handleItem: (d: T) => IDisposable): IDisposable {
+function trackSetChanges<T>(getData: () => ReadonlySet<T>, onDidChangeData: Event<unknown>, handleItem: (d: T) => IDisposable): IDisposable {
 	const map = new DisposableMap<T, IDisposable>();
 	let oldData = new Set(getData());
 	for (const d of oldData) {

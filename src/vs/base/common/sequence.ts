@@ -20,7 +20,7 @@ export interface ISequence<T> {
 	readonly onDidSplice: Event<ISplice<T>>;
 }
 
-export class Sequence<T> implements ISequence<T>, ISpliceable<T> {
+class Sequence<T> implements ISequence<T>, ISpliceable<T> {
 
 	readonly elements: T[] = [];
 

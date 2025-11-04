@@ -10,7 +10,7 @@ import { DisposableStore, toDisposable } from './lifecycle.js';
 /**
  * The payload that flows in readable stream events.
  */
-export type ReadableStreamEventPayload<T> = T | Error | 'end';
+type ReadableStreamEventPayload<T> = T | Error | 'end';
 
 export interface ReadableStreamEvents<T> {
 
@@ -80,7 +80,7 @@ export interface Readable<T> {
 	read(): T | null;
 }
 
-export function isReadable<T>(obj: unknown): obj is Readable<T> {
+function isReadable<T>(obj: unknown): obj is Readable<T> {
 	const candidate = obj as Readable<T> | undefined;
 	if (!candidate) {
 		return false;
@@ -160,7 +160,7 @@ export function isReadableStream<T>(obj: unknown): obj is ReadableStream<T> {
 	return [candidate.on, candidate.pause, candidate.resume, candidate.destroy].every(fn => typeof fn === 'function');
 }
 
-export function isReadableBufferedStream<T>(obj: unknown): obj is ReadableBufferedStream<T> {
+function isReadableBufferedStream<T>(obj: unknown): obj is ReadableBufferedStream<T> {
 	const candidate = obj as ReadableBufferedStream<T> | undefined;
 	if (!candidate) {
 		return false;
@@ -484,7 +484,7 @@ export function consumeReadable<T>(readable: Readable<T>, reducer: IReducer<T>):
  * reached, will return a readable instead to ensure all data can still
  * be read.
  */
-export function peekReadable<T>(readable: Readable<T>, reducer: IReducer<T>, maxChunks: number): T | Readable<T> {
+function peekReadable<T>(readable: Readable<T>, reducer: IReducer<T>, maxChunks: number): T | Readable<T> {
 	const chunks: T[] = [];
 
 	let chunk: T | null | undefined = undefined;
@@ -615,7 +615,7 @@ export function listenStream<T>(stream: ReadableStreamEvents<T>, listener: IStre
  * the stream has ended or not. If not, caller needs to add a `data` listener
  * to continue reading.
  */
-export function peekStream<T>(stream: ReadableStream<T>, maxChunks: number): Promise<ReadableBufferedStream<T>> {
+function peekStream<T>(stream: ReadableStream<T>, maxChunks: number): Promise<ReadableBufferedStream<T>> {
 	return new Promise((resolve, reject) => {
 		const streamListeners = new DisposableStore();
 		const buffer: T[] = [];
@@ -680,7 +680,7 @@ export function toStream<T>(t: T, reducer: IReducer<T>): ReadableStream<T> {
 /**
  * Helper to create an empty stream
  */
-export function emptyStream(): ReadableStream<never> {
+function emptyStream(): ReadableStream<never> {
 	const stream = newWriteableStream<never>(() => { throw new Error('not supported'); });
 	stream.end();
 

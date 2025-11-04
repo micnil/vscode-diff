@@ -121,7 +121,7 @@ export function raceCancellationError<T>(promise: Promise<T>, token: Cancellatio
  * avoid issues with shared promises that would normally be returned as
  * cancellable to consumers.
  */
-export function notCancellablePromise<T>(promise: CancelablePromise<T>): Promise<T> {
+function notCancellablePromise<T>(promise: CancelablePromise<T>): Promise<T> {
 	return new Promise<T>((resolve, reject) => {
 		promise.then(resolve, reject);
 	});
@@ -130,7 +130,7 @@ export function notCancellablePromise<T>(promise: CancelablePromise<T>): Promise
 /**
  * Returns as soon as one of the promises resolves or rejects and cancels remaining promises
  */
-export function raceCancellablePromises<T>(cancellablePromises: (CancelablePromise<T> | Promise<T>)[]): CancelablePromise<T> {
+function raceCancellablePromises<T>(cancellablePromises: (CancelablePromise<T> | Promise<T>)[]): CancelablePromise<T> {
 	let resolvedPromiseIndex = -1;
 	const promises = cancellablePromises.map((promise, index) => promise.then(result => { resolvedPromiseIndex = index; return result; }));
 	const promise = Promise.race(promises) as CancelablePromise<T>;
@@ -161,7 +161,7 @@ export function raceTimeout<T>(promise: Promise<T>, timeout: number, onTimeout?:
 	]);
 }
 
-export function asPromise<T>(callback: () => T | Thenable<T>): Promise<T> {
+function asPromise<T>(callback: () => T | Thenable<T>): Promise<T> {
 	return new Promise<T>((resolve, reject) => {
 		const item = callback();
 		if (isThenable<T>(item)) {
@@ -286,7 +286,7 @@ export class Throttler implements IDisposable {
 	}
 }
 
-export class Sequencer {
+class Sequencer {
 
 	private current: Promise<unknown> = Promise.resolve(null);
 
@@ -295,7 +295,7 @@ export class Sequencer {
 	}
 }
 
-export class SequencerByKey<TKey> {
+class SequencerByKey<TKey> {
 
 	private promiseMap = new Map<TKey, Promise<unknown>>();
 
@@ -457,7 +457,7 @@ export class Delayer<T> implements IDisposable {
  * and can only be delivered once he is back. Once he is back the mail man will
  * do one more trip to deliver the letters that have accumulated while he was out.
  */
-export class ThrottledDelayer<T> {
+class ThrottledDelayer<T> {
 
 	private delayer: Delayer<Promise<T>>;
 	private throttler: Throttler;
@@ -518,7 +518,7 @@ export class Barrier {
  * A barrier that is initially closed and then becomes opened permanently after a certain period of
  * time or when open is called explicitly
  */
-export class AutoOpenBarrier extends Barrier {
+class AutoOpenBarrier extends Barrier {
 
 	private readonly _timeout: Timeout;
 
@@ -570,7 +570,7 @@ export function timeout(millis: number, token?: CancellationToken): CancelablePr
  *   timeoutDisposable.dispose();
  * }
  */
-export function disposableTimeout(handler: () => void, timeout = 0, store?: DisposableStore): IDisposable {
+function disposableTimeout(handler: () => void, timeout = 0, store?: DisposableStore): IDisposable {
 	const timer = setTimeout(() => {
 		handler();
 		if (store) {
@@ -590,7 +590,7 @@ export function disposableTimeout(handler: () => void, timeout = 0, store?: Disp
  * promise will complete to an array of results from each promise.
  */
 
-export function sequence<T>(promiseFactories: ITask<Promise<T>>[]): Promise<T[]> {
+function sequence<T>(promiseFactories: ITask<Promise<T>>[]): Promise<T[]> {
 	const results: T[] = [];
 	let index = 0;
 	const len = promiseFactories.length;
@@ -615,7 +615,7 @@ export function sequence<T>(promiseFactories: ITask<Promise<T>>[]): Promise<T[]>
 	return Promise.resolve(null).then(thenHandler);
 }
 
-export function first<T>(promiseFactories: ITask<Promise<T>>[], shouldStop: (t: T) => boolean = t => !!t, defaultValue: T | null = null): Promise<T | null> {
+function first<T>(promiseFactories: ITask<Promise<T>>[], shouldStop: (t: T) => boolean = t => !!t, defaultValue: T | null = null): Promise<T | null> {
 	let index = 0;
 	const len = promiseFactories.length;
 
@@ -803,7 +803,7 @@ export class Queue<T> extends Limiter<T> {
  * As such, the returned promise may not be from the factory that is passed in but from the next factory that
  * is running after having called `queue`.
  */
-export class LimitedQueue {
+class LimitedQueue {
 
 	private readonly sequentializer = new TaskSequentializer();
 
@@ -824,7 +824,7 @@ export class LimitedQueue {
  * A helper to organize queues per resource. The ResourceQueue makes sure to manage queues per resource
  * by disposing them once the queue is empty.
  */
-export class ResourceQueue implements IDisposable {
+class ResourceQueue implements IDisposable {
 
 	private readonly queues = new Map<string, Queue<void>>();
 
@@ -932,12 +932,12 @@ export type Task<T = void> = () => (Promise<T> | T);
  * Wrap a type in an optional promise. This can be useful to avoid the runtime
  * overhead of creating a promise.
  */
-export type MaybePromise<T> = Promise<T> | T;
+type MaybePromise<T> = Promise<T> | T;
 
 /**
  * Processes tasks in the order they were scheduled.
 */
-export class TaskQueue {
+class TaskQueue {
 	private _runningTask: Task<any> | undefined = undefined;
 	private _pendingTasks: { task: Task<any>; deferred: DeferredPromise<any>; setUndefinedWhenCleared: boolean }[] = [];
 
@@ -1012,7 +1012,7 @@ export class TaskQueue {
 	}
 }
 
-export class TimeoutTimer implements IDisposable {
+class TimeoutTimer implements IDisposable {
 	private _token: Timeout | undefined;
 	private _isDisposed = false;
 
@@ -1066,7 +1066,7 @@ export class TimeoutTimer implements IDisposable {
 	}
 }
 
-export class IntervalTimer implements IDisposable {
+class IntervalTimer implements IDisposable {
 
 	private disposable: IDisposable | undefined = undefined;
 	private isDisposed = false;
@@ -1181,7 +1181,7 @@ export class RunOnceScheduler implements IDisposable {
  * for 8hrs, `setTimeout` will fire **as soon as the computer wakes from sleep**. But
  * this scheduler will execute 3hrs **after waking the computer from sleep**.
  */
-export class ProcessTimeRunOnceScheduler {
+class ProcessTimeRunOnceScheduler {
 
 	private runner: (() => void) | null;
 	private timeout: number;
@@ -1246,7 +1246,7 @@ export class ProcessTimeRunOnceScheduler {
 	}
 }
 
-export class RunOnceWorker<T> extends RunOnceScheduler {
+class RunOnceWorker<T> extends RunOnceScheduler {
 
 	private units: T[] = [];
 
@@ -1308,7 +1308,7 @@ export interface IThrottledWorkerOptions {
  * * there is a maximum of units the worker will keep in memory for processing (via `maxBufferedWork`)
  * * after having handled `maxWorkChunkSize` units, the worker needs to rest (via `throttleDelay`)
  */
-export class ThrottledWorker<T> extends Disposable {
+class ThrottledWorker<T> extends Disposable {
 
 	private readonly pendingWork: T[] = [];
 
@@ -1540,7 +1540,7 @@ export abstract class AbstractIdleValue<T> {
  * **Note** that there is `dom.ts#WindowIdleValue` which is better suited when running inside a browser
  * context
  */
-export class GlobalIdleValue<T> extends AbstractIdleValue<T> {
+class GlobalIdleValue<T> extends AbstractIdleValue<T> {
 
 	constructor(executor: () => T) {
 		super(globalThis, executor);
@@ -1549,7 +1549,7 @@ export class GlobalIdleValue<T> extends AbstractIdleValue<T> {
 
 //#endregion
 
-export async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: number): Promise<T> {
+async function retry<T>(task: ITask<Promise<T>>, delay: number, retries: number): Promise<T> {
 	let lastError: Error | undefined;
 
 	for (let i = 0; i < retries; i++) {
@@ -1690,7 +1690,7 @@ export class TaskSequentializer {
  * throttle a frequent task when a certain threshold
  * is reached.
  */
-export class IntervalCounter {
+class IntervalCounter {
 
 	private lastIncrementTime = 0;
 
@@ -1896,7 +1896,7 @@ export class StatefulPromise<T> {
 	}
 }
 
-export class LazyStatefulPromise<T> {
+class LazyStatefulPromise<T> {
 	private readonly _promise = new Lazy(() => new StatefulPromise(this._compute()));
 
 	constructor(
@@ -2172,7 +2172,7 @@ export class AsyncIterableObject<T> implements AsyncIterable<T> {
 }
 
 
-export function createCancelableAsyncIterableProducer<T>(callback: (token: CancellationToken) => AsyncIterable<T>): CancelableAsyncIterableProducer<T> {
+function createCancelableAsyncIterableProducer<T>(callback: (token: CancellationToken) => AsyncIterable<T>): CancelableAsyncIterableProducer<T> {
 	const source = new CancellationTokenSource();
 	const innerIterable = callback(source.token);
 
@@ -2200,7 +2200,7 @@ export function createCancelableAsyncIterableProducer<T>(callback: (token: Cance
 	});
 }
 
-export class AsyncIterableSource<T> {
+class AsyncIterableSource<T> {
 
 	private readonly _deferred = new DeferredPromise<void>();
 	private readonly _asyncIterable: AsyncIterableObject<T>;
@@ -2277,7 +2277,7 @@ export class AsyncIterableSource<T> {
 	}
 }
 
-export function cancellableIterable<T>(iterableOrIterator: AsyncIterator<T> | AsyncIterable<T>, token: CancellationToken): AsyncIterableIterator<T> {
+function cancellableIterable<T>(iterableOrIterator: AsyncIterator<T> | AsyncIterable<T>, token: CancellationToken): AsyncIterableIterator<T> {
 	const iterator = Symbol.asyncIterator in iterableOrIterator ? iterableOrIterator[Symbol.asyncIterator]() : iterableOrIterator;
 
 	return {
@@ -2505,7 +2505,7 @@ export class CancelableAsyncIterableProducer<T> extends AsyncIterableProducer<T>
 
 export const AsyncReaderEndOfStream = Symbol('AsyncReaderEndOfStream');
 
-export class AsyncReader<T> {
+class AsyncReader<T> {
 	private _buffer: T[] = [];
 	private _atEnd = false;
 

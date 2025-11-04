@@ -38,7 +38,7 @@ export const enum Constants {
 	UNICODE_SUPPLEMENTARY_PLANE_BEGIN = 0x010000
 }
 
-export function toUint8(v: number): number {
+function toUint8(v: number): number {
 	if (v < 0) {
 		return 0;
 	}
@@ -48,7 +48,7 @@ export function toUint8(v: number): number {
 	return v | 0;
 }
 
-export function toUint32(v: number): number {
+function toUint32(v: number): number {
 	if (v < 0) {
 		return 0;
 	}

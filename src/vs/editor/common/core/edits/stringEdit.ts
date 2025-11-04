@@ -398,7 +398,7 @@ export class StringReplacement extends BaseStringReplacement<StringReplacement> 
 	}
 }
 
-export function applyEditsToRanges(sortedRanges: OffsetRange[], edit: StringEdit): OffsetRange[] {
+function applyEditsToRanges(sortedRanges: OffsetRange[], edit: StringEdit): OffsetRange[] {
 	sortedRanges = sortedRanges.slice();
 
 	// treat edits as deletion of the replace range and then as insertion that extends the first range

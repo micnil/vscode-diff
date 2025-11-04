@@ -10,7 +10,7 @@ export interface CacheResult<T> extends IDisposable {
 	promise: Promise<T>;
 }
 
-export class Cache<T> {
+class Cache<T> {
 
 	private result: CacheResult<T> | null = null;
 	constructor(private task: (ct: CancellationToken) => Promise<T>) { }
@@ -84,7 +84,7 @@ export class LRUCachedFunction<TArg, TComputed> {
 /**
  * Uses an unbounded cache to memoize the results of the given function.
 */
-export class CachedFunction<TArg, TComputed> {
+class CachedFunction<TArg, TComputed> {
 	private readonly _map = new Map<TArg, TComputed>();
 	private readonly _map2 = new Map<unknown, TComputed>();
 	public get cachedValues(): ReadonlyMap<TArg, TComputed> {
@@ -122,7 +122,7 @@ export class CachedFunction<TArg, TComputed> {
 /**
  * Uses an unbounded cache to memoize the results of the given function.
 */
-export class WeakCachedFunction<TArg, TComputed> {
+class WeakCachedFunction<TArg, TComputed> {
 	private readonly _map = new WeakMap<WeakKey, TComputed>();
 
 	private readonly _fn: (arg: TArg) => TComputed;

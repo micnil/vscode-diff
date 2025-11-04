@@ -141,7 +141,7 @@ export class CancellationTokenSource {
 	}
 }
 
-export function cancelOnDispose(store: DisposableStore): CancellationToken {
+function cancelOnDispose(store: DisposableStore): CancellationToken {
 	const source = new CancellationTokenSource();
 	store.add({ dispose() { source.cancel(); } });
 	return source.token;
@@ -153,7 +153,7 @@ export function cancelOnDispose(store: DisposableStore): CancellationToken {
  * to the pool has been cancelled. Adding tokens after the pool token has
  * been cancelled has no effect.
  */
-export class CancellationTokenPool {
+class CancellationTokenPool {
 
 	private readonly _source = new CancellationTokenSource();
 	private readonly _listeners = new DisposableStore();

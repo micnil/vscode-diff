@@ -45,7 +45,7 @@ export interface IDisposableTracker {
 	markAsSingleton(disposable: IDisposable): void;
 }
 
-export class GCBasedDisposableTracker implements IDisposableTracker {
+class GCBasedDisposableTracker implements IDisposableTracker {
 
 	private readonly _registry = new FinalizationRegistry<string>(heldValue => {
 		console.warn(`[LEAKED DISPOSABLE] ${heldValue}`);
@@ -292,7 +292,7 @@ function setParentOfDisposables(children: IDisposable[], parent: IDisposable | n
 /**
  * Indicates that the given object is a singleton which does not need to be disposed.
 */
-export function markAsSingleton<T extends IDisposable>(singleton: T): T {
+function markAsSingleton<T extends IDisposable>(singleton: T): T {
 	disposableTracker?.markAsSingleton(singleton);
 	return singleton;
 }
@@ -355,7 +355,7 @@ export function dispose<T extends IDisposable>(arg: T | Iterable<T> | undefined)
 	}
 }
 
-export function disposeIfDisposable<T extends IDisposable | object>(disposables: Array<T>): Array<T> {
+function disposeIfDisposable<T extends IDisposable | object>(disposables: Array<T>): Array<T> {
 	for (const d of disposables) {
 		if (isDisposable(d)) {
 			d.dispose();
@@ -633,7 +633,7 @@ export class MutableDisposable<T extends IDisposable> implements IDisposable {
  * Manages the lifecycle of a disposable value that may be changed like {@link MutableDisposable}, but the value must
  * exist and cannot be undefined.
  */
-export class MandatoryMutableDisposable<T extends IDisposable> implements IDisposable {
+class MandatoryMutableDisposable<T extends IDisposable> implements IDisposable {
 	private readonly _disposable = new MutableDisposable<T>();
 	private _isDisposed = false;
 
@@ -658,7 +658,7 @@ export class MandatoryMutableDisposable<T extends IDisposable> implements IDispo
 	}
 }
 
-export class RefCountedDisposable {
+class RefCountedDisposable {
 
 	private _counter: number = 1;
 
@@ -716,7 +716,7 @@ export abstract class ReferenceCollection<T> {
  * Unwraps a reference collection of promised values. Makes sure
  * references are disposed whenever promises get rejected.
  */
-export class AsyncReferenceCollection<T> {
+class AsyncReferenceCollection<T> {
 
 	constructor(private referenceCollection: ReferenceCollection<Promise<T>>) { }
 
@@ -737,12 +737,12 @@ export class AsyncReferenceCollection<T> {
 	}
 }
 
-export class ImmortalReference<T> implements IReference<T> {
+class ImmortalReference<T> implements IReference<T> {
 	constructor(public object: T) { }
 	dispose(): void { /* noop */ }
 }
 
-export function disposeOnReturn(fn: (store: DisposableStore) => void): void {
+function disposeOnReturn(fn: (store: DisposableStore) => void): void {
 	const store = new DisposableStore();
 	try {
 		fn(store);
@@ -851,7 +851,7 @@ export class DisposableMap<K, V extends IDisposable = IDisposable> implements ID
 /**
  * Call `then` on a Promise, unless the returned disposable is disposed.
  */
-export function thenIfNotDisposed<T>(promise: Promise<T>, then: (result: T) => void): IDisposable {
+function thenIfNotDisposed<T>(promise: Promise<T>, then: (result: T) => void): IDisposable {
 	let disposed = false;
 	promise.then(result => {
 		if (disposed) {
@@ -869,7 +869,7 @@ export function thenIfNotDisposed<T>(promise: Promise<T>, then: (result: T) => v
  * disposable or register it to the {@link DisposableStore}, depending on whether the store is
  * disposed or not.
  */
-export function thenRegisterOrDispose<T extends IDisposable>(promise: Promise<T>, store: DisposableStore): Promise<T> {
+function thenRegisterOrDispose<T extends IDisposable>(promise: Promise<T>, store: DisposableStore): Promise<T> {
 	return promise.then(disposable => {
 		if (store.isDisposed) {
 			disposable.dispose();

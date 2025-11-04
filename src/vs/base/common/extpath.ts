@@ -118,7 +118,7 @@ export function getRoot(path: string, sep: string = posix.sep): string {
  * @return A boolean indication if the path is a UNC path, on none-windows
  * always false.
  */
-export function isUNC(path: string): boolean {
+function isUNC(path: string): boolean {
 	if (!isWindows) {
 		// UNC is a windows concept
 		return false;
@@ -166,7 +166,7 @@ export function isUNC(path: string): boolean {
 const WINDOWS_INVALID_FILE_CHARS = /[\\/:\*\?"<>\|]/g;
 const UNIX_INVALID_FILE_CHARS = /[/]/g;
 const WINDOWS_FORBIDDEN_NAMES = /^(con|prn|aux|clock\$|nul|lpt[0-9]|com[0-9])(\.(.*?))?$/i;
-export function isValidBasename(name: string | null | undefined, isWindowsOS: boolean = isWindows): boolean {
+function isValidBasename(name: string | null | undefined, isWindowsOS: boolean = isWindows): boolean {
 	const invalidFileChars = isWindowsOS ? WINDOWS_INVALID_FILE_CHARS : UNIX_INVALID_FILE_CHARS;
 
 	if (!name || name.length === 0 || /^\s+$/.test(name)) {
@@ -206,7 +206,7 @@ export function isValidBasename(name: string | null | undefined, isWindowsOS: bo
  * in a context without services, consider to pass down the `extUri` from the outside
  * or use `extUriBiasedIgnorePathCase` if you know what you are doing.
  */
-export function isEqual(pathA: string, pathB: string, ignoreCase?: boolean): boolean {
+function isEqual(pathA: string, pathB: string, ignoreCase?: boolean): boolean {
 	const identityEquals = (pathA === pathB);
 	if (!ignoreCase || identityEquals) {
 		return identityEquals;
@@ -266,7 +266,7 @@ export function isWindowsDriveLetter(char0: number): boolean {
 	return char0 >= CharCode.A && char0 <= CharCode.Z || char0 >= CharCode.a && char0 <= CharCode.z;
 }
 
-export function sanitizeFilePath(candidate: string, cwd: string): string {
+function sanitizeFilePath(candidate: string, cwd: string): string {
 
 	// Special case: allow to open a drive letter without trailing backslash
 	if (isWindows && candidate.endsWith(':')) {
@@ -306,7 +306,7 @@ export function removeTrailingPathSeparator(candidate: string): string {
 	return candidate;
 }
 
-export function isRootOrDriveLetter(path: string): boolean {
+function isRootOrDriveLetter(path: string): boolean {
 	const pathNormalized = normalize(path);
 
 	if (isWindows) {
@@ -329,11 +329,11 @@ export function hasDriveLetter(path: string, isWindowsOS: boolean = isWindows): 
 	return false;
 }
 
-export function getDriveLetter(path: string, isWindowsOS: boolean = isWindows): string | undefined {
+function getDriveLetter(path: string, isWindowsOS: boolean = isWindows): string | undefined {
 	return hasDriveLetter(path, isWindowsOS) ? path[0] : undefined;
 }
 
-export function indexOfPath(path: string, candidate: string, ignoreCase?: boolean): number {
+function indexOfPath(path: string, candidate: string, ignoreCase?: boolean): number {
 	if (candidate.length > path.length) {
 		return -1;
 	}
@@ -356,7 +356,7 @@ export interface IPathWithLineAndColumn {
 	column?: number;
 }
 
-export function parseLineAndColumnAware(rawPath: string): IPathWithLineAndColumn {
+function parseLineAndColumnAware(rawPath: string): IPathWithLineAndColumn {
 	const segments = rawPath.split(':'); // C:\file.txt:<line>:<column>
 
 	let path: string | undefined;
@@ -388,7 +388,7 @@ export function parseLineAndColumnAware(rawPath: string): IPathWithLineAndColumn
 const pathChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 const windowsSafePathFirstChars = 'BDEFGHIJKMOQRSTUVWXYZbdefghijkmoqrstuvwxyz0123456789';
 
-export function randomPath(parent?: string, prefix?: string, randomLength = 8): string {
+function randomPath(parent?: string, prefix?: string, randomLength = 8): string {
 	let suffix = '';
 	for (let i = 0; i < randomLength; i++) {
 		let pathCharsTouse: string;

@@ -8,7 +8,7 @@ import { CharCode } from './charCode.js';
 import { Lazy } from './lazy.js';
 import { Constants } from './uint.js';
 
-export function isFalsyOrWhitespace(str: string | undefined): boolean {
+function isFalsyOrWhitespace(str: string | undefined): boolean {
 	if (!str || typeof str !== 'string') {
 		return true;
 	}
@@ -23,7 +23,7 @@ const _formatRegexp = /{(\d+)}/g;
  * @param value string to which formatting is applied
  * @param args replacements for {n}-entries
  */
-export function format(value: string, ...args: any[]): string {
+function format(value: string, ...args: any[]): string {
 	if (args.length === 0) {
 		return value;
 	}
@@ -41,7 +41,7 @@ const _format2Regexp = /{([^}]+)}/g;
  * Helper to create a string from a template and a string record.
  * Similar to `format` but with objects instead of positional arguments.
  */
-export function format2(template: string, values: Record<string, unknown>): string {
+function format2(template: string, values: Record<string, unknown>): string {
 	if (Object.keys(values).length === 0) {
 		return template;
 	}
@@ -54,7 +54,7 @@ export function format2(template: string, values: Record<string, unknown>): stri
  * In other words, computes `$val`, such that `attr` in `<div attr="$val" />` has the runtime value `value`.
  * This prevents XSS injection.
  */
-export function htmlAttributeEncodeValue(value: string): string {
+function htmlAttributeEncodeValue(value: string): string {
 	return value.replace(/[<>"'&]/g, ch => {
 		switch (ch) {
 			case '<': return '&lt;';
@@ -71,7 +71,7 @@ export function htmlAttributeEncodeValue(value: string): string {
  * Converts HTML characters inside the string to use entities instead. Makes the string safe from
  * being used e.g. in HTMLElement.innerHTML.
  */
-export function escape(html: string): string {
+function escape(html: string): string {
 	return html.replace(/[<>&]/g, function (match) {
 		switch (match) {
 			case '<': return '&lt;';
@@ -92,7 +92,7 @@ export function escapeRegExpCharacters(value: string): string {
 /**
  * Counts how often `substr` occurs inside `value`.
  */
-export function count(value: string, substr: string): number {
+function count(value: string, substr: string): number {
 	let result = 0;
 	let index = value.indexOf(substr);
 	while (index !== -1) {
@@ -102,7 +102,7 @@ export function count(value: string, substr: string): number {
 	return result;
 }
 
-export function truncate(value: string, maxLength: number, suffix = Ellipsis): string {
+function truncate(value: string, maxLength: number, suffix = Ellipsis): string {
 	if (value.length <= maxLength) {
 		return value;
 	}
@@ -110,7 +110,7 @@ export function truncate(value: string, maxLength: number, suffix = Ellipsis): s
 	return `${value.substr(0, maxLength)}${suffix}`;
 }
 
-export function truncateMiddle(value: string, maxLength: number, suffix = Ellipsis): string {
+function truncateMiddle(value: string, maxLength: number, suffix = Ellipsis): string {
 	if (value.length <= maxLength) {
 		return value;
 	}
@@ -126,7 +126,7 @@ export function truncateMiddle(value: string, maxLength: number, suffix = Ellips
  * @param haystack string to trim
  * @param needle the thing to trim (default is a blank)
  */
-export function trim(haystack: string, needle: string = ' '): string {
+function trim(haystack: string, needle: string = ' '): string {
 	const trimmed = ltrim(haystack, needle);
 	return rtrim(trimmed, needle);
 }
@@ -188,7 +188,7 @@ export function rtrim(haystack: string, needle: string): string {
 	return haystack.substring(0, offset);
 }
 
-export function convertSimple2RegExpPattern(pattern: string): string {
+function convertSimple2RegExpPattern(pattern: string): string {
 	return pattern.replace(/[\-\\\{\}\+\?\|\^\$\.\,\[\]\(\)\#\s]/g, '\\$&').replace(/[\*]/g, '.*');
 }
 
@@ -200,7 +200,7 @@ export interface RegExpOptions {
 	unicode?: boolean;
 }
 
-export function createRegExp(searchString: string, isRegex: boolean, options: RegExpOptions = {}): RegExp {
+function createRegExp(searchString: string, isRegex: boolean, options: RegExpOptions = {}): RegExp {
 	if (!searchString) {
 		throw new Error('Cannot create regex from empty string');
 	}
@@ -232,7 +232,7 @@ export function createRegExp(searchString: string, isRegex: boolean, options: Re
 	return new RegExp(searchString, modifiers);
 }
 
-export function regExpLeadsToEndlessLoop(regexp: RegExp): boolean {
+function regExpLeadsToEndlessLoop(regexp: RegExp): boolean {
 	// Exit early if it's one of these special cases which are meant to match
 	// against an empty string
 	if (regexp.source === '^' || regexp.source === '^$' || regexp.source === '$' || regexp.source === '^\\s*$') {
@@ -245,7 +245,7 @@ export function regExpLeadsToEndlessLoop(regexp: RegExp): boolean {
 	return !!(match && regexp.lastIndex === 0);
 }
 
-export function joinStrings(items: (string | undefined | null | false)[], separator: string): string {
+function joinStrings(items: (string | undefined | null | false)[], separator: string): string {
 	return items.filter(item => item !== undefined && item !== null && item !== false).join(separator);
 }
 
@@ -253,7 +253,7 @@ export function splitLines(str: string): string[] {
 	return str.split(/\r\n|\r|\n/);
 }
 
-export function splitLinesIncludeSeparators(str: string): string[] {
+function splitLinesIncludeSeparators(str: string): string[] {
 	const linesWithSeparators: string[] = [];
 	const splitLinesAndSeparators = str.split(/(\r\n|\r|\n)/);
 	for (let i = 0; i < Math.ceil(splitLinesAndSeparators.length / 2); i++) {
@@ -262,7 +262,7 @@ export function splitLinesIncludeSeparators(str: string): string[] {
 	return linesWithSeparators;
 }
 
-export function indexOfPattern(str: string, re: RegExp) {
+function indexOfPattern(str: string, re: RegExp) {
 	const match = re.exec(str);
 	if (match) {
 		return match.index;
@@ -288,7 +288,7 @@ export function firstNonWhitespaceIndex(str: string): number {
  * Returns the leading whitespace of the string.
  * If the string contains only whitespaces, returns entire string
  */
-export function getLeadingWhitespace(str: string, start: number = 0, end: number = str.length): string {
+function getLeadingWhitespace(str: string, start: number = 0, end: number = str.length): string {
 	for (let i = start; i < end; i++) {
 		const chCode = str.charCodeAt(i);
 		if (chCode !== CharCode.Space && chCode !== CharCode.Tab) {
@@ -312,7 +312,7 @@ export function lastNonWhitespaceIndex(str: string, startIndex: number = str.len
 	return -1;
 }
 
-export function getIndentationLength(str: string): number {
+function getIndentationLength(str: string): number {
 	const idx = firstNonWhitespaceIndex(str);
 	if (idx === -1) { return str.length; }
 	return idx;
@@ -322,7 +322,7 @@ export function getIndentationLength(str: string): number {
  * Function that works identically to String.prototype.replace, except, the
  * replace function is allowed to be async and return a Promise.
  */
-export function replaceAsync(str: string, search: RegExp, replacer: (match: string, ...args: any[]) => Promise<string>): Promise<string> {
+function replaceAsync(str: string, search: RegExp, replacer: (match: string, ...args: any[]) => Promise<string>): Promise<string> {
 	const parts: (string | Promise<string>)[] = [];
 
 	let last = 0;
@@ -371,7 +371,7 @@ export function compareSubstring(a: string, b: string, aStart: number = 0, aEnd:
 	return 0;
 }
 
-export function compareIgnoreCase(a: string, b: string): number {
+function compareIgnoreCase(a: string, b: string): number {
 	return compareSubstringIgnoreCase(a, b, 0, a.length, 0, b.length);
 }
 
@@ -422,7 +422,7 @@ export function compareSubstringIgnoreCase(a: string, b: string, aStart: number 
 	return 0;
 }
 
-export function isAsciiDigit(code: number): boolean {
+function isAsciiDigit(code: number): boolean {
 	return code >= CharCode.Digit0 && code <= CharCode.Digit9;
 }
 
@@ -430,7 +430,7 @@ export function isLowerAsciiLetter(code: number): boolean {
 	return code >= CharCode.a && code <= CharCode.z;
 }
 
-export function isUpperAsciiLetter(code: number): boolean {
+function isUpperAsciiLetter(code: number): boolean {
 	return code >= CharCode.A && code <= CharCode.Z;
 }
 
@@ -438,7 +438,7 @@ export function equalsIgnoreCase(a: string, b: string): boolean {
 	return a.length === b.length && compareSubstringIgnoreCase(a, b) === 0;
 }
 
-export function equals(a: string | undefined, b: string | undefined, ignoreCase?: boolean): boolean {
+function equals(a: string | undefined, b: string | undefined, ignoreCase?: boolean): boolean {
 	return a === b || (!!ignoreCase && a !== undefined && b !== undefined && equalsIgnoreCase(a, b));
 }
 
@@ -447,7 +447,7 @@ export function startsWithIgnoreCase(str: string, candidate: string): boolean {
 	return len <= str.length && compareSubstringIgnoreCase(str, candidate, 0, len) === 0;
 }
 
-export function endsWithIgnoreCase(str: string, candidate: string): boolean {
+function endsWithIgnoreCase(str: string, candidate: string): boolean {
 	const len = str.length;
 	const start = len - candidate.length;
 	return start >= 0 && compareSubstringIgnoreCase(str, candidate, start, len) === 0;
@@ -641,7 +641,7 @@ export function prevCharLength(str: string, initialOffset: number): number {
 	return iterator.prevGraphemeLength();
 }
 
-export function getCharContainingOffset(str: string, offset: number): [number, number] {
+function getCharContainingOffset(str: string, offset: number): [number, number] {
 	if (offset > 0 && isLowSurrogate(str.charCodeAt(offset))) {
 		offset--;
 	}
@@ -650,7 +650,7 @@ export function getCharContainingOffset(str: string, offset: number): [number, n
 	return [startOffset, endOffset];
 }
 
-export function charCount(str: string): number {
+function charCount(str: string): number {
 	const iterator = new GraphemeIterator(str);
 	let length = 0;
 	while (!iterator.eol()) {
@@ -670,7 +670,7 @@ function makeContainsRtl() {
 /**
  * Returns true if `str` contains any Unicode character that is classified as "R" or "AL".
  */
-export function containsRTL(str: string): boolean {
+function containsRTL(str: string): boolean {
 	if (!CONTAINS_RTL) {
 		CONTAINS_RTL = makeContainsRtl();
 	}
@@ -682,7 +682,7 @@ const IS_BASIC_ASCII = /^[\t\n\r\x20-\x7E]*$/;
 /**
  * Returns true if `str` contains only basic ASCII characters in the range 32 - 126 (including 32 and 126) or \n, \r, \t
  */
-export function isBasicASCII(str: string): boolean {
+function isBasicASCII(str: string): boolean {
 	return IS_BASIC_ASCII.test(str);
 }
 
@@ -690,11 +690,11 @@ export const UNUSUAL_LINE_TERMINATORS = /[\u2028\u2029]/; // LINE SEPARATOR (LS)
 /**
  * Returns true if `str` contains unusual line terminators, like LS or PS
  */
-export function containsUnusualLineTerminators(str: string): boolean {
+function containsUnusualLineTerminators(str: string): boolean {
 	return UNUSUAL_LINE_TERMINATORS.test(str);
 }
 
-export function isFullWidthCharacter(charCode: number): boolean {
+function isFullWidthCharacter(charCode: number): boolean {
 	// Do a cheap trick to better support wrapping of wide characters, treat them as 2 columns
 	// http://jrgraphix.net/research/unicode_blocks.php
 	//          2E80 - 2EFF   CJK Radicals Supplement
@@ -759,7 +759,7 @@ export function isEmojiImprecise(x: number): boolean {
  * happens at favorable positions - such as whitespace or punctuation characters.
  * The return value can be longer than the given value of `n`. Leading whitespace is always trimmed.
  */
-export function lcut(text: string, n: number, prefix = ''): string {
+function lcut(text: string, n: number, prefix = ''): string {
 	const trimmed = text.trimStart();
 
 	if (trimmed.length < n) {
@@ -795,7 +795,7 @@ const CONTROL_SEQUENCES = new RegExp('(?:' + [
 ].join('|') + ')', 'g');
 
 /** Iterates over parts of a string with CSI sequences */
-export function* forAnsiStringParts(str: string) {
+function* forAnsiStringParts(str: string) {
 	let last = 0;
 	for (const match of str.matchAll(CONTROL_SEQUENCES)) {
 		if (last !== match.index) {
@@ -837,20 +837,20 @@ const PROMPT_NON_PRINTABLE = /\\\[.*?\\\]/g;
  * removeAnsiEscapeCodesFromPrompt('\n\\[\u001b[01;34m\\]\\w\\[\u001b[00m\\]\n\\[\u001b[1;32m\\]> \\[\u001b[0m\\]');
  * // '\n\\w\n> '
  */
-export function removeAnsiEscapeCodesFromPrompt(str: string): string {
+function removeAnsiEscapeCodesFromPrompt(str: string): string {
 	return removeAnsiEscapeCodes(str).replace(PROMPT_NON_PRINTABLE, '');
 }
 
 
 // -- UTF-8 BOM
 
-export const UTF8_BOM_CHARACTER = String.fromCharCode(CharCode.UTF8_BOM);
+const UTF8_BOM_CHARACTER = String.fromCharCode(CharCode.UTF8_BOM);
 
 export function startsWithUTF8BOM(str: string): boolean {
 	return !!(str && str.length > 0 && str.charCodeAt(0) === CharCode.UTF8_BOM);
 }
 
-export function stripUTF8BOM(str: string): string {
+function stripUTF8BOM(str: string): string {
 	return startsWithUTF8BOM(str) ? str.substr(1) : str;
 }
 
@@ -858,7 +858,7 @@ export function stripUTF8BOM(str: string): string {
  * Checks if the characters of the provided query string are included in the
  * target string. The characters do not have to be contiguous within the string.
  */
-export function fuzzyContains(target: string, query: string): boolean {
+function fuzzyContains(target: string, query: string): boolean {
 	if (!target || !query) {
 		return false; // return early if target or query are undefined
 	}
@@ -886,7 +886,7 @@ export function fuzzyContains(target: string, query: string): boolean {
 	return true;
 }
 
-export function containsUppercaseCharacter(target: string, ignoreEscapedChars = false): boolean {
+function containsUppercaseCharacter(target: string, ignoreEscapedChars = false): boolean {
 	if (!target) {
 		return false;
 	}
@@ -898,11 +898,11 @@ export function containsUppercaseCharacter(target: string, ignoreEscapedChars = 
 	return target.toLowerCase() !== target;
 }
 
-export function uppercaseFirstLetter(str: string): string {
+function uppercaseFirstLetter(str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function getNLines(str: string, n = 1): string {
+function getNLines(str: string, n = 1): string {
 	if (n === 0) {
 		return '';
 	}
@@ -927,7 +927,7 @@ export function getNLines(str: string, n = 1): string {
 /**
  * Produces 'a'-'z', followed by 'A'-'Z'... followed by 'a'-'z', etc.
  */
-export function singleLetterHash(n: number): string {
+function singleLetterHash(n: number): string {
 	const LETTERS_CNT = (CharCode.Z - CharCode.A + 1);
 
 	n = n % (2 * LETTERS_CNT);
@@ -941,7 +941,7 @@ export function singleLetterHash(n: number): string {
 
 //#region Unicode Grapheme Break
 
-export function getGraphemeBreakType(codePoint: number): GraphemeBreakType {
+function getGraphemeBreakType(codePoint: number): GraphemeBreakType {
 	const graphemeBreakTree = GraphemeBreakTree.getInstance();
 	return graphemeBreakTree.getGraphemeBreakType(codePoint);
 }
@@ -1107,7 +1107,7 @@ function getGraphemeBreakRawData(): number[] {
  * Computes the offset after performing a left delete on the given string,
  * while considering unicode grapheme/emoji rules.
 */
-export function getLeftDeleteOffset(offset: number, str: string): number {
+function getLeftDeleteOffset(offset: number, str: string): number {
 	if (offset === 0) {
 		return 0;
 	}
@@ -1180,7 +1180,7 @@ const enum CodePoint {
 	space = 0x0020,
 }
 
-export const noBreakWhitespace = '\xa0';
+const noBreakWhitespace = '\xa0';
 
 export class AmbiguousCharacters {
 	private static readonly ambiguousCharacterData = new Lazy<
@@ -1359,6 +1359,6 @@ function toBinary(str: string): string {
  * of throwing an exception.
  */
 
-export function multibyteAwareBtoa(str: string): string {
+function multibyteAwareBtoa(str: string): string {
 	return btoa(toBinary(str));
 }

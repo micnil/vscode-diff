@@ -161,11 +161,11 @@ export function matchesScheme(target: URI | string, scheme: string): boolean {
 	}
 }
 
-export function matchesSomeScheme(target: URI | string, ...schemes: string[]): boolean {
+function matchesSomeScheme(target: URI | string, ...schemes: string[]): boolean {
 	return schemes.some(scheme => matchesScheme(target, scheme));
 }
 
-export const connectionTokenCookieName = 'vscode-tkn';
+const connectionTokenCookieName = 'vscode-tkn';
 export const connectionTokenQueryName = 'tkn';
 
 class RemoteAuthoritiesImpl {
@@ -255,10 +255,10 @@ export type AppResourcePath = (
 	| `y${string}` | `z${string}`
 );
 
-export const builtinExtensionsPath: AppResourcePath = 'vs/../../extensions';
-export const nodeModulesPath: AppResourcePath = 'vs/../../node_modules';
-export const nodeModulesAsarPath: AppResourcePath = 'vs/../../node_modules.asar';
-export const nodeModulesAsarUnpackedPath: AppResourcePath = 'vs/../../node_modules.asar.unpacked';
+const builtinExtensionsPath: AppResourcePath = 'vs/../../extensions';
+const nodeModulesPath: AppResourcePath = 'vs/../../node_modules';
+const nodeModulesAsarPath: AppResourcePath = 'vs/../../node_modules.asar';
+const nodeModulesAsarUnpackedPath: AppResourcePath = 'vs/../../node_modules.asar.unpacked';
 
 export const VSCODE_AUTHORITY = 'vscode-app';
 
@@ -367,13 +367,13 @@ class FileAccessImpl {
 	}
 }
 
-export const FileAccess = new FileAccessImpl();
+const FileAccess = new FileAccessImpl();
 
-export const CacheControlheaders: Record<string, string> = Object.freeze({
+const CacheControlheaders: Record<string, string> = Object.freeze({
 	'Cache-Control': 'no-cache, no-store'
 });
 
-export const DocumentPolicyheaders: Record<string, string> = Object.freeze({
+const DocumentPolicyheaders: Record<string, string> = Object.freeze({
 	'Document-Policy': 'include-js-call-stacks-in-crash-reports'
 });
 

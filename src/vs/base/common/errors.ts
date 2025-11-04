@@ -75,7 +75,7 @@ export class ErrorHandler {
 export const errorHandler = new ErrorHandler();
 
 /** @skipMangle */
-export function setUnexpectedErrorHandler(newUnexpectedErrorHandler: (e: any) => void): void {
+function setUnexpectedErrorHandler(newUnexpectedErrorHandler: (e: any) => void): void {
 	errorHandler.setUnexpectedErrorHandler(newUnexpectedErrorHandler);
 }
 
@@ -85,7 +85,7 @@ export function setUnexpectedErrorHandler(newUnexpectedErrorHandler: (e: any) =>
  *
  * @see https://github.com/microsoft/vscode-remote-release/issues/6481
  */
-export function isSigPipeError(e: unknown): e is Error {
+function isSigPipeError(e: unknown): e is Error {
 	if (!e || typeof e !== 'object') {
 		return false;
 	}
@@ -99,7 +99,7 @@ export function isSigPipeError(e: unknown): e is Error {
  * E.g. buggy extensions/invalid user-input/network issues should not be able to trigger this code path.
  * If they are, this indicates there is also a bug in the product.
 */
-export function onBugIndicatingError(e: any): undefined {
+function onBugIndicatingError(e: any): undefined {
 	errorHandler.onUnexpectedError(e);
 	return undefined;
 }
@@ -112,7 +112,7 @@ export function onUnexpectedError(e: any): undefined {
 	return undefined;
 }
 
-export function onUnexpectedExternalError(e: any): undefined {
+function onUnexpectedExternalError(e: any): undefined {
 	// ignore errors from cancelled promises
 	if (!isCancellationError(e)) {
 		errorHandler.onUnexpectedExternalError(e);
@@ -176,7 +176,7 @@ export function transformErrorFromSerialization(data: SerializedError): Error {
 }
 
 // see https://github.com/v8/v8/wiki/Stack%20Trace%20API#basic-stack-traces
-export interface V8CallSite {
+interface V8CallSite {
 	getThis(): unknown;
 	getTypeName(): string | null;
 	getFunction(): Function | undefined;
@@ -231,13 +231,13 @@ export class PendingMigrationError extends Error {
 /**
  * @deprecated use {@link CancellationError `new CancellationError()`} instead
  */
-export function canceled(): Error {
+function canceled(): Error {
 	const error = new Error(canceledName);
 	error.name = error.message;
 	return error;
 }
 
-export function illegalArgument(name?: string): Error {
+function illegalArgument(name?: string): Error {
 	if (name) {
 		return new Error(`Illegal argument: ${name}`);
 	} else {
@@ -245,7 +245,7 @@ export function illegalArgument(name?: string): Error {
 	}
 }
 
-export function illegalState(name?: string): Error {
+function illegalState(name?: string): Error {
 	if (name) {
 		return new Error(`Illegal state: ${name}`);
 	} else {
@@ -253,13 +253,13 @@ export function illegalState(name?: string): Error {
 	}
 }
 
-export class ReadonlyError extends TypeError {
+class ReadonlyError extends TypeError {
 	constructor(name?: string) {
 		super(name ? `${name} is read-only and cannot be changed` : 'Cannot change read-only property');
 	}
 }
 
-export function getErrorMessage(err: any): string {
+function getErrorMessage(err: any): string {
 	if (!err) {
 		return 'Error';
 	}
@@ -275,7 +275,7 @@ export function getErrorMessage(err: any): string {
 	return String(err);
 }
 
-export class NotImplementedError extends Error {
+class NotImplementedError extends Error {
 	constructor(message?: string) {
 		super('NotImplemented');
 		if (message) {
@@ -284,7 +284,7 @@ export class NotImplementedError extends Error {
 	}
 }
 
-export class NotSupportedError extends Error {
+class NotSupportedError extends Error {
 	constructor(message?: string) {
 		super('NotSupported');
 		if (message) {
@@ -293,7 +293,7 @@ export class NotSupportedError extends Error {
 	}
 }
 
-export class ExpectedError extends Error {
+class ExpectedError extends Error {
 	readonly isExpected = true;
 }
 

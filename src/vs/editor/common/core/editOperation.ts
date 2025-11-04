@@ -26,7 +26,7 @@ export interface ISingleEditOperation {
 	forceMoveMarkers?: boolean;
 }
 
-export class EditOperation {
+class EditOperation {
 
 	public static insert(position: Position, text: string): ISingleEditOperation {
 		return {

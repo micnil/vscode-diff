@@ -395,7 +395,7 @@ export function getLineRangeMapping(rangeMapping: RangeMapping, originalLines: A
 	return new DetailedLineRangeMapping(originalLineRange, modifiedLineRange, [rangeMapping]);
 }
 
-export function lineRangeMappingFromChange(change: IChange): LineRangeMapping {
+function lineRangeMappingFromChange(change: IChange): LineRangeMapping {
 	let originalRange: LineRange;
 	if (change.originalEndLineNumber === 0) {
 		// Insertion

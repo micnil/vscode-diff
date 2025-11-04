@@ -182,7 +182,7 @@ export interface ITransaction {
 /**
  * This function is used to indicate that the caller recovered from an error that indicates a bug.
 */
-export function handleBugIndicatingErrorRecovery(message: string) {
+function handleBugIndicatingErrorRecovery(message: string) {
 	const err = new Error('BugIndicatingErrorRecovery: ' + message);
 	onUnexpectedError(err);
 	console.error('recovered from an error that indicates a bug', err);
@@ -191,10 +191,10 @@ export function handleBugIndicatingErrorRecovery(message: string) {
 /**
  * A settable observable.
  */
-export interface ISettableObservable<T, TChange = void> extends IObservableWithChange<T, TChange>, ISettable<T, TChange> {
+interface ISettableObservable<T, TChange = void> extends IObservableWithChange<T, TChange>, ISettable<T, TChange> {
 }
 
-export interface IReaderWithStore extends IReader {
+interface IReaderWithStore extends IReader {
 	/**
 	 * Items in this store get disposed just before the observable recomputes/reruns or when it becomes unobserved.
 	*/

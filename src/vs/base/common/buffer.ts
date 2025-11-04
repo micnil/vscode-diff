@@ -248,14 +248,14 @@ export function binaryIndexOf(haystack: Uint8Array, needle: Uint8Array, offset =
 	return result;
 }
 
-export function readUInt16LE(source: Uint8Array, offset: number): number {
+function readUInt16LE(source: Uint8Array, offset: number): number {
 	return (
 		((source[offset + 0] << 0) >>> 0) |
 		((source[offset + 1] << 8) >>> 0)
 	);
 }
 
-export function writeUInt16LE(destination: Uint8Array, value: number, offset: number): void {
+function writeUInt16LE(destination: Uint8Array, value: number, offset: number): void {
 	destination[offset + 0] = (value & 0b11111111);
 	value = value >>> 8;
 	destination[offset + 1] = (value & 0b11111111);
@@ -311,15 +311,15 @@ export interface VSBufferReadable extends streams.Readable<VSBuffer> { }
 
 export interface VSBufferReadableStream extends streams.ReadableStream<VSBuffer> { }
 
-export interface VSBufferWriteableStream extends streams.WriteableStream<VSBuffer> { }
+interface VSBufferWriteableStream extends streams.WriteableStream<VSBuffer> { }
 
-export interface VSBufferReadableBufferedStream extends streams.ReadableBufferedStream<VSBuffer> { }
+interface VSBufferReadableBufferedStream extends streams.ReadableBufferedStream<VSBuffer> { }
 
-export function readableToBuffer(readable: VSBufferReadable): VSBuffer {
+function readableToBuffer(readable: VSBufferReadable): VSBuffer {
 	return streams.consumeReadable<VSBuffer>(readable, chunks => VSBuffer.concat(chunks));
 }
 
-export function bufferToReadable(buffer: VSBuffer): VSBufferReadable {
+function bufferToReadable(buffer: VSBuffer): VSBufferReadable {
 	return streams.toReadable<VSBuffer>(buffer);
 }
 
@@ -327,7 +327,7 @@ export function streamToBuffer(stream: streams.ReadableStream<VSBuffer>): Promis
 	return streams.consumeStream<VSBuffer>(stream, chunks => VSBuffer.concat(chunks));
 }
 
-export async function bufferedStreamToBuffer(bufferedStream: streams.ReadableBufferedStream<VSBuffer>): Promise<VSBuffer> {
+async function bufferedStreamToBuffer(bufferedStream: streams.ReadableBufferedStream<VSBuffer>): Promise<VSBuffer> {
 	if (bufferedStream.ended) {
 		return VSBuffer.concat(bufferedStream.buffer);
 	}
@@ -342,28 +342,28 @@ export async function bufferedStreamToBuffer(bufferedStream: streams.ReadableBuf
 	]);
 }
 
-export function bufferToStream(buffer: VSBuffer): streams.ReadableStream<VSBuffer> {
+function bufferToStream(buffer: VSBuffer): streams.ReadableStream<VSBuffer> {
 	return streams.toStream<VSBuffer>(buffer, chunks => VSBuffer.concat(chunks));
 }
 
-export function streamToBufferReadableStream(stream: streams.ReadableStreamEvents<Uint8Array | string>): streams.ReadableStream<VSBuffer> {
+function streamToBufferReadableStream(stream: streams.ReadableStreamEvents<Uint8Array | string>): streams.ReadableStream<VSBuffer> {
 	return streams.transform<Uint8Array | string, VSBuffer>(stream, { data: data => typeof data === 'string' ? VSBuffer.fromString(data) : VSBuffer.wrap(data) }, chunks => VSBuffer.concat(chunks));
 }
 
-export function newWriteableBufferStream(options?: streams.WriteableStreamOptions): streams.WriteableStream<VSBuffer> {
+function newWriteableBufferStream(options?: streams.WriteableStreamOptions): streams.WriteableStream<VSBuffer> {
 	return streams.newWriteableStream<VSBuffer>(chunks => VSBuffer.concat(chunks), options);
 }
 
-export function prefixedBufferReadable(prefix: VSBuffer, readable: VSBufferReadable): VSBufferReadable {
+function prefixedBufferReadable(prefix: VSBuffer, readable: VSBufferReadable): VSBufferReadable {
 	return streams.prefixedReadable(prefix, readable, chunks => VSBuffer.concat(chunks));
 }
 
-export function prefixedBufferStream(prefix: VSBuffer, stream: VSBufferReadableStream): VSBufferReadableStream {
+function prefixedBufferStream(prefix: VSBuffer, stream: VSBufferReadableStream): VSBufferReadableStream {
 	return streams.prefixedStream(prefix, stream, chunks => VSBuffer.concat(chunks));
 }
 
 /** Decodes base64 to a uint8 array. URL-encoded and unpadded base64 is allowed. */
-export function decodeBase64(encoded: string) {
+function decodeBase64(encoded: string) {
 	let building = 0;
 	let remainder = 0;
 	let bufi = 0;
@@ -428,7 +428,7 @@ const base64Alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123
 const base64UrlSafeAlphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
 /** Encodes a buffer to a base64 string. */
-export function encodeBase64({ buffer }: VSBuffer, padded = true, urlSafe = false) {
+function encodeBase64({ buffer }: VSBuffer, padded = true, urlSafe = false) {
 	const dictionary = urlSafe ? base64UrlSafeAlphabet : base64Alphabet;
 	let output = '';
 
@@ -474,7 +474,7 @@ export function encodeHex({ buffer }: VSBuffer): string {
 	return result;
 }
 
-export function decodeHex(hex: string): VSBuffer {
+function decodeHex(hex: string): VSBuffer {
 	if (hex.length % 2 !== 0) {
 		throw new SyntaxError('Hex string must have an even length');
 	}

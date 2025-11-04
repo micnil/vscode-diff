@@ -73,4 +73,4 @@ export const platform = safeProcess.platform;
  * environments.
  * Note: `arch` is `undefined` in web
  */
-export const arch = safeProcess.arch;
+const arch = safeProcess.arch;

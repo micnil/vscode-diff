@@ -7,13 +7,13 @@
  * An interface for a JavaScript object that
  * acts a dictionary. The keys are strings.
  */
-export type IStringDictionary<V> = Record<string, V>;
+type IStringDictionary<V> = Record<string, V>;
 
 /**
  * An interface for a JavaScript object that
  * acts a dictionary. The keys are numbers.
  */
-export type INumberDictionary<V> = Record<number, V>;
+type INumberDictionary<V> = Record<number, V>;
 
 /**
  * Groups the collection into a dictionary based on the provided
@@ -32,7 +32,7 @@ export function groupBy<K extends string | number | symbol, V>(data: readonly V[
 	return result;
 }
 
-export function groupByMap<K, V>(data: V[], groupFn: (element: V) => K): Map<K, V[]> {
+function groupByMap<K, V>(data: V[], groupFn: (element: V) => K): Map<K, V[]> {
 	const result = new Map<K, V[]>();
 	for (const element of data) {
 		const key = groupFn(element);
@@ -62,7 +62,7 @@ export function diffSets<T>(before: ReadonlySet<T>, after: ReadonlySet<T>): { re
 	return { removed, added };
 }
 
-export function diffMaps<K, V>(before: Map<K, V>, after: Map<K, V>): { removed: V[]; added: V[] } {
+function diffMaps<K, V>(before: Map<K, V>, after: Map<K, V>): { removed: V[]; added: V[] } {
 	const removed: V[] = [];
 	const added: V[] = [];
 	for (const [index, value] of before) {
@@ -85,7 +85,7 @@ export function diffMaps<K, V>(before: Map<K, V>, after: Map<K, V>): { removed: 
  * @param setB - The second iterable.
  * @returns A new set containing the elements that are in both `setA` and `setB`.
  */
-export function intersection<T>(setA: Set<T>, setB: Iterable<T>): Set<T> {
+function intersection<T>(setA: Set<T>, setB: Iterable<T>): Set<T> {
 	const result = new Set<T>();
 	for (const elem of setB) {
 		if (setA.has(elem)) {
@@ -95,7 +95,7 @@ export function intersection<T>(setA: Set<T>, setB: Iterable<T>): Set<T> {
 	return result;
 }
 
-export class SetWithKey<T> implements Set<T> {
+class SetWithKey<T> implements Set<T> {
 	private _map = new Map<any, T>();
 
 	constructor(values: T[], private toKey: (t: T) => unknown) {

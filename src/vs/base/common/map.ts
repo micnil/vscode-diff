@@ -5,7 +5,7 @@
 
 import { URI } from './uri.js';
 
-export function getOrSet<K, V>(map: Map<K, V>, key: K, value: V): V {
+function getOrSet<K, V>(map: Map<K, V>, key: K, value: V): V {
 	let result = map.get(key);
 	if (result === undefined) {
 		result = value;
@@ -15,7 +15,7 @@ export function getOrSet<K, V>(map: Map<K, V>, key: K, value: V): V {
 	return result;
 }
 
-export function mapToString<K, V>(map: Map<K, V>): string {
+function mapToString<K, V>(map: Map<K, V>): string {
 	const entries: string[] = [];
 	map.forEach((value, key) => {
 		entries.push(`${key} => ${value}`);
@@ -24,7 +24,7 @@ export function mapToString<K, V>(map: Map<K, V>): string {
 	return `Map(${map.size}) {${entries.join(', ')}}`;
 }
 
-export function setToString<K>(set: Set<K>): string {
+function setToString<K>(set: Set<K>): string {
 	const entries: K[] = [];
 	set.forEach(value => {
 		entries.push(value);
@@ -150,7 +150,7 @@ export class ResourceMap<T> implements Map<URI, T> {
 	}
 }
 
-export class ResourceSet implements Set<URI> {
+class ResourceSet implements Set<URI> {
 
 	readonly [Symbol.toStringTag]: string = 'ResourceSet';
 
@@ -675,7 +675,7 @@ abstract class Cache<K, V> extends LinkedMap<K, V> {
 	protected abstract trim(newSize: number): void;
 }
 
-export class LRUCache<K, V> extends Cache<K, V> {
+class LRUCache<K, V> extends Cache<K, V> {
 
 	constructor(limit: number, ratio: number = 1) {
 		super(limit, ratio);
@@ -692,7 +692,7 @@ export class LRUCache<K, V> extends Cache<K, V> {
 	}
 }
 
-export class MRUCache<K, V> extends Cache<K, V> {
+class MRUCache<K, V> extends Cache<K, V> {
 
 	constructor(limit: number, ratio: number = 1) {
 		super(limit, ratio);
@@ -852,7 +852,7 @@ export class SetMap<K, V> {
 	}
 }
 
-export function mapsStrictEqualIgnoreOrder(a: Map<unknown, unknown>, b: Map<unknown, unknown>): boolean {
+function mapsStrictEqualIgnoreOrder(a: Map<unknown, unknown>, b: Map<unknown, unknown>): boolean {
 	if (a === b) {
 		return true;
 	}
@@ -882,7 +882,7 @@ export function mapsStrictEqualIgnoreOrder(a: Map<unknown, unknown>, b: Map<unkn
  * example for a very hot function, constructing a string like `first-second-third` for every call
  * will cause a significant hit to performance.
  */
-export class NKeyMap<TValue, TKeys extends (string | boolean | number)[]> {
+class NKeyMap<TValue, TKeys extends (string | boolean | number)[]> {
 	private _data: Map<any, any> = new Map();
 
 	/**

@@ -19,13 +19,13 @@ import { BugIndicatingError, onUnexpectedError } from './errors.js';
  * There is no tooling for generating such an import statement.
  * Thus, the `assert(...)` function should be used instead.
  */
-export function ok(value?: unknown, message?: string) {
+function ok(value?: unknown, message?: string) {
 	if (!value) {
 		throw new Error(message ? `Assertion failed (${message})` : 'Assertion Failed');
 	}
 }
 
-export function assertNever(value: never, message = 'Unreachable'): never {
+function assertNever(value: never, message = 'Unreachable'): never {
 	throw new Error(message);
 }
 
@@ -54,7 +54,7 @@ export function assert(
 /**
  * Like assert, but doesn't throw.
  */
-export function softAssert(condition: boolean, message = 'Soft Assertion Failed'): void {
+function softAssert(condition: boolean, message = 'Soft Assertion Failed'): void {
 	if (!condition) {
 		onUnexpectedError(new BugIndicatingError(message));
 	}
