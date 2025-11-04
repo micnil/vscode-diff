@@ -419,7 +419,7 @@ export class URI implements UriComponents {
 	}
 }
 
-export interface UriComponents {
+interface UriComponents {
 	scheme: string;
 	authority?: string;
 	path?: string;
@@ -607,7 +607,7 @@ function encodeURIComponentMinimal(path: string): string {
 /**
  * Compute `fsPath` for the given uri
  */
-export function uriToFsPath(uri: URI, keepDriveLetterCasing: boolean): string {
+function uriToFsPath(uri: URI, keepDriveLetterCasing: boolean): string {
 
 	let value: string;
 	if (uri.authority && uri.path.length > 1 && uri.scheme === 'file') {

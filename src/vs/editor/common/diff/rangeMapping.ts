@@ -357,7 +357,7 @@ export function lineRangeMappingFromRangeMappings(alignments: readonly RangeMapp
 	return changes;
 }
 
-export function getLineRangeMapping(rangeMapping: RangeMapping, originalLines: AbstractText, modifiedLines: AbstractText): DetailedLineRangeMapping {
+function getLineRangeMapping(rangeMapping: RangeMapping, originalLines: AbstractText, modifiedLines: AbstractText): DetailedLineRangeMapping {
 	let lineStartDelta = 0;
 	let lineEndDelta = 0;
 

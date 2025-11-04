@@ -5,7 +5,7 @@
 
 import * as nls from '../../nls.js';
 
-export const LANGUAGE_DEFAULT = 'en';
+const LANGUAGE_DEFAULT = 'en';
 
 let _isWindows = false;
 let _isMacintosh = false;
@@ -113,7 +113,7 @@ else {
 	console.error('Unable to resolve platform.');
 }
 
-export const enum Platform {
+const enum Platform {
 	Web,
 	Mac,
 	Linux,
@@ -137,7 +137,7 @@ export const isMacintosh = _isMacintosh;
  * the string is all lower case (e.g. zh-tw for Traditional
  * Chinese or de for German)
  */
-export const language = _language;
+const language = _language;
 
 export namespace Language {
 

@@ -11,7 +11,7 @@ import { Range } from '../range.js';
 import type { TextReplacement, TextEdit } from '../edits/textEdit.js';
 import type { TextLength } from '../text/textLength.js';
 
-export abstract class PositionOffsetTransformerBase {
+abstract class PositionOffsetTransformerBase {
 	abstract getOffset(position: Position): number;
 
 	getOffsetRange(range: Range): OffsetRange {

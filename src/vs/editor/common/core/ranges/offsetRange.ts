@@ -5,7 +5,7 @@
 
 import { BugIndicatingError } from '../../../../base/common/errors.js';
 
-export interface IOffsetRange {
+interface IOffsetRange {
 	readonly start: number;
 	readonly endExclusive: number;
 }

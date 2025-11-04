@@ -246,7 +246,7 @@ export class LineRange {
 	}
 }
 
-export type ISerializedLineRange = [startLineNumber: number, endLineNumberExclusive: number];
+type ISerializedLineRange = [startLineNumber: number, endLineNumberExclusive: number];
 
 
 export class LineRangeSet {

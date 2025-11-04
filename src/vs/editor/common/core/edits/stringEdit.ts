@@ -188,7 +188,7 @@ export abstract class BaseStringEdit<T extends BaseStringReplacement<T> = BaseSt
 	}
 }
 
-export abstract class BaseStringReplacement<T extends BaseStringReplacement<T> = BaseStringReplacement<any>> extends BaseReplacement<T> {
+abstract class BaseStringReplacement<T extends BaseStringReplacement<T> = BaseStringReplacement<any>> extends BaseReplacement<T> {
 	constructor(
 		range: OffsetRange,
 		public readonly newText: string
@@ -354,12 +354,12 @@ export class StringEdit extends BaseStringEdit<StringReplacement, StringEdit> {
 /**
  * Warning: Be careful when changing this type, as it is used for serialization!
 */
-export type ISerializedStringEdit = ISerializedStringReplacement[];
+type ISerializedStringEdit = ISerializedStringReplacement[];
 
 /**
  * Warning: Be careful when changing this type, as it is used for serialization!
 */
-export interface ISerializedStringReplacement {
+interface ISerializedStringReplacement {
 	txt: string;
 	pos: number;
 	len: number;
@@ -398,7 +398,7 @@ export class StringReplacement extends BaseStringReplacement<StringReplacement> 
 /**
  * Represents data associated to a single edit, which survives certain edit operations.
 */
-export interface IEditData<T> {
+interface IEditData<T> {
 	join(other: T): T | undefined;
 }
 

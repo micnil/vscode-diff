@@ -66,7 +66,7 @@ export abstract class AbstractText {
 	}
 }
 
-export class LineBasedText extends AbstractText {
+class LineBasedText extends AbstractText {
 	constructor(
 		private readonly _getLineContent: (lineNumber: number) => string,
 		private readonly _lineCount: number

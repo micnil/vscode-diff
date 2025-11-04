@@ -178,7 +178,7 @@ function _format(sep: string, pathObject: ParsedPath) {
 	return dir === pathObject.root ? `${dir}${base}` : `${dir}${sep}${base}`;
 }
 
-export interface ParsedPath {
+interface ParsedPath {
 	root: string;
 	dir: string;
 	base: string;
@@ -186,7 +186,7 @@ export interface ParsedPath {
 	name: string;
 }
 
-export interface IPath {
+interface IPath {
 	normalize(path: string): string;
 	isAbsolute(path: string): boolean;
 	join(...paths: string[]): string;

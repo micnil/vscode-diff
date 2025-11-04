@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export interface INLSLanguagePackConfiguration {
+interface INLSLanguagePackConfiguration {
 
 	/**
 	 * The path to the translations config file that contains pointers to
