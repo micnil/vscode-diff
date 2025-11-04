@@ -80,26 +80,6 @@ export function commonSuffixLength(a: string, b: string): number {
 	return len;
 }
 
-/**
- * See http://en.wikipedia.org/wiki/Surrogate_pair
- */
-export function isHighSurrogate(charCode: number): boolean {
-	return (0xD800 <= charCode && charCode <= 0xDBFF);
-}
-
-/**
- * See http://en.wikipedia.org/wiki/Surrogate_pair
- */
-export function isLowSurrogate(charCode: number): boolean {
-	return (0xDC00 <= charCode && charCode <= 0xDFFF);
-}
-
-/**
- * See http://en.wikipedia.org/wiki/Surrogate_pair
- */
-export function computeCodePoint(highSurrogate: number, lowSurrogate: number): number {
-	return ((highSurrogate - 0xD800) << 10) + (lowSurrogate - 0xDC00) + 0x10000;
-}
 
 export class AmbiguousCharacters {
 	private static readonly ambiguousCharacterData = new Lazy<
