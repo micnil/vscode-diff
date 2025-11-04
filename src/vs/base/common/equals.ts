@@ -83,6 +83,3 @@ export function structuralEquals<T>(a: T, b: T): boolean {
 
 	return false;
 }
-
-let objectId = 0;
-const objIds = new WeakMap<object, number>();

@@ -4,10 +4,10 @@
  *--------------------------------------------------------------------------------------------*/
 
 import * as errors from './errors.js';
+import * as paths from './path.js';
 import * as platform from './platform.js';
 import { equalsIgnoreCase, startsWithIgnoreCase } from './strings.js';
 import { URI } from './uri.js';
-import * as paths from './path.js';
 
 export namespace Schemas {
 
@@ -287,7 +287,6 @@ export namespace COI {
 	 * isn't enabled the current context
 	 */
 	export function addSearchParam(urlOrSearch: URLSearchParams | Record<string, string>, coop: boolean, coep: boolean): void {
-		// eslint-disable-next-line local/code-no-any-casts
 		if (!(<any>globalThis).crossOriginIsolated) {
 			// depends on the current context being COI
 			return;

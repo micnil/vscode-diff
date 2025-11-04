@@ -46,7 +46,6 @@ export function isNumber(obj: unknown): obj is number {
  * @returns whether the provided parameter is an Iterable, casting to the given generic
  */
 export function isIterable<T>(obj: unknown): obj is Iterable<T> {
-	// eslint-disable-next-line local/code-no-any-casts
 	return !!obj && typeof (obj as any)[Symbol.iterator] === 'function';
 }
 
@@ -157,7 +156,6 @@ export function validateConstraint(arg: unknown, constraint: TypeConstraint | un
 		} catch {
 			// ignore
 		}
-		// eslint-disable-next-line local/code-no-any-casts
 		if (!isUndefinedOrNull(arg) && (arg as any).constructor === constraint) {
 			return;
 		}
