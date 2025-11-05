@@ -7,14 +7,6 @@ import { LRUCachedFunction } from './cache.js';
 import { CharCode } from './charCode.js';
 import { Lazy } from './lazy.js';
 
-const _formatRegexp = /{(\d+)}/g;
-
-const _format2Regexp = /{([^}]+)}/g;
-
-export function splitLines(str: string): string[] {
-	return str.split(/\r\n|\r|\n/);
-}
-
 /**
  * Returns first index of the string that is not whitespace.
  * If string is empty or contains only whitespaces, returns -1

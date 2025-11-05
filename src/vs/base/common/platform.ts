@@ -23,7 +23,7 @@ let _platformLocale: string = LANGUAGE_DEFAULT;
 let _translationsConfigFile: string | undefined = undefined;
 let _userAgent: string | undefined = undefined;
 
-export interface IProcessEnvironment {
+interface IProcessEnvironment {
 	[key: string]: string | undefined;
 }
 
@@ -34,7 +34,7 @@ export interface IProcessEnvironment {
  * define the properties here that we need for `platform`
  * to work and nothing else.
  */
-export interface INodeProcess {
+interface INodeProcess {
 	platform: string;
 	arch: string;
 	env: IProcessEnvironment;
@@ -130,7 +130,6 @@ if (_isMacintosh) {
 }
 
 export const isWindows = _isWindows;
-export const isMacintosh = _isMacintosh;
 
 /**
  * The language used for the user interface. The format of

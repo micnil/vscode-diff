@@ -89,25 +89,3 @@ export class ArrayText extends LineBasedText {
 		);
 	}
 }
-
-export class StringText extends AbstractText {
-	private readonly _t;
-
-	constructor(public readonly value: string) {
-		super();
-		this._t = new PositionOffsetTransformer(this.value);
-	}
-
-	getValueOfRange(range: Range): string {
-		return this._t.getOffsetRange(range).substring(this.value);
-	}
-
-	get length(): TextLength {
-		return this._t.textLength;
-	}
-
-	// Override the getTransformer method to return the cached transformer
-	override getTransformer() {
-		return this._t;
-	}
-}
