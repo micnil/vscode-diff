@@ -12,35 +12,11 @@ export abstract class AbstractText {
 	abstract getValueOfRange(range: Range): string;
 	abstract readonly length: TextLength;
 
-	
-
-
-
-	getValue(): string {
-		return this.getValueOfRange(this.length.toRange());
-	}
-
-
-
 	getLineLength(lineNumber: number): number {
 		return this.getValueOfRange(new Range(lineNumber, 1, lineNumber, Number.MAX_SAFE_INTEGER)).length;
 	}
 
 	private _transformer: PositionOffsetTransformer | undefined = undefined;
-
-	getTransformer(): PositionOffsetTransformer {
-		if (!this._transformer) {
-			this._transformer = new PositionOffsetTransformer(this.getValue());
-		}
-		return this._transformer;
-	}
-
-	
-
-
-
-
-
 
 }
 

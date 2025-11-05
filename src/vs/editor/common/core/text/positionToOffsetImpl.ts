@@ -5,10 +5,10 @@
 
 import { findLastIdxMonotonous } from '../../../../base/common/arraysFind.js';
 import { StringEdit, StringReplacement } from '../edits/stringEdit.js';
-import { OffsetRange } from '../ranges/offsetRange.js';
+import type { TextEdit, TextReplacement } from '../edits/textEdit.js';
 import { Position } from '../position.js';
 import { Range } from '../range.js';
-import type { TextReplacement, TextEdit } from '../edits/textEdit.js';
+import { OffsetRange } from '../ranges/offsetRange.js';
 import type { TextLength } from '../text/textLength.js';
 
 abstract class PositionOffsetTransformerBase {
@@ -121,8 +121,6 @@ export class PositionOffsetTransformer extends PositionOffsetTransformerBase {
 		const column = offset - this.lineStartOffsetByLineIdx[idx] + 1;
 		return new Position(lineNumber, column);
 	}
-
-	
 
 	get textLength(): TextLength {
 		const lineIdx = this.lineStartOffsetByLineIdx.length - 1;

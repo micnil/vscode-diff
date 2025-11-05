@@ -1,4 +1,4 @@
-import { AdvancedLinesDiffComputer, DiffComputer, IDiffComputerOpts, ILineChange, ILinesDiffComputerOptions } from '../dist';
+import { DefaultLinesDiffComputer, DiffComputer, IDiffComputerOpts, ILineChange, ILinesDiffComputerOptions } from '../dist';
 
 let originalLines: string[] = ["hello", "original", "world"];
 let modifiedLines: string[] = ["hello", "modified", "world", "foobar"];
@@ -20,7 +20,7 @@ let advOptions: ILinesDiffComputerOptions = {
 	computeMoves: true,
 	maxComputationTimeMs: 0
 }
-let advDiffComputer = new AdvancedLinesDiffComputer()
+let advDiffComputer = new DefaultLinesDiffComputer()
 let advLineChanges = advDiffComputer.computeDiff(originalLines, modifiedLines, advOptions).changes;
 
 console.log(JSON.stringify(advLineChanges, null, 2));

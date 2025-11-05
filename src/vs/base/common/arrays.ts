@@ -218,7 +218,3 @@ export class Permutation {
 	}
 
 }
-
-export function sumBy<T>(array: readonly T[], selector: (value: T) => number): number {
-	return array.reduce((acc, value) => acc + selector(value), 0);
-}

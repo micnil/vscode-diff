@@ -20,8 +20,5 @@ export class TextReplacement {
 		public readonly text: string,
 	) {
 	}
-	static equals(first: TextReplacement, second: TextReplacement) {
-		return first.range.equalsRange(second.range) && first.text === second.text;
-	}
 }
 

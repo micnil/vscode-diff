@@ -188,16 +188,7 @@ export abstract class BaseReplacement<TSelf extends BaseReplacement<TSelf>> {
 		return this.slice(this.replaceRange.delta(offset), new OffsetRange(0, this.getNewLength()));
 	}
 
-	public getLengthDelta(): number {
-		return this.getNewLength() - this.replaceRange.length;
-	}
-
 	abstract equals(other: TSelf): boolean;
-
-
-	get isEmpty() {
-		return this.getNewLength() === 0 && this.replaceRange.length === 0;
-	}
 }
 
 

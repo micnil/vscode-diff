@@ -41,7 +41,7 @@ export class Position {
 	 * @param newLineNumber new line number
 	 * @param newColumn new column
 	 */
-	
+
 
 	/**
 	 * Derive a new position from this position.
@@ -49,17 +49,17 @@ export class Position {
 	 * @param deltaLineNumber line number delta
 	 * @param deltaColumn column delta
 	 */
-	
+
 
 	/**
 	 * Test if this position equals other position
 	 */
-	
+
 
 	/**
 	 * Test if position `a` equals position `b`
 	 */
-	
+
 
 	/**
 	 * Test if this position is before other position.
@@ -105,34 +105,4 @@ export class Position {
 		return a.column <= b.column;
 	}
 
-	/**
-	 * A function that compares positions, useful for sorting
-	 */
-	
-
-	/**
-	 * Clone this position.
-	 */
-	
-
-	/**
-	 * Convert to a human-readable representation.
-	 */
-	
-
-	// ---
-
-	/**
-	 * Create a `Position` from an `IPosition`.
-	 */
-	public static lift(pos: IPosition): Position {
-		return new Position(pos.lineNumber, pos.column);
-	}
-
-	/**
-	 * Test if `obj` is an `IPosition`.
-	 */
-	
-
-	
 }

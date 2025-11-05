@@ -12,9 +12,7 @@ import { OffsetRange } from './offsetRange.js';
  * A range of lines (1-based).
  */
 export class LineRange {
-	public static ofLength(startLineNumber: number, length: number): LineRange {
-		return new LineRange(startLineNumber, startLineNumber + length);
-	}
+
 	/**
 	 * The start line number.
 	 */

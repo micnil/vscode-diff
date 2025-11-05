@@ -38,28 +38,56 @@ Output:
 ```json
 [
   {
-    "originalStartLineNumber": 2,
-    "originalEndLineNumber": 2,
-    "modifiedStartLineNumber": 2,
-    "modifiedEndLineNumber": 2,
-    "charChanges": [
+    "original": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "modified": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "innerChanges": [
       {
-        "originalStartLineNumber": 2,
-        "originalStartColumn": 1,
-        "originalEndLineNumber": 2,
-        "originalEndColumn": 9,
-        "modifiedStartLineNumber": 2,
-        "modifiedStartColumn": 1,
-        "modifiedEndLineNumber": 2,
-        "modifiedEndColumn": 9
+        "originalRange": {
+          "startLineNumber": 2,
+          "startColumn": 1,
+          "endLineNumber": 2,
+          "endColumn": 9
+        },
+        "modifiedRange": {
+          "startLineNumber": 2,
+          "startColumn": 1,
+          "endLineNumber": 2,
+          "endColumn": 9
+        }
       }
     ]
   },
   {
-    "originalStartLineNumber": 3,
-    "originalEndLineNumber": 0,
-    "modifiedStartLineNumber": 4,
-    "modifiedEndLineNumber": 4
+    "original": {
+      "startLineNumber": 4,
+      "endLineNumberExclusive": 4
+    },
+    "modified": {
+      "startLineNumber": 4,
+      "endLineNumberExclusive": 5
+    },
+    "innerChanges": [
+      {
+        "originalRange": {
+          "startLineNumber": 3,
+          "startColumn": 6,
+          "endLineNumber": 3,
+          "endColumn": 6
+        },
+        "modifiedRange": {
+          "startLineNumber": 3,
+          "startColumn": 6,
+          "endLineNumber": 4,
+          "endColumn": 7
+        }
+      }
+    ]
   }
 ]
 ```

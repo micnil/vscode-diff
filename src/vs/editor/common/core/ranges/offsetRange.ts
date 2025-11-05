@@ -14,11 +14,6 @@ interface IOffsetRange {
  * A range of offsets (0-based).
 */
 export class OffsetRange implements IOffsetRange {
-	
-
-	
-
-	
 
 	public static ofLength(length: number): OffsetRange {
 		return new OffsetRange(0, length);
@@ -66,9 +61,9 @@ export class OffsetRange implements IOffsetRange {
 		return this.start === other.start && this.endExclusive === other.endExclusive;
 	}
 
-	
 
-	
+
+
 
 	/**
 	 * for all numbers n: range1.contains(n) or range2.contains(n) => range1.join(range2).contains(n)
@@ -93,7 +88,7 @@ export class OffsetRange implements IOffsetRange {
 		return undefined;
 	}
 
-	
+
 
 	public intersects(other: OffsetRange): boolean {
 		const start = Math.max(this.start, other.start);
@@ -107,9 +102,9 @@ export class OffsetRange implements IOffsetRange {
 		return start <= end;
 	}
 
-	
 
-	
+
+
 
 	public slice<T>(arr: readonly T[]): T[] {
 		return arr.slice(this.start, this.endExclusive);
@@ -118,22 +113,6 @@ export class OffsetRange implements IOffsetRange {
 	public substring(str: string): string {
 		return str.substring(this.start, this.endExclusive);
 	}
-
-	/**
-	 * Returns the given value if it is contained in this instance, otherwise the closest value that is contained.
-	 * The range must not be empty.
-	 */
-	
-
-	/**
-	 * Returns `r := value + k * length` such that `r` is contained in this range.
-	 * The range must not be empty.
-	 *
-	 * E.g. `[5, 10).clipCyclic(10) === 5`, `[5, 10).clipCyclic(11) === 6` and `[5, 10).clipCyclic(4) === 9`.
-	 */
-	
-
-	
 
 	public forEach(f: (offset: number) => void): void {
 		for (let i = this.start; i < this.endExclusive; i++) {

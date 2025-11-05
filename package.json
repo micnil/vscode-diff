@@ -23,7 +23,7 @@
     "build": "tsc --project tsconfig.build.json",
     "knip": "knip",
     "cleanup": "eslint --quiet -f json | remove-unused-vars",
-    "example": "yarn build && ts-node ./example/example.ts",
+    "example": "npm run build && tsx ./example/example.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

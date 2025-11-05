@@ -103,17 +103,6 @@ abstract class BaseStringReplacement<T extends BaseStringReplacement<T> = BaseSt
  * All these replacements are applied at once.
 */
 export class StringEdit extends BaseStringEdit<StringReplacement, StringEdit> {
-	public static readonly empty = new StringEdit([]);
-
-	public static create(replacements: readonly StringReplacement[]): StringEdit {
-		return new StringEdit(replacements);
-	}
-
-	/**
-	 * The replacements are applied in order!
-	 * Equals `StringEdit.compose(replacements.map(r => r.toEdit()))`, but is much more performant.
-	*/
-
 
 	constructor(replacements: readonly StringReplacement[]) {
 		super(replacements);
@@ -135,9 +124,6 @@ interface ISerializedStringReplacement {
 }
 
 export class StringReplacement extends BaseStringReplacement<StringReplacement> {
-	public static fromJson(data: ISerializedStringReplacement): StringReplacement {
-		return new StringReplacement(OffsetRange.ofStartAndLength(data.pos, data.len), data.txt);
-	}
 
 	override equals(other: StringReplacement): boolean {
 		return this.replaceRange.equals(other.replaceRange) && this.newText === other.newText;
