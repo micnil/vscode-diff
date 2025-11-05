@@ -12,13 +12,13 @@
     "knip": "^5.67.1",
     "mocha": "^9.2.2",
     "remove-unused-vars": "^0.0.9",
-    "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.3"
   },
   "scripts": {
-    "test": "mocha -u tdd --require ts-node/register src/**/test/**/*.ts",
+    "test": "mocha -u tdd --require tsx/cjs src/**/test/**/*.ts",
     "watch": "tsc --watch",
     "build": "tsc --project tsconfig.build.json",
     "knip": "knip",
