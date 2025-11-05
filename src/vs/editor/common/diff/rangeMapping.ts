@@ -6,7 +6,6 @@
 import { groupAdjacentBy } from '../../../base/common/arrays.js';
 import { assertFn, checkAdjacentItems } from '../../../base/common/assert.js';
 import { BugIndicatingError } from '../../../base/common/errors.js';
-import { TextReplacement } from '../core/edits/textEdit.js';
 import { Position } from '../core/position.js';
 import { Range } from '../core/range.js';
 import { LineRange } from '../core/ranges/lineRange.js';
@@ -236,14 +235,6 @@ export class RangeMapping {
 
 	public flip(): RangeMapping {
 		return new RangeMapping(this.modifiedRange, this.originalRange);
-	}
-
-	/**
-	 * Creates a single text edit that describes the change from the original to the modified text.
-	*/
-	public toTextEdit(modified: AbstractText): TextReplacement {
-		const newText = modified.getValueOfRange(this.modifiedRange);
-		return new TextReplacement(this.originalRange, newText);
 	}
 
 	public join(other: RangeMapping): RangeMapping {

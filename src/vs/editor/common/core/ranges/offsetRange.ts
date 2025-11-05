@@ -107,12 +107,6 @@ export class OffsetRange implements IOffsetRange {
 			f(i);
 		}
 	}
-
-	/**
-	 * this: [ 5, 10), range: [10, 15) => [5, 15)]
-	 * Throws if the ranges are not touching.
-	*/
-
 }
 
 export class OffsetRangeSet {
