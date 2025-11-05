@@ -66,9 +66,7 @@ export class Range {
 	/**
 	 * Test if this range is empty.
 	 */
-	public isEmpty(): boolean {
-		return Range.isEmpty(this);
-	}
+	
 
 	/**
 	 * Test if `range` is empty.
@@ -85,18 +83,7 @@ export class Range {
 	/**
 	 * Test if `position` is in `range`. If the position is at the edges, will return true.
 	 */
-	public static containsPosition(range: IRange, position: IPosition): boolean {
-		if (position.lineNumber < range.startLineNumber || position.lineNumber > range.endLineNumber) {
-			return false;
-		}
-		if (position.lineNumber === range.startLineNumber && position.column < range.startColumn) {
-			return false;
-		}
-		if (position.lineNumber === range.endLineNumber && position.column > range.endColumn) {
-			return false;
-		}
-		return true;
-	}
+	
 
 	/**
 	 * Test if `position` is in `range`. If the position is at the edges, will return false.
@@ -138,21 +125,7 @@ export class Range {
 	/**
 	 * Test if `otherRange` is strictly in `range` (must start after, and end before). If the ranges are equal, will return false.
 	 */
-	public static strictContainsRange(range: IRange, otherRange: IRange): boolean {
-		if (otherRange.startLineNumber < range.startLineNumber || otherRange.endLineNumber < range.startLineNumber) {
-			return false;
-		}
-		if (otherRange.startLineNumber > range.endLineNumber || otherRange.endLineNumber > range.endLineNumber) {
-			return false;
-		}
-		if (otherRange.startLineNumber === range.startLineNumber && otherRange.startColumn <= range.startColumn) {
-			return false;
-		}
-		if (otherRange.endLineNumber === range.endLineNumber && otherRange.endColumn >= range.endColumn) {
-			return false;
-		}
-		return true;
-	}
+	
 
 	/**
 	 * A reunion of the two ranges.
@@ -205,39 +178,7 @@ export class Range {
 	/**
 	 * A intersection of the two ranges.
 	 */
-	public static intersectRanges(a: IRange, b: IRange): Range | null {
-		let resultStartLineNumber = a.startLineNumber;
-		let resultStartColumn = a.startColumn;
-		let resultEndLineNumber = a.endLineNumber;
-		let resultEndColumn = a.endColumn;
-		const otherStartLineNumber = b.startLineNumber;
-		const otherStartColumn = b.startColumn;
-		const otherEndLineNumber = b.endLineNumber;
-		const otherEndColumn = b.endColumn;
-
-		if (resultStartLineNumber < otherStartLineNumber) {
-			resultStartLineNumber = otherStartLineNumber;
-			resultStartColumn = otherStartColumn;
-		} else if (resultStartLineNumber === otherStartLineNumber) {
-			resultStartColumn = Math.max(resultStartColumn, otherStartColumn);
-		}
-
-		if (resultEndLineNumber > otherEndLineNumber) {
-			resultEndLineNumber = otherEndLineNumber;
-			resultEndColumn = otherEndColumn;
-		} else if (resultEndLineNumber === otherEndLineNumber) {
-			resultEndColumn = Math.min(resultEndColumn, otherEndColumn);
-		}
-
-		// Check if selection is now empty
-		if (resultStartLineNumber > resultEndLineNumber) {
-			return null;
-		}
-		if (resultStartLineNumber === resultEndLineNumber && resultStartColumn > resultEndColumn) {
-			return null;
-		}
-		return new Range(resultStartLineNumber, resultStartColumn, resultEndLineNumber, resultEndColumn);
-	}
+	
 
 	/**
 	 * Test if this range equals other.
@@ -294,9 +235,7 @@ export class Range {
 	/**
 	 * Transform to a user presentable string representation.
 	 */
-	public toString(): string {
-		return '[' + this.startLineNumber + ',' + this.startColumn + ' -> ' + this.endLineNumber + ',' + this.endColumn + ']';
-	}
+	
 
 	/**
 	 * Create a new range using this range's start position, and using endLineNumber and endColumn as the end position.
@@ -316,9 +255,7 @@ export class Range {
 	/**
 	 * Create a new empty range using this range's start position.
 	 */
-	public static collapseToStart(range: IRange): Range {
-		return new Range(range.startLineNumber, range.startColumn, range.startLineNumber, range.startColumn);
-	}
+	
 
 	/**
 	 * Create a new empty range using this range's end position.
@@ -328,9 +265,7 @@ export class Range {
 	/**
 	 * Create a new empty range using this range's end position.
 	 */
-	public static collapseToEnd(range: IRange): Range {
-		return new Range(range.endLineNumber, range.endColumn, range.endLineNumber, range.endColumn);
-	}
+	
 
 	/**
 	 * Moves the range by the given amount of lines.
@@ -377,34 +312,7 @@ export class Range {
 	 * A function that compares ranges, useful for sorting ranges
 	 * It will first compare ranges on the startPosition and then on the endPosition
 	 */
-	public static compareRangesUsingStarts(a: IRange | null | undefined, b: IRange | null | undefined): number {
-		if (a && b) {
-			const aStartLineNumber = a.startLineNumber | 0;
-			const bStartLineNumber = b.startLineNumber | 0;
-
-			if (aStartLineNumber === bStartLineNumber) {
-				const aStartColumn = a.startColumn | 0;
-				const bStartColumn = b.startColumn | 0;
-
-				if (aStartColumn === bStartColumn) {
-					const aEndLineNumber = a.endLineNumber | 0;
-					const bEndLineNumber = b.endLineNumber | 0;
-
-					if (aEndLineNumber === bEndLineNumber) {
-						const aEndColumn = a.endColumn | 0;
-						const bEndColumn = b.endColumn | 0;
-						return aEndColumn - bEndColumn;
-					}
-					return aEndLineNumber - bEndLineNumber;
-				}
-				return aStartColumn - bStartColumn;
-			}
-			return aStartLineNumber - bStartLineNumber;
-		}
-		const aExists = (a ? 1 : 0);
-		const bExists = (b ? 1 : 0);
-		return aExists - bExists;
-	}
+	
 
 	/**
 	 * A function that compares ranges, useful for sorting ranges

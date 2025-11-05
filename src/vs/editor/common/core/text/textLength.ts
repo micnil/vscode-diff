@@ -4,13 +4,12 @@
  *--------------------------------------------------------------------------------------------*/
 import { Position } from '../position.js';
 import { Range } from '../range.js';
-import { LineRange } from '../ranges/lineRange.js';
 
 /**
  * Represents a non-negative length of text in terms of line and column count.
 */
 export class TextLength {
-	public static zero = new TextLength(0, 0);
+	
 
 
 
@@ -24,9 +23,7 @@ export class TextLength {
 
 
 
-	public static ofRange(range: Range) {
-		return TextLength.betweenPositions(range.getStartPosition(), range.getEndPosition());
-	}
+	
 
 	public static ofText(text: string): TextLength {
 		let line = 0;
@@ -53,12 +50,7 @@ export class TextLength {
 
 
 
-	public isLessThan(other: TextLength): boolean {
-		if (this.lineCount !== other.lineCount) {
-			return this.lineCount < other.lineCount;
-		}
-		return this.columnCount < other.columnCount;
-	}
+	
 
 
 
@@ -68,13 +60,7 @@ export class TextLength {
 
 
 
-	public add(other: TextLength): TextLength {
-		if (other.lineCount === 0) {
-			return new TextLength(this.lineCount, this.columnCount + other.columnCount);
-		} else {
-			return new TextLength(this.lineCount + other.lineCount, other.columnCount);
-		}
-	}
+	
 
 	public createRange(startPosition: Position): Range {
 		if (this.lineCount === 0) {
@@ -88,9 +74,7 @@ export class TextLength {
 		return new Range(1, 1, this.lineCount + 1, this.columnCount + 1);
 	}
 
-	public toLineRange(): LineRange {
-		return LineRange.ofLength(1, this.lineCount + 1);
-	}
+	
 
 	public addToPosition(position: Position): Position {
 		if (this.lineCount === 0) {

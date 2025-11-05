@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { sumBy } from '../../../../base/common/arrays.js';
 import { BugIndicatingError } from '../../../../base/common/errors.js';
 import { OffsetRange } from '../ranges/offsetRange.js';
 
@@ -27,9 +26,9 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 	 * Note that this does not mean that the edits have the same effect on a given input!
 	 * See `.normalize()` or `.normalizeOnBase(base)` for that.
 	*/
-	
 
-	
+
+
 
 	/**
 	 * Normalizes the edit by removing empty replacements and joining touching replacements (if the replacements allow joining).
@@ -170,68 +169,38 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 		return this._createNew(result).normalize();
 	}
 
-	
+
 
 	/**
 	 * Returns the range of each replacement in the applied value.
 	*/
-	
 
-	
+
+
 
 	public isEmpty(): boolean {
 		return this.replacements.length === 0;
 	}
 
-	public getLengthDelta(): number {
-		return sumBy(this.replacements, (replacement) => replacement.getLengthDelta());
-	}
 
-	
 
-	public applyToOffset(originalOffset: number): number {
-		let accumulatedDelta = 0;
-		for (const r of this.replacements) {
-			if (r.replaceRange.start <= originalOffset) {
-				if (originalOffset < r.replaceRange.endExclusive) {
-					// the offset is in the replaced range
-					return r.replaceRange.start + accumulatedDelta;
-				}
-				accumulatedDelta += r.getNewLength() - r.replaceRange.length;
-			} else {
-				break;
-			}
-		}
-		return originalOffset + accumulatedDelta;
-	}
 
-	
 
-	
+
+
+
+
+
 
 	/**
 	 * Return undefined if the originalOffset is within an edit
 	 */
-	public applyToOffsetOrUndefined(originalOffset: number): number | undefined {
-		let accumulatedDelta = 0;
-		for (const edit of this.replacements) {
-			if (edit.replaceRange.start <= originalOffset) {
-				if (originalOffset < edit.replaceRange.endExclusive) {
-					// the offset is in the replaced range
-					return undefined;
-				}
-				accumulatedDelta += edit.getNewLength() - edit.replaceRange.length;
-			} else {
-				break;
-			}
-		}
-		return originalOffset + accumulatedDelta;
-	}
+
 
 	/**
 	 * Return undefined if the originalRange is within an edit
 	 */
-	
+
 }
 
 export abstract class BaseReplacement<TSelf extends BaseReplacement<TSelf>> {
@@ -261,15 +230,10 @@ export abstract class BaseReplacement<TSelf extends BaseReplacement<TSelf>> {
 
 	abstract equals(other: TSelf): boolean;
 
-	toString(): string {
-		return `{ ${this.replaceRange.toString()} -> ${this.getNewLength()} }`;
-	}
 
 	get isEmpty() {
 		return this.getNewLength() === 0 && this.replaceRange.length === 0;
 	}
-
-	
 }
 
 

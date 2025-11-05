@@ -195,50 +195,7 @@ export class URI implements UriComponents {
 
 	// ---- modify to new -------------------------
 
-	with(change: { scheme?: string; authority?: string | null; path?: string | null; query?: string | null; fragment?: string | null }): URI {
 
-		if (!change) {
-			return this;
-		}
-
-		let { scheme, authority, path, query, fragment } = change;
-		if (scheme === undefined) {
-			scheme = this.scheme;
-		} else if (scheme === null) {
-			scheme = _empty;
-		}
-		if (authority === undefined) {
-			authority = this.authority;
-		} else if (authority === null) {
-			authority = _empty;
-		}
-		if (path === undefined) {
-			path = this.path;
-		} else if (path === null) {
-			path = _empty;
-		}
-		if (query === undefined) {
-			query = this.query;
-		} else if (query === null) {
-			query = _empty;
-		}
-		if (fragment === undefined) {
-			fragment = this.fragment;
-		} else if (fragment === null) {
-			fragment = _empty;
-		}
-
-		if (scheme === this.scheme
-			&& authority === this.authority
-			&& path === this.path
-			&& query === this.query
-			&& fragment === this.fragment) {
-
-			return this;
-		}
-
-		return new Uri(scheme, authority, path, query, fragment);
-	}
 
 	// ---- parse & validate ------------------------
 
@@ -271,32 +228,7 @@ export class URI implements UriComponents {
 	 *
 	 * @param path A file system path (see `URI#fsPath`)
 	 */
-	static file(path: string): URI {
 
-		let authority = _empty;
-
-		// normalize to fwd-slashes on windows,
-		// on other systems bwd-slashes are valid
-		// filename character, eg /f\oo/ba\r.txt
-		if (isWindows) {
-			path = path.replace(/\\/g, _slash);
-		}
-
-		// check for authority as used in UNC shares
-		// or use the path as given
-		if (path[0] === _slash && path[1] === _slash) {
-			const idx = path.indexOf(_slash, 2);
-			if (idx === -1) {
-				authority = path.substring(2);
-				path = _slash;
-			} else {
-				authority = path.substring(2, idx);
-				path = path.substring(idx) || _slash;
-			}
-		}
-
-		return new Uri('file', authority, path, _empty, _empty);
-	}
 
 	/**
 	 * Creates new URI from uri components.

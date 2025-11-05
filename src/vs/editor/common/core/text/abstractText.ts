@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { assert } from '../../../../base/common/assert.js';
-import { Position } from '../position.js';
 import { Range } from '../range.js';
 import { TextLength } from '../text/textLength.js';
 import { PositionOffsetTransformer } from './positionToOffsetImpl.js';
@@ -13,9 +12,7 @@ export abstract class AbstractText {
 	abstract getValueOfRange(range: Range): string;
 	abstract readonly length: TextLength;
 
-	get endPositionExclusive(): Position {
-		return this.length.addToPosition(new Position(1, 1));
-	}
+	
 
 
 
@@ -38,9 +35,7 @@ export abstract class AbstractText {
 		return this._transformer;
 	}
 
-	getLineAt(lineNumber: number): string {
-		return this.getValueOfRange(new Range(lineNumber, 1, lineNumber, Number.MAX_SAFE_INTEGER));
-	}
+	
 
 
 

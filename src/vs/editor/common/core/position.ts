@@ -41,13 +41,7 @@ export class Position {
 	 * @param newLineNumber new line number
 	 * @param newColumn new column
 	 */
-	with(newLineNumber: number = this.lineNumber, newColumn: number = this.column): Position {
-		if (newLineNumber === this.lineNumber && newColumn === this.column) {
-			return this;
-		} else {
-			return new Position(newLineNumber, newColumn);
-		}
-	}
+	
 
 	/**
 	 * Derive a new position from this position.
@@ -65,17 +59,7 @@ export class Position {
 	/**
 	 * Test if position `a` equals position `b`
 	 */
-	public static equals(a: IPosition | null, b: IPosition | null): boolean {
-		if (!a && !b) {
-			return true;
-		}
-		return (
-			!!a &&
-			!!b &&
-			a.lineNumber === b.lineNumber &&
-			a.column === b.column
-		);
-	}
+	
 
 	/**
 	 * Test if this position is before other position.

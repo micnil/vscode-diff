@@ -107,9 +107,7 @@ export class OffsetRange implements IOffsetRange {
 		return start <= end;
 	}
 
-	public isBefore(other: OffsetRange): boolean {
-		return this.endExclusive <= other.start;
-	}
+	
 
 	
 
