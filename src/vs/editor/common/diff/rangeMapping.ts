@@ -185,9 +185,6 @@ export class DetailedLineRangeMapping extends LineRangeMapping {
  */
 export class RangeMapping {
 
-
-
-
 	public static join(rangeMappings: RangeMapping[]): RangeMapping {
 		if (rangeMappings.length === 0) {
 			throw new BugIndicatingError('Cannot join an empty list of range mappings');

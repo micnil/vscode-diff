@@ -4,4 +4,5 @@ export * from './vs/editor/common/diff/defaultLinesDiffComputer/defaultLinesDiff
 export * from './vs/editor/common/diff/legacyLinesDiffComputer';
 export * from './vs/editor/common/diff/linesDiffComputer';
 export * from './vs/editor/common/diff/linesDiffComputers';
+export * from './vs/editor/common/diff/rangeMapping';
 
