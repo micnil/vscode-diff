@@ -135,12 +135,6 @@ interface ISerializedStringReplacement {
 }
 
 export class StringReplacement extends BaseStringReplacement<StringReplacement> {
-
-
-
-
-
-
 	public static fromJson(data: ISerializedStringReplacement): StringReplacement {
 		return new StringReplacement(OffsetRange.ofStartAndLength(data.pos, data.len), data.txt);
 	}

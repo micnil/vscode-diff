@@ -21,13 +21,6 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 
 	protected abstract _createNew(replacements: readonly T[]): TEdit;
 
-	/**
-	 * Returns true if and only if this edit and the given edit are structurally equal.
-	 * Note that this does not mean that the edits have the same effect on a given input!
-	 * See `.normalize()` or `.normalizeOnBase(base)` for that.
-	*/
-
-
 
 
 	/**
@@ -168,38 +161,9 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 
 		return this._createNew(result).normalize();
 	}
-
-
-
-	/**
-	 * Returns the range of each replacement in the applied value.
-	*/
-
-
-
-
 	public isEmpty(): boolean {
 		return this.replacements.length === 0;
 	}
-
-
-
-
-
-
-
-
-
-
-
-	/**
-	 * Return undefined if the originalOffset is within an edit
-	 */
-
-
-	/**
-	 * Return undefined if the originalRange is within an edit
-	 */
 
 }
 
