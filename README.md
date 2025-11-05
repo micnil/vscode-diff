@@ -12,92 +12,20 @@ npm install vscode-diff --save
 ```
 ## Usage
 
-Starting from version 1.71.0 VS Code introduced new diffing algorithm that can also detect code moves. It is currently used by default in VS Code and can be accessed in this library as `AdvancedLinesDiffComputer`.
-The legacy algorithm can be accessed as `DiffComputer`.
-
-### Example of legacy algorithm usage:
-
-```typescript
-import { DiffComputer, IDiffComputerOpts, ILineChange } from 'vscode-diff';
-
-let originalLines: string[] = ["hello", "original", "world"];
-let modifiedLines: string[] = ["hello", "modified", "world", "foobar"];
-let options: IDiffComputerOpts = {
-  shouldPostProcessCharChanges: true,
-  shouldIgnoreTrimWhitespace: true,
-  shouldMakePrettyDiff: true,
-  shouldComputeCharChanges: true,
-  maxComputationTime: 0 // time in milliseconds, 0 => no computation limit.
-}
-let diffComputer = new DiffComputer(originalLines, modifiedLines, options);
-let lineChanges: ILineChange[] = diffComputer.computeDiff().changes;
-
-console.log(JSON.stringify(lineChanges, null, 2));
-```
-Output:
-```json
-[
-  {
-    "originalStartLineNumber": 2,
-    "originalEndLineNumber": 2,
-    "modifiedStartLineNumber": 2,
-    "modifiedEndLineNumber": 2,
-    "charChanges": [
-      {
-        "originalStartLineNumber": 2,
-        "originalStartColumn": 1,
-        "originalEndLineNumber": 2,
-        "originalEndColumn": 9,
-        "modifiedStartLineNumber": 2,
-        "modifiedStartColumn": 1,
-        "modifiedEndLineNumber": 2,
-        "modifiedEndColumn": 9
-      }
-    ]
-  },
-  {
-    "originalStartLineNumber": 3,
-    "originalEndLineNumber": 0,
-    "modifiedStartLineNumber": 4,
-    "modifiedEndLineNumber": 4
-  }
-]
-```
-Each element in the produced `lineChanges` array corresponds to a change from the original lines to the modified lines.
-
-The column and row indices are 1-based. If a 0 index is present, it means that a row has been added/removed, eg:
-```json
-{
-  "originalStartLineNumber": 3,
-  "originalEndLineNumber": 0,
-  "modifiedStartLineNumber": 4,
-  "modifiedEndLineNumber": 4
-}
-```
-means that the 4th line in the modified text was added after line 3 in the original text.
-
-The opposite:
-```json
-{
-  "originalStartLineNumber": 4,
-  "originalEndLineNumber": 4,
-  "modifiedStartLineNumber": 3,
-  "modifiedEndLineNumber": 0
-}
-```
-means that the 4th line in the original text was removed from after line 3 in the modified text.
+Starting from version 1.71.0 VS Code introduced new diffing algorithm that can also detect code moves. It is currently used by default in VS Code and can be accessed in this library as `DefaultLinesDiffComputer`.
+The legacy algorithm can be accessed as `DiffComputer`. It is also possible to use the wrapper class `LegacyLinesDiffComputer` which adapts the output of `DiffComputer` to a newer format.
 
 ### Example of new algorithm usage:
 ```typescript
-let advOptions: ILinesDiffComputerOptions = {
-    ignoreTrimWhitespace: true,
-    computeMoves: true,
-    maxComputationTimeMs: 0
+const defaultOptions: ILinesDiffComputerOptions = {
+	ignoreTrimWhitespace: true,
+	computeMoves: true,
+	maxComputationTimeMs: 0
 }
-let advDiffComputer = new AdvancedLinesDiffComputer()
-let advLineChanges = advDiffComputer.computeDiff(originalLines, modifiedLines, advOptions).changes;
+const defaultDiffComputer = new DefaultLinesDiffComputer()
+const defaultLineChanges = defaultDiffComputer.computeDiff(originalLines, modifiedLines, defaultOptions).changes;
 
-console.log(JSON.stringify(advLineChanges, null, 2));
+console.log(JSON.stringify(defaultLineChanges, null, 2));
 ```
 
 Output:
@@ -171,6 +99,80 @@ as opposed to
 "originalStartLineNumber": 2,
 "originalEndLineNumber": 2,
 ```
+
+
+
+### Example of legacy algorithm usage:
+
+```typescript
+import { DiffComputer, IDiffComputerOpts, ILineChange } from 'vscode-diff';
+
+const originalLines: string[] = ["hello", "original", "world"];
+const modifiedLines: string[] = ["hello", "modified", "world", "foobar"];
+const options: IDiffComputerOpts = {
+	shouldPostProcessCharChanges: true,
+	shouldIgnoreTrimWhitespace: true,
+	shouldMakePrettyDiff: true,
+	shouldComputeCharChanges: true,
+	maxComputationTime: 0 // time in milliseconds, 0 => no computation limit.
+}
+const diffComputer = new DiffComputer(originalLines, modifiedLines, options);
+const lineChanges: ILineChange[] = diffComputer.computeDiff().changes;
+
+console.log(JSON.stringify(lineChanges, null, 2));
+```
+Output:
+```json
+[
+  {
+    "originalStartLineNumber": 2,
+    "originalEndLineNumber": 2,
+    "modifiedStartLineNumber": 2,
+    "modifiedEndLineNumber": 2,
+    "charChanges": [
+      {
+        "originalStartLineNumber": 2,
+        "originalStartColumn": 1,
+        "originalEndLineNumber": 2,
+        "originalEndColumn": 9,
+        "modifiedStartLineNumber": 2,
+        "modifiedStartColumn": 1,
+        "modifiedEndLineNumber": 2,
+        "modifiedEndColumn": 9
+      }
+    ]
+  },
+  {
+    "originalStartLineNumber": 3,
+    "originalEndLineNumber": 0,
+    "modifiedStartLineNumber": 4,
+    "modifiedEndLineNumber": 4
+  }
+]
+```
+Each element in the produced `lineChanges` array corresponds to a change from the original lines to the modified lines.
+
+The column and row indices are 1-based. If a 0 index is present, it means that a row has been added/removed, eg:
+```json
+{
+  "originalStartLineNumber": 3,
+  "originalEndLineNumber": 0,
+  "modifiedStartLineNumber": 4,
+  "modifiedEndLineNumber": 4
+}
+```
+means that the 4th line in the modified text was added after line 3 in the original text.
+
+The opposite:
+```json
+{
+  "originalStartLineNumber": 4,
+  "originalEndLineNumber": 4,
+  "modifiedStartLineNumber": 3,
+  "modifiedEndLineNumber": 0
+}
+```
+means that the 4th line in the original text was removed from after line 3 in the modified text.
 
 
 ## Changelog
