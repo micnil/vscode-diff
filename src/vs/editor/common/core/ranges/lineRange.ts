@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Comparator, compareBy, numberComparator } from '../../../../base/common/arrays.js';
 import { findFirstIdxMonotonousOrArrLen, findLastIdxMonotonous, findLastMonotonous } from '../../../../base/common/arraysFind.js';
 import { BugIndicatingError } from '../../../../base/common/errors.js';
 import { IRange, Range } from '../range.js';
@@ -17,20 +16,20 @@ export class LineRange {
 		return new LineRange(startLineNumber, startLineNumber + length);
 	}
 
-	
+
 
 	public static fromRangeInclusive(range: IRange): LineRange {
 		return new LineRange(range.startLineNumber, range.endLineNumber + 1);
 	}
 
-	
 
-	
+
+
 
 	/**
 	 * @param lineRanges An array of arrays of of sorted line ranges.
 	 */
-	
+
 
 	public static join(lineRanges: LineRange[]): LineRange {
 		if (lineRanges.length === 0) {
@@ -48,7 +47,7 @@ export class LineRange {
 	/**
 	 * @internal
 	 */
-	
+
 
 	/**
 	 * The start line number.
@@ -78,7 +77,7 @@ export class LineRange {
 		return this.startLineNumber <= lineNumber && lineNumber < this.endLineNumberExclusive;
 	}
 
-	
+
 
 	/**
 	 * Indicates if this line range is empty.
@@ -94,7 +93,7 @@ export class LineRange {
 		return new LineRange(this.startLineNumber + offset, this.endLineNumberExclusive + offset);
 	}
 
-	
+
 
 	/**
 	 * The number of lines this line range spans.
@@ -130,13 +129,13 @@ export class LineRange {
 		return undefined;
 	}
 
-	
+
 
 	public intersectsOrTouches(other: LineRange): boolean {
 		return this.startLineNumber <= other.endLineNumberExclusive && other.startLineNumber <= this.endLineNumberExclusive;
 	}
 
-	
+
 
 	public toInclusiveRange(): Range | null {
 		if (this.isEmpty) {
@@ -148,7 +147,7 @@ export class LineRange {
 	/**
 	 * @deprecated Using this function is discouraged because it might lead to bugs: The end position is not guaranteed to be a valid position!
 	*/
-	
+
 
 	public mapToLineArray<T>(f: (lineNumber: number) => T): T[] {
 		const result: T[] = [];
@@ -158,12 +157,12 @@ export class LineRange {
 		return result;
 	}
 
-	
+
 
 	/**
 	 * @internal
 	 */
-	
+
 
 	/**
 	 * Converts this 1-based line range to a 0-based offset range (subtracts 1!).
@@ -173,14 +172,12 @@ export class LineRange {
 		return new OffsetRange(this.startLineNumber - 1, this.endLineNumberExclusive - 1);
 	}
 
-	
 
-	
 
-	
+
+
+
 }
-
-type ISerializedLineRange = [startLineNumber: number, endLineNumberExclusive: number];
 
 
 export class LineRangeSet {
@@ -229,7 +226,7 @@ export class LineRangeSet {
 		return !!rangeThatStartsBeforeEnd && rangeThatStartsBeforeEnd.endLineNumberExclusive > lineNumber;
 	}
 
-	
+
 
 	getUnion(other: LineRangeSet): LineRangeSet {
 		if (this._normalizedRanges.length === 0) {
@@ -311,7 +308,7 @@ export class LineRangeSet {
 		return new LineRangeSet(result);
 	}
 
-	
+
 
 	getIntersection(other: LineRangeSet): LineRangeSet {
 		const result: LineRange[] = [];
