@@ -177,6 +177,9 @@ means that the 4th line in the original text was removed from after line 3 in th
 
 ## Changelog
 
+### 3.0.1
+* Remove vscode settings from npm package
+
 ### 3.0.0
 
 ### Breaking change
