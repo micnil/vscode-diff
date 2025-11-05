@@ -6,7 +6,6 @@
 import { assert } from '../../../../base/common/assert.js';
 import { Range } from '../range.js';
 import { TextLength } from '../text/textLength.js';
-import { PositionOffsetTransformer } from './positionToOffsetImpl.js';
 
 export abstract class AbstractText {
 	abstract getValueOfRange(range: Range): string;
@@ -16,7 +15,6 @@ export abstract class AbstractText {
 		return this.getValueOfRange(new Range(lineNumber, 1, lineNumber, Number.MAX_SAFE_INTEGER)).length;
 	}
 
-	private _transformer: PositionOffsetTransformer | undefined = undefined;
 
 }
 

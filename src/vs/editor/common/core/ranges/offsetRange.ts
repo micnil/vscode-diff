@@ -19,14 +19,6 @@ export class OffsetRange implements IOffsetRange {
 		return new OffsetRange(0, length);
 	}
 
-	public static ofStartAndLength(start: number, length: number): OffsetRange {
-		return new OffsetRange(start, start + length);
-	}
-
-	public static emptyAt(offset: number): OffsetRange {
-		return new OffsetRange(offset, offset);
-	}
-
 	constructor(public readonly start: number, public readonly endExclusive: number) {
 		if (start > endExclusive) {
 			throw new BugIndicatingError(`Invalid range: ${this.toString()}`);
@@ -57,9 +49,7 @@ export class OffsetRange implements IOffsetRange {
 		return `[${this.start}, ${this.endExclusive})`;
 	}
 
-	public equals(other: OffsetRange): boolean {
-		return this.start === other.start && this.endExclusive === other.endExclusive;
-	}
+
 
 
 
@@ -110,9 +100,7 @@ export class OffsetRange implements IOffsetRange {
 		return arr.slice(this.start, this.endExclusive);
 	}
 
-	public substring(str: string): string {
-		return str.substring(this.start, this.endExclusive);
-	}
+
 
 	public forEach(f: (offset: number) => void): void {
 		for (let i = this.start; i < this.endExclusive; i++) {
@@ -124,12 +112,7 @@ export class OffsetRange implements IOffsetRange {
 	 * this: [ 5, 10), range: [10, 15) => [5, 15)]
 	 * Throws if the ranges are not touching.
 	*/
-	public joinRightTouching(range: OffsetRange): OffsetRange {
-		if (this.endExclusive !== range.start) {
-			throw new BugIndicatingError(`Invalid join: ${this.toString()} and ${range.toString()}`);
-		}
-		return new OffsetRange(this.start, range.endExclusive);
-	}
+
 }
 
 export class OffsetRangeSet {

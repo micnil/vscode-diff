@@ -35,42 +35,6 @@ export function lastNonWhitespaceIndex(str: string, startIndex: number = str.len
 	return -1;
 }
 
-/**
- * @returns the length of the common prefix of the two strings.
- */
-export function commonPrefixLength(a: string, b: string): number {
-
-	const len = Math.min(a.length, b.length);
-	let i: number;
-
-	for (i = 0; i < len; i++) {
-		if (a.charCodeAt(i) !== b.charCodeAt(i)) {
-			return i;
-		}
-	}
-
-	return len;
-}
-
-/**
- * @returns the length of the common suffix of the two strings.
- */
-export function commonSuffixLength(a: string, b: string): number {
-
-	const len = Math.min(a.length, b.length);
-	let i: number;
-
-	const aLastIndex = a.length - 1;
-	const bLastIndex = b.length - 1;
-
-	for (i = 0; i < len; i++) {
-		if (a.charCodeAt(aLastIndex - i) !== b.charCodeAt(bLastIndex - i)) {
-			return i;
-		}
-	}
-
-	return len;
-}
 
 
 export class AmbiguousCharacters {
