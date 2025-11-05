@@ -122,9 +122,7 @@ export class PositionOffsetTransformer extends PositionOffsetTransformerBase {
 		return new Position(lineNumber, column);
 	}
 
-	getTextLength(offsetRange: OffsetRange): TextLength {
-		return Deps.deps.TextLength.ofRange(this.getRange(offsetRange));
-	}
+	
 
 	get textLength(): TextLength {
 		const lineIdx = this.lineStartOffsetByLineIdx.length - 1;

@@ -80,9 +80,7 @@ export class Range {
 	/**
 	 * Test if position is in this range. If the position is at the edges, will return true.
 	 */
-	public containsPosition(position: IPosition): boolean {
-		return Range.containsPosition(this, position);
-	}
+	
 
 	/**
 	 * Test if `position` is in `range`. If the position is at the edges, will return true.
@@ -104,18 +102,7 @@ export class Range {
 	 * Test if `position` is in `range`. If the position is at the edges, will return false.
 	 * @internal
 	 */
-	public static strictContainsPosition(range: IRange, position: IPosition): boolean {
-		if (position.lineNumber < range.startLineNumber || position.lineNumber > range.endLineNumber) {
-			return false;
-		}
-		if (position.lineNumber === range.startLineNumber && position.column <= range.startColumn) {
-			return false;
-		}
-		if (position.lineNumber === range.endLineNumber && position.column >= range.endColumn) {
-			return false;
-		}
-		return true;
-	}
+	
 
 	/**
 	 * Test if range is in this range. If the range is equal to this range, will return true.
@@ -146,9 +133,7 @@ export class Range {
 	/**
 	 * Test if `range` is strictly in this range. `range` must start after and end before this range for the result to be true.
 	 */
-	public strictContainsRange(range: IRange): boolean {
-		return Range.strictContainsRange(this, range);
-	}
+	
 
 	/**
 	 * Test if `otherRange` is strictly in `range` (must start after, and end before). If the ranges are equal, will return false.
@@ -215,9 +200,7 @@ export class Range {
 	/**
 	 * A intersection of the two ranges.
 	 */
-	public intersectRanges(range: IRange): Range | null {
-		return Range.intersectRanges(this, range);
-	}
+	
 
 	/**
 	 * A intersection of the two ranges.
@@ -318,23 +301,17 @@ export class Range {
 	/**
 	 * Create a new range using this range's start position, and using endLineNumber and endColumn as the end position.
 	 */
-	public setEndPosition(endLineNumber: number, endColumn: number): Range {
-		return new Range(this.startLineNumber, this.startColumn, endLineNumber, endColumn);
-	}
+	
 
 	/**
 	 * Create a new range using this range's end position, and using startLineNumber and startColumn as the start position.
 	 */
-	public setStartPosition(startLineNumber: number, startColumn: number): Range {
-		return new Range(startLineNumber, startColumn, this.endLineNumber, this.endColumn);
-	}
+	
 
 	/**
 	 * Create a new empty range using this range's start position.
 	 */
-	public collapseToStart(): Range {
-		return Range.collapseToStart(this);
-	}
+	
 
 	/**
 	 * Create a new empty range using this range's start position.
@@ -346,9 +323,7 @@ export class Range {
 	/**
 	 * Create a new empty range using this range's end position.
 	 */
-	public collapseToEnd(): Range {
-		return Range.collapseToEnd(this);
-	}
+	
 
 	/**
 	 * Create a new empty range using this range's end position.
@@ -360,13 +335,9 @@ export class Range {
 	/**
 	 * Moves the range by the given amount of lines.
 	 */
-	public delta(lineCount: number): Range {
-		return new Range(this.startLineNumber + lineCount, this.startColumn, this.endLineNumber + lineCount, this.endColumn);
-	}
+	
 
-	public isSingleLine(): boolean {
-		return this.startLineNumber === this.endLineNumber;
-	}
+	
 
 	// ---
 
@@ -377,82 +348,30 @@ export class Range {
 	/**
 	 * Create a `Range` from an `IRange`.
 	 */
-	public static lift(range: undefined | null): null;
-	public static lift(range: IRange): Range;
-	public static lift(range: IRange | undefined | null): Range | null;
-	public static lift(range: IRange | undefined | null): Range | null {
-		if (!range) {
-			return null;
-		}
-		return new Range(range.startLineNumber, range.startColumn, range.endLineNumber, range.endColumn);
-	}
+	
+	
+	
+	
 
 	/**
 	 * Test if `obj` is an `IRange`.
 	 */
-	public static isIRange(obj: unknown): obj is IRange {
-		return (
-			!!obj
-			&& (typeof (obj as IRange).startLineNumber === 'number')
-			&& (typeof (obj as IRange).startColumn === 'number')
-			&& (typeof (obj as IRange).endLineNumber === 'number')
-			&& (typeof (obj as IRange).endColumn === 'number')
-		);
-	}
+	
 
 	/**
 	 * Test if the two ranges are touching in any way.
 	 */
-	public static areIntersectingOrTouching(a: IRange, b: IRange): boolean {
-		// Check if `a` is before `b`
-		if (a.endLineNumber < b.startLineNumber || (a.endLineNumber === b.startLineNumber && a.endColumn < b.startColumn)) {
-			return false;
-		}
-
-		// Check if `b` is before `a`
-		if (b.endLineNumber < a.startLineNumber || (b.endLineNumber === a.startLineNumber && b.endColumn < a.startColumn)) {
-			return false;
-		}
-
-		// These ranges must intersect
-		return true;
-	}
+	
 
 	/**
 	 * Test if the two ranges are intersecting. If the ranges are touching it returns true.
 	 */
-	public static areIntersecting(a: IRange, b: IRange): boolean {
-		// Check if `a` is before `b`
-		if (a.endLineNumber < b.startLineNumber || (a.endLineNumber === b.startLineNumber && a.endColumn <= b.startColumn)) {
-			return false;
-		}
-
-		// Check if `b` is before `a`
-		if (b.endLineNumber < a.startLineNumber || (b.endLineNumber === a.startLineNumber && b.endColumn <= a.startColumn)) {
-			return false;
-		}
-
-		// These ranges must intersect
-		return true;
-	}
+	
 
 	/**
 	 * Test if the two ranges are intersecting, but not touching at all.
 	 */
-	public static areOnlyIntersecting(a: IRange, b: IRange): boolean {
-		// Check if `a` is before `b`
-		if (a.endLineNumber < (b.startLineNumber - 1) || (a.endLineNumber === b.startLineNumber && a.endColumn < (b.startColumn - 1))) {
-			return false;
-		}
-
-		// Check if `b` is before `a`
-		if (b.endLineNumber < (a.startLineNumber - 1) || (b.endLineNumber === a.startLineNumber && b.endColumn < (a.startColumn - 1))) {
-			return false;
-		}
-
-		// These ranges must intersect
-		return true;
-	}
+	
 
 	/**
 	 * A function that compares ranges, useful for sorting ranges
@@ -491,27 +410,12 @@ export class Range {
 	 * A function that compares ranges, useful for sorting ranges
 	 * It will first compare ranges on the endPosition and then on the startPosition
 	 */
-	public static compareRangesUsingEnds(a: IRange, b: IRange): number {
-		if (a.endLineNumber === b.endLineNumber) {
-			if (a.endColumn === b.endColumn) {
-				if (a.startLineNumber === b.startLineNumber) {
-					return a.startColumn - b.startColumn;
-				}
-				return a.startLineNumber - b.startLineNumber;
-			}
-			return a.endColumn - b.endColumn;
-		}
-		return a.endLineNumber - b.endLineNumber;
-	}
+	
 
 	/**
 	 * Test if the range spans multiple lines.
 	 */
-	public static spansMultipleLines(range: IRange): boolean {
-		return range.endLineNumber > range.startLineNumber;
-	}
+	
 
-	public toJSON(): IRange {
-		return this;
-	}
+	
 }

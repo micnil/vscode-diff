@@ -5,7 +5,6 @@
 
 import { CharCode } from './charCode.js';
 import { MarshalledId } from './marshallingIds.js';
-import * as paths from './path.js';
 import { isWindows } from './platform.js';
 
 const _schemePattern = /^\w[\w\d+.-]*$/;
@@ -97,22 +96,7 @@ const _regexp = /^(([^:/?#]+?):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
  */
 export class URI implements UriComponents {
 
-	static isUri(thing: unknown): thing is URI {
-		if (thing instanceof URI) {
-			return true;
-		}
-		if (!thing || typeof thing !== 'object') {
-			return false;
-		}
-		return typeof (<URI>thing).authority === 'string'
-			&& typeof (<URI>thing).fragment === 'string'
-			&& typeof (<URI>thing).path === 'string'
-			&& typeof (<URI>thing).query === 'string'
-			&& typeof (<URI>thing).scheme === 'string'
-			&& typeof (<URI>thing).fsPath === 'string'
-			&& typeof (<URI>thing).with === 'function'
-			&& typeof (<URI>thing).toString === 'function';
-	}
+
 
 	/**
 	 * scheme is the 'http' part of 'http://www.example.com/some/path?query#fragment'.
@@ -264,20 +248,7 @@ export class URI implements UriComponents {
 	 *
 	 * @param value A string which represents an URI (see `URI#toString`).
 	 */
-	static parse(value: string, _strict: boolean = false): URI {
-		const match = _regexp.exec(value);
-		if (!match) {
-			return new Uri(_empty, _empty, _empty, _empty, _empty);
-		}
-		return new Uri(
-			match[2] || _empty,
-			percentDecode(match[4] || _empty),
-			percentDecode(match[5] || _empty),
-			percentDecode(match[7] || _empty),
-			percentDecode(match[9] || _empty),
-			_strict
-		);
-	}
+
 
 	/**
 	 * Creates a new URI from a file system path, e.g. `c:\my\files`,
@@ -353,18 +324,7 @@ export class URI implements UriComponents {
 	 * @param pathFragment The path fragment to add to the URI path.
 	 * @returns The resulting URI.
 	 */
-	static joinPath(uri: URI, ...pathFragment: string[]): URI {
-		if (!uri.path) {
-			throw new Error(`[UriError]: cannot call joinPath on URI without path`);
-		}
-		let newPath: string;
-		if (isWindows && uri.scheme === 'file') {
-			newPath = URI.file(paths.win32.join(uriToFsPath(uri, true), ...pathFragment)).path;
-		} else {
-			newPath = paths.posix.join(uri.path, ...pathFragment);
-		}
-		return uri.with({ path: newPath });
-	}
+
 
 	// ---- printing/externalize ---------------------------
 
@@ -397,22 +357,11 @@ export class URI implements UriComponents {
 	 * @param data The URI components or URI to revive.
 	 * @returns The revived URI or undefined or null.
 	 */
-	static revive(data: UriComponents | URI): URI;
-	static revive(data: UriComponents | URI | undefined): URI | undefined;
-	static revive(data: UriComponents | URI | null): URI | null;
-	static revive(data: UriComponents | URI | undefined | null): URI | undefined | null;
-	static revive(data: UriComponents | URI | undefined | null): URI | undefined | null {
-		if (!data) {
-			return data;
-		} else if (data instanceof URI) {
-			return data;
-		} else {
-			const result = new Uri(data);
-			result._formatted = (<UriState>data).external ?? null;
-			result._fsPath = (<UriState>data)._sep === _pathSepMarker ? (<UriState>data).fsPath ?? null : null;
-			return result;
-		}
-	}
+
+
+
+
+
 
 	[Symbol.for('debug.description')]() {
 		return `URI(${this.toString()})`;
@@ -707,25 +656,7 @@ function _asFormatted(uri: URI, skipEncoding: boolean): string {
 	return res;
 }
 
-// --- decode
 
-function decodeURIComponentGraceful(str: string): string {
-	try {
-		return decodeURIComponent(str);
-	} catch {
-		if (str.length > 3) {
-			return str.substr(0, 3) + decodeURIComponentGraceful(str.substr(3));
-		} else {
-			return str;
-		}
-	}
-}
 
 const _rEncodedAsHex = /(%[0-9A-Za-z][0-9A-Za-z])+/g;
 
-function percentDecode(str: string): string {
-	if (!str.match(_rEncodedAsHex)) {
-		return str;
-	}
-	return str.replace(_rEncodedAsHex, (match) => decodeURIComponentGraceful(match));
-}

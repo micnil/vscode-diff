@@ -27,22 +27,9 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 	 * Note that this does not mean that the edits have the same effect on a given input!
 	 * See `.normalize()` or `.normalizeOnBase(base)` for that.
 	*/
-	public equals(other: TEdit): boolean {
-		if (this.replacements.length !== other.replacements.length) {
-			return false;
-		}
-		for (let i = 0; i < this.replacements.length; i++) {
-			if (!this.replacements[i].equals(other.replacements[i])) {
-				return false;
-			}
-		}
-		return true;
-	}
+	
 
-	public toString() {
-		const edits = this.replacements.map(e => e.toString()).join(', ');
-		return `[${edits}]`;
-	}
+	
 
 	/**
 	 * Normalizes the edit by removing empty replacements and joining touching replacements (if the replacements allow joining).
@@ -183,41 +170,14 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 		return this._createNew(result).normalize();
 	}
 
-	public decomposeSplit(shouldBeInE1: (repl: T) => boolean): { e1: TEdit; e2: TEdit } {
-		const e1: T[] = [];
-		const e2: T[] = [];
-
-		let e2delta = 0;
-		for (const edit of this.replacements) {
-			if (shouldBeInE1(edit)) {
-				e1.push(edit);
-				e2delta += edit.getNewLength() - edit.replaceRange.length;
-			} else {
-				e2.push(edit.slice(edit.replaceRange.delta(e2delta), new OffsetRange(0, edit.getNewLength())));
-			}
-		}
-		return { e1: this._createNew(e1), e2: this._createNew(e2) };
-	}
+	
 
 	/**
 	 * Returns the range of each replacement in the applied value.
 	*/
-	public getNewRanges(): OffsetRange[] {
-		const ranges: OffsetRange[] = [];
-		let offset = 0;
-		for (const e of this.replacements) {
-			ranges.push(OffsetRange.ofStartAndLength(e.replaceRange.start + offset, e.getNewLength()));
-			offset += e.getLengthDelta();
-		}
-		return ranges;
-	}
+	
 
-	public getJoinedReplaceRange(): OffsetRange | undefined {
-		if (this.replacements.length === 0) {
-			return undefined;
-		}
-		return this.replacements[0].replaceRange.join(this.replacements.at(-1)!.replaceRange);
-	}
+	
 
 	public isEmpty(): boolean {
 		return this.replacements.length === 0;
@@ -227,9 +187,7 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 		return sumBy(this.replacements, (replacement) => replacement.getLengthDelta());
 	}
 
-	public getNewDataLength(dataLength: number): number {
-		return dataLength + this.getLengthDelta();
-	}
+	
 
 	public applyToOffset(originalOffset: number): number {
 		let accumulatedDelta = 0;
@@ -247,29 +205,9 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 		return originalOffset + accumulatedDelta;
 	}
 
-	public applyToOffsetRange(originalRange: OffsetRange): OffsetRange {
-		return new OffsetRange(
-			this.applyToOffset(originalRange.start),
-			this.applyToOffset(originalRange.endExclusive)
-		);
-	}
+	
 
-	public applyInverseToOffset(postEditsOffset: number): number {
-		let accumulatedDelta = 0;
-		for (const edit of this.replacements) {
-			const editLength = edit.getNewLength();
-			if (edit.replaceRange.start <= postEditsOffset - accumulatedDelta) {
-				if (postEditsOffset - accumulatedDelta < edit.replaceRange.start + editLength) {
-					// the offset is in the replaced range
-					return edit.replaceRange.start;
-				}
-				accumulatedDelta += editLength - edit.replaceRange.length;
-			} else {
-				break;
-			}
-		}
-		return postEditsOffset - accumulatedDelta;
-	}
+	
 
 	/**
 	 * Return undefined if the originalOffset is within an edit
@@ -293,17 +231,7 @@ export abstract class BaseEdit<T extends BaseReplacement<T> = BaseReplacement<an
 	/**
 	 * Return undefined if the originalRange is within an edit
 	 */
-	public applyToOffsetRangeOrUndefined(originalRange: OffsetRange): OffsetRange | undefined {
-		const start = this.applyToOffsetOrUndefined(originalRange.start);
-		if (start === undefined) {
-			return undefined;
-		}
-		const end = this.applyToOffsetOrUndefined(originalRange.endExclusive);
-		if (end === undefined) {
-			return undefined;
-		}
-		return new OffsetRange(start, end);
-	}
+	
 }
 
 export abstract class BaseReplacement<TSelf extends BaseReplacement<TSelf>> {
@@ -341,9 +269,7 @@ export abstract class BaseReplacement<TSelf extends BaseReplacement<TSelf>> {
 		return this.getNewLength() === 0 && this.replaceRange.length === 0;
 	}
 
-	getRangeAfterReplace(): OffsetRange {
-		return new OffsetRange(this.replaceRange.start, this.replaceRange.start + this.getNewLength());
-	}
+	
 }
 
 

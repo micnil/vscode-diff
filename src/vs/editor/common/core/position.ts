@@ -55,16 +55,12 @@ export class Position {
 	 * @param deltaLineNumber line number delta
 	 * @param deltaColumn column delta
 	 */
-	delta(deltaLineNumber: number = 0, deltaColumn: number = 0): Position {
-		return this.with(Math.max(1, this.lineNumber + deltaLineNumber), Math.max(1, this.column + deltaColumn));
-	}
+	
 
 	/**
 	 * Test if this position equals other position
 	 */
-	public equals(other: IPosition): boolean {
-		return Position.equals(this, other);
-	}
+	
 
 	/**
 	 * Test if position `a` equals position `b`
@@ -128,32 +124,17 @@ export class Position {
 	/**
 	 * A function that compares positions, useful for sorting
 	 */
-	public static compare(a: IPosition, b: IPosition): number {
-		const aLineNumber = a.lineNumber | 0;
-		const bLineNumber = b.lineNumber | 0;
-
-		if (aLineNumber === bLineNumber) {
-			const aColumn = a.column | 0;
-			const bColumn = b.column | 0;
-			return aColumn - bColumn;
-		}
-
-		return aLineNumber - bLineNumber;
-	}
+	
 
 	/**
 	 * Clone this position.
 	 */
-	public clone(): Position {
-		return new Position(this.lineNumber, this.column);
-	}
+	
 
 	/**
 	 * Convert to a human-readable representation.
 	 */
-	public toString(): string {
-		return '(' + this.lineNumber + ',' + this.column + ')';
-	}
+	
 
 	// ---
 
@@ -167,18 +148,7 @@ export class Position {
 	/**
 	 * Test if `obj` is an `IPosition`.
 	 */
-	public static isIPosition(obj: unknown): obj is IPosition {
-		return (
-			!!obj
-			&& (typeof (obj as IPosition).lineNumber === 'number')
-			&& (typeof (obj as IPosition).column === 'number')
-		);
-	}
+	
 
-	public toJSON(): IPosition {
-		return {
-			lineNumber: this.lineNumber,
-			column: this.column
-		};
-	}
+	
 }

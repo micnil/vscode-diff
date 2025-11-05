@@ -217,16 +217,6 @@ export class Permutation {
 		return arr.map((_, index) => arr[this._indexMap[index]]);
 	}
 
-	/**
-	 * Returns a new permutation that undoes the re-arrangement of this permutation.
-	*/
-	inverse(): Permutation {
-		const inverseIndexMap = this._indexMap.slice();
-		for (let i = 0; i < this._indexMap.length; i++) {
-			inverseIndexMap[this._indexMap[i]] = i;
-		}
-		return new Permutation(inverseIndexMap);
-	}
 }
 
 export function sumBy<T>(array: readonly T[], selector: (value: T) => number): number {

@@ -4,11 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { assert } from '../../../../base/common/assert.js';
-import { splitLines } from '../../../../base/common/strings.js';
 import { Position } from '../position.js';
 import { Range } from '../range.js';
-import { LineRange } from '../ranges/lineRange.js';
-import { OffsetRange } from '../ranges/offsetRange.js';
 import { TextLength } from '../text/textLength.js';
 import { PositionOffsetTransformer } from './positionToOffsetImpl.js';
 
@@ -20,17 +17,13 @@ export abstract class AbstractText {
 		return this.length.addToPosition(new Position(1, 1));
 	}
 
-	get lineRange(): LineRange {
-		return this.length.toLineRange();
-	}
+
 
 	getValue(): string {
 		return this.getValueOfRange(this.length.toRange());
 	}
 
-	getValueOfOffsetRange(range: OffsetRange): string {
-		return this.getValueOfRange(this.getTransformer().getRange(range));
-	}
+
 
 	getLineLength(lineNumber: number): number {
 		return this.getValueOfRange(new Range(lineNumber, 1, lineNumber, Number.MAX_SAFE_INTEGER)).length;
@@ -49,21 +42,11 @@ export abstract class AbstractText {
 		return this.getValueOfRange(new Range(lineNumber, 1, lineNumber, Number.MAX_SAFE_INTEGER));
 	}
 
-	getLines(): string[] {
-		const value = this.getValue();
-		return splitLines(value);
-	}
 
-	getLinesOfRange(range: LineRange): string[] {
-		return range.mapToLineArray(lineNumber => this.getLineAt(lineNumber));
-	}
 
-	equals(other: AbstractText): boolean {
-		if (this === other) {
-			return true;
-		}
-		return this.getValue() === other.getValue();
-	}
+
+
+
 }
 
 class LineBasedText extends AbstractText {

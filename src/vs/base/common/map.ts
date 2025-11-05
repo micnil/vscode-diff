@@ -643,19 +643,7 @@ export class SetMap<K, V> {
 		values.add(value);
 	}
 
-	delete(key: K, value: V): void {
-		const values = this.map.get(key);
-
-		if (!values) {
-			return;
-		}
-
-		values.delete(value);
-
-		if (values.size === 0) {
-			this.map.delete(key);
-		}
-	}
+	
 
 	forEach(key: K, fn: (value: V) => void): void {
 		const values = this.map.get(key);
@@ -667,11 +655,5 @@ export class SetMap<K, V> {
 		values.forEach(fn);
 	}
 
-	get(key: K): ReadonlySet<V> {
-		const values = this.map.get(key);
-		if (!values) {
-			return new Set<V>();
-		}
-		return values;
-	}
+	
 }

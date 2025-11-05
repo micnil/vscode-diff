@@ -6,7 +6,7 @@
 import { groupAdjacentBy } from '../../../base/common/arrays.js';
 import { assertFn, checkAdjacentItems } from '../../../base/common/assert.js';
 import { BugIndicatingError } from '../../../base/common/errors.js';
-import { TextEdit, TextReplacement } from '../core/edits/textEdit.js';
+import { TextReplacement } from '../core/edits/textEdit.js';
 import { Position } from '../core/position.js';
 import { Range } from '../core/range.js';
 import { LineRange } from '../core/ranges/lineRange.js';
@@ -16,43 +16,8 @@ import { AbstractText } from '../core/text/abstractText.js';
  * Maps a line range in the original text model to a line range in the modified text model.
  */
 export class LineRangeMapping {
-	public static inverse(mapping: readonly LineRangeMapping[], originalLineCount: number, modifiedLineCount: number): LineRangeMapping[] {
-		const result: LineRangeMapping[] = [];
-		let lastOriginalEndLineNumber = 1;
-		let lastModifiedEndLineNumber = 1;
 
-		for (const m of mapping) {
-			const r = new LineRangeMapping(
-				new LineRange(lastOriginalEndLineNumber, m.original.startLineNumber),
-				new LineRange(lastModifiedEndLineNumber, m.modified.startLineNumber),
-			);
-			if (!r.modified.isEmpty) {
-				result.push(r);
-			}
-			lastOriginalEndLineNumber = m.original.endLineNumberExclusive;
-			lastModifiedEndLineNumber = m.modified.endLineNumberExclusive;
-		}
-		const r = new LineRangeMapping(
-			new LineRange(lastOriginalEndLineNumber, originalLineCount + 1),
-			new LineRange(lastModifiedEndLineNumber, modifiedLineCount + 1),
-		);
-		if (!r.modified.isEmpty) {
-			result.push(r);
-		}
-		return result;
-	}
 
-	public static clip(mapping: readonly LineRangeMapping[], originalRange: LineRange, modifiedRange: LineRange): LineRangeMapping[] {
-		const result: LineRangeMapping[] = [];
-		for (const m of mapping) {
-			const original = m.original.intersect(originalRange);
-			const modified = m.modified.intersect(modifiedRange);
-			if (original && !original.isEmpty && modified && !modified.isEmpty) {
-				result.push(new LineRangeMapping(original, modified));
-			}
-		}
-		return result;
-	}
 
 	/**
 	 * The line range in the original text model.
@@ -73,9 +38,7 @@ export class LineRangeMapping {
 	}
 
 
-	public toString(): string {
-		return `{${this.original.toString()}->${this.modified.toString()}}`;
-	}
+
 
 	public flip(): LineRangeMapping {
 		return new LineRangeMapping(this.modified, this.original);
@@ -88,9 +51,7 @@ export class LineRangeMapping {
 		);
 	}
 
-	public get changedLineCount() {
-		return Math.max(this.original.length, this.modified.length);
-	}
+
 
 	/**
 	 * This method assumes that the LineRangeMapping describes a valid diff!
@@ -193,22 +154,9 @@ function isValidLineNumber(lineNumber: number, lines: string[]): boolean {
  * Also contains inner range mappings.
  */
 export class DetailedLineRangeMapping extends LineRangeMapping {
-	public static toTextEdit(mapping: readonly DetailedLineRangeMapping[], modified: AbstractText): TextEdit {
-		const replacements: TextReplacement[] = [];
-		for (const m of mapping) {
-			for (const r of m.innerChanges ?? []) {
-				const replacement = r.toTextEdit(modified);
-				replacements.push(replacement);
-			}
-		}
-		return new TextEdit(replacements);
-	}
 
-	public static fromRangeMappings(rangeMappings: RangeMapping[]): DetailedLineRangeMapping {
-		const originalRange = LineRange.join(rangeMappings.map(r => LineRange.fromRangeInclusive(r.originalRange)));
-		const modifiedRange = LineRange.join(rangeMappings.map(r => LineRange.fromRangeInclusive(r.modifiedRange)));
-		return new DetailedLineRangeMapping(originalRange, modifiedRange, rangeMappings);
-	}
+
+
 
 	/**
 	 * If inner changes have not been computed, this is set to undefined.
@@ -231,26 +179,16 @@ export class DetailedLineRangeMapping extends LineRangeMapping {
 		return new DetailedLineRangeMapping(this.modified, this.original, this.innerChanges?.map(c => c.flip()));
 	}
 
-	public withInnerChangesFromLineRanges(): DetailedLineRangeMapping {
-		return new DetailedLineRangeMapping(this.original, this.modified, [this.toRangeMapping()]);
-	}
+
 }
 
 /**
  * Maps a range in the original text model to a range in the modified text model.
  */
 export class RangeMapping {
-	public static fromEdit(edit: TextEdit): RangeMapping[] {
-		const newRanges = edit.getNewRanges();
-		const result = edit.replacements.map((e, idx) => new RangeMapping(e.range, newRanges[idx]));
-		return result;
-	}
 
-	public static fromEditJoin(edit: TextEdit): RangeMapping {
-		const newRanges = edit.getNewRanges();
-		const result = edit.replacements.map((e, idx) => new RangeMapping(e.range, newRanges[idx]));
-		return RangeMapping.join(result);
-	}
+
+
 
 	public static join(rangeMappings: RangeMapping[]): RangeMapping {
 		if (rangeMappings.length === 0) {
@@ -294,9 +232,7 @@ export class RangeMapping {
 		this.modifiedRange = modifiedRange;
 	}
 
-	public toString(): string {
-		return `{${this.originalRange.toString()}->${this.modifiedRange.toString()}}`;
-	}
+
 
 	public flip(): RangeMapping {
 		return new RangeMapping(this.modifiedRange, this.originalRange);
