@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { CharCode } from './charCode';
+import { CharCode } from './charCode.js';
 
 /**
  * Returns first index of the string that is not whitespace.
@@ -31,26 +31,4 @@ export function lastNonWhitespaceIndex(str: string, startIndex: number = str.len
 		}
 	}
 	return -1;
-}
-
-/**
- * See http://en.wikipedia.org/wiki/Surrogate_pair
- */
-export function isHighSurrogate(charCode: number): boolean {
-	return (0xD800 <= charCode && charCode <= 0xDBFF);
-}
-
-/**
- * See http://en.wikipedia.org/wiki/Surrogate_pair
- */
-export function isLowSurrogate(charCode: number): boolean {
-	return (0xDC00 <= charCode && charCode <= 0xDFFF);
-}
-
-
-/**
- * See http://en.wikipedia.org/wiki/Surrogate_pair
- */
-export function computeCodePoint(highSurrogate: number, lowSurrogate: number): number {
-	return ((highSurrogate - 0xD800) << 10) + (lowSurrogate - 0xDC00) + 0x10000;
 }

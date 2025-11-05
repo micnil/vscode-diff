@@ -1,15 +1,17 @@
 {
 	"compilerOptions": {
-		"target": "es2021",
+		"target": "ES2022",
 		"lib": [
-			"es2021",
+			"ES2024",
 			"DOM"
 		],
 		"module": "commonjs",
 		"declaration": true,
+		"esModuleInterop": true,
 		"outDir": "./dist",
 		"strict": true,
 		"useUnknownInCatchVariables": false,
+		"skipLibCheck": true
 	},
 	"include": [
 		"src/**/*",

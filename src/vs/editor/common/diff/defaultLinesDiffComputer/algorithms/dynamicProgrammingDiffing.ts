@@ -3,9 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { OffsetRange } from '../../core/offsetRange';
-import { DiffAlgorithmResult, IDiffAlgorithm, ISequence, ITimeout, InfiniteTimeout, SequenceDiff } from './diffAlgorithm';
-import { Array2D } from './utils';
+import { OffsetRange } from '../../../core/ranges/offsetRange.js';
+import { Array2D } from '../utils.js';
+import { DiffAlgorithmResult, IDiffAlgorithm, ISequence, ITimeout, InfiniteTimeout, SequenceDiff } from './diffAlgorithm.js';
 
 /**
  * A O(MN) diffing algorithm that supports a score function.

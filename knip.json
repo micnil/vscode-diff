@@ -1,6 +1,7 @@
 {
 	"entry": ["src/index.ts"],
 	"project": ["src/**/*.ts"],
-	"exclude": ["dependencies", "enumMembers", "classMembers", "duplicates"],
-	"ignoreExportsUsedInFile": true
+	"exclude": ["dependencies", "enumMembers", "duplicates"],
+	"include": ["classMembers"],
+	"ignoreExportsUsedInFile": false
 }

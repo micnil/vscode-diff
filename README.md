@@ -12,25 +12,112 @@ npm install vscode-diff --save
 ```
 ## Usage
 
-Starting from version 1.71.0 VS Code introduced new diffing algorithm that can also detect code moves. It is currently used by default in VS Code and can be accessed in this library as `AdvancedLinesDiffComputer`.
-The legacy algorithm can be accessed as `DiffComputer`.
+Starting from version 1.71.0 VS Code introduced new diffing algorithm that can also detect code moves. It is currently used by default in VS Code and can be accessed in this library as `DefaultLinesDiffComputer`.
+The legacy algorithm can be accessed as `DiffComputer`. It is also possible to use the wrapper class `LegacyLinesDiffComputer` which adapts the output of `DiffComputer` to a newer format.
+
+### Example of new algorithm usage:
+```typescript
+const defaultOptions: ILinesDiffComputerOptions = {
+	ignoreTrimWhitespace: true,
+	computeMoves: true,
+	maxComputationTimeMs: 0
+}
+const defaultDiffComputer = new DefaultLinesDiffComputer()
+const defaultLineChanges = defaultDiffComputer.computeDiff(originalLines, modifiedLines, defaultOptions).changes;
+
+console.log(JSON.stringify(defaultLineChanges, null, 2));
+```
+
+Output:
+```json
+[
+  {
+    "original": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "modified": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "innerChanges": [
+      {
+        "originalRange": {
+          "startLineNumber": 2,
+          "startColumn": 1,
+          "endLineNumber": 2,
+          "endColumn": 9
+        },
+        "modifiedRange": {
+          "startLineNumber": 2,
+          "startColumn": 1,
+          "endLineNumber": 2,
+          "endColumn": 9
+        }
+      }
+    ]
+  },
+  {
+    "original": {
+      "startLineNumber": 4,
+      "endLineNumberExclusive": 4
+    },
+    "modified": {
+      "startLineNumber": 4,
+      "endLineNumberExclusive": 5
+    },
+    "innerChanges": [
+      {
+        "originalRange": {
+          "startLineNumber": 3,
+          "startColumn": 6,
+          "endLineNumber": 3,
+          "endColumn": 6
+        },
+        "modifiedRange": {
+          "startLineNumber": 3,
+          "startColumn": 6,
+          "endLineNumber": 4,
+          "endColumn": 7
+        }
+      }
+    ]
+  }
+]
+```
+
+The format of the result mapping is similar to that returned by `DiffComputer` but beware that then ending line number in line range is exclusive, e.g.
+```json
+"originalRange": {
+  "startLineNumber": 2,
+  "endLineNumberExclusive": 3
+}
+```
+
+as opposed to
+```json
+"originalStartLineNumber": 2,
+"originalEndLineNumber": 2,
+```
+
+
 
 ### Example of legacy algorithm usage:
 
 ```typescript
 import { DiffComputer, IDiffComputerOpts, ILineChange } from 'vscode-diff';
 
-let originalLines: string[] = ["hello", "original", "world"];
-let modifiedLines: string[] = ["hello", "modified", "world", "foobar"];
-let options: IDiffComputerOpts = {
-  shouldPostProcessCharChanges: true,
-  shouldIgnoreTrimWhitespace: true,
-  shouldMakePrettyDiff: true,
-  shouldComputeCharChanges: true,
-  maxComputationTime: 0 // time in milliseconds, 0 => no computation limit.
+const originalLines: string[] = ["hello", "original", "world"];
+const modifiedLines: string[] = ["hello", "modified", "world", "foobar"];
+const options: IDiffComputerOpts = {
+	shouldPostProcessCharChanges: true,
+	shouldIgnoreTrimWhitespace: true,
+	shouldMakePrettyDiff: true,
+	shouldComputeCharChanges: true,
+	maxComputationTime: 0 // time in milliseconds, 0 => no computation limit.
 }
-let diffComputer = new DiffComputer(originalLines, modifiedLines, options);
-let lineChanges: ILineChange[] = diffComputer.computeDiff().changes;
+const diffComputer = new DiffComputer(originalLines, modifiedLines, options);
+const lineChanges: ILineChange[] = diffComputer.computeDiff().changes;
 
 console.log(JSON.stringify(lineChanges, null, 2));
 ```
@@ -87,21 +174,16 @@ The opposite:
 ```
 means that the 4th line in the original text was removed from after line 3 in the modified text.
 
-### Example of new algorithm usage:
-```typescript
-let advOptions: ILinesDiffComputerOptions = {
-    ignoreTrimWhitespace: true,
-    computeMoves: true,
-    maxComputationTimeMs: 0
-}
-let advDiffComputer = new AdvancedLinesDiffComputer()
-let advLineChanges = advDiffComputer.computeDiff(originalLines, modifiedLines, advOptions).changes;
 
-console.log(JSON.stringify(advLineChanges, null, 2));
+## Changelog
+
+### 3.0.0
+
+### Breaking change
+* The class `AdvancedLinesDiffComputer` has change name to `DefaultLinesDiffComputer`
+* THe output of `DefaultLinesDiffComputer` has renamed keys:
 ```
-
-Output:
-```json
+// OLD
 [
   {
     "originalRange": {
@@ -111,69 +193,26 @@ Output:
     "modifiedRange": {
       "startLineNumber": 2,
       "endLineNumberExclusive": 3
-    },
-    "innerChanges": [
-      {
-        "originalRange": {
-          "startLineNumber": 2,
-          "startColumn": 1,
-          "endLineNumber": 2,
-          "endColumn": 9
-        },
-        "modifiedRange": {
-          "startLineNumber": 2,
-          "startColumn": 1,
-          "endLineNumber": 2,
-          "endColumn": 9
-        }
-      }
-    ]
-  },
+    }
+	}
+]
+// NEW
+[
   {
-    "originalRange": {
-      "startLineNumber": 4,
-      "endLineNumberExclusive": 4
+    "original": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
     },
-    "modifiedRange": {
-      "startLineNumber": 4,
-      "endLineNumberExclusive": 5
-    },
-    "innerChanges": [
-      {
-        "originalRange": {
-          "startLineNumber": 3,
-          "startColumn": 6,
-          "endLineNumber": 3,
-          "endColumn": 6
-        },
-        "modifiedRange": {
-          "startLineNumber": 3,
-          "startColumn": 6,
-          "endLineNumber": 4,
-          "endColumn": 7
-        }
-      }
-    ]
-  }
+    "modified": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    }
+	}
 ]
 ```
-
-The format of the result mapping is similar to that returned by `DiffComputer` but beware that then ending line number in line range is exclusive, e.g.
-```json
-"originalRange": {
-  "startLineNumber": 2,
-  "endLineNumberExclusive": 3
-}
-```
-
-as opposed to
-```json
-"originalStartLineNumber": 2,
-"originalEndLineNumber": 2,
-```
-
-
-## Changelog
+### Minors
+* Various refactorings and bug fixes such as:
+	- https://github.com/microsoft/vscode/pull/213035
 
 ### 2.1.1
 * Fix build errors in 2.1.0 [#3](https://github.com/micnil/vscode-diff/issues/3)

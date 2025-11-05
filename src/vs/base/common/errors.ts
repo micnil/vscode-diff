@@ -3,16 +3,16 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-export interface ErrorListenerCallback {
+interface ErrorListenerCallback {
 	(error: any): void;
 }
 
-export interface ErrorListenerUnbind {
+interface ErrorListenerUnbind {
 	(): void;
 }
 
 // Avoid circular dependency on EventEmitter by implementing a subset of the interface.
-export class ErrorHandler {
+class ErrorHandler {
 	private unexpectedErrorHandler: (e: any) => void;
 	private listeners: ErrorListenerCallback[];
 
@@ -72,8 +72,7 @@ export class ErrorHandler {
 	}
 }
 
-export const errorHandler = new ErrorHandler();
-
+const errorHandler = new ErrorHandler();
 
 export function onUnexpectedError(e: any): undefined {
 	// ignore errors from cancelled promises
@@ -88,7 +87,7 @@ const canceledName = 'Canceled';
 /**
  * Checks if the given error is a promise in canceled state
  */
-export function isCancellationError(error: any): boolean {
+function isCancellationError(error: any): boolean {
 	if (error instanceof CancellationError) {
 		return true;
 	}
@@ -97,12 +96,13 @@ export function isCancellationError(error: any): boolean {
 
 // !!!IMPORTANT!!!
 // Do NOT change this class because it is also used as an API-type.
-export class CancellationError extends Error {
+class CancellationError extends Error {
 	constructor() {
 		super(canceledName);
 		this.name = this.message;
 	}
 }
+
 
 /**
  * Error that when thrown won't be logged in telemetry as an unhandled error.
@@ -143,7 +143,6 @@ export class BugIndicatingError extends Error {
 
 		// Because we know for sure only buggy code throws this,
 		// we definitely want to break here and fix the bug.
-		// eslint-disable-next-line no-debugger
 		// debugger;
 	}
 }

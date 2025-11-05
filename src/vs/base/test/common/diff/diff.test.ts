@@ -2,8 +2,7 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-
-import * as assert from 'assert';
+import assert from 'assert';
 import { IDiffChange, LcsDiff, StringDiffSequence } from '../../../common/diff/diff';
 
 function createArray<T>(length: number, value: T): T[] {
