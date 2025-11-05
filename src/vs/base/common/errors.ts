@@ -103,19 +103,6 @@ class CancellationError extends Error {
 	}
 }
 
-export class PendingMigrationError extends Error {
-
-	private static readonly _name = 'PendingMigrationError';
-
-	static is(error: unknown): error is PendingMigrationError {
-		return error instanceof PendingMigrationError || (error instanceof Error && error.name === PendingMigrationError._name);
-	}
-
-	constructor(message: string) {
-		super(message);
-		this.name = PendingMigrationError._name;
-	}
-}
 
 /**
  * Error that when thrown won't be logged in telemetry as an unhandled error.
