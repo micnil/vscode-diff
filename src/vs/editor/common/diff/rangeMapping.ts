@@ -36,8 +36,9 @@ export class LineRangeMapping {
 		this.modified = modifiedRange;
 	}
 
-
-
+	public toString(): string {
+		return `{${this.original.toString()}->${this.modified.toString()}}`;
+	}
 
 	public flip(): LineRangeMapping {
 		return new LineRangeMapping(this.modified, this.original);
@@ -49,8 +50,6 @@ export class LineRangeMapping {
 			this.modified.join(other.modified)
 		);
 	}
-
-
 
 	/**
 	 * This method assumes that the LineRangeMapping describes a valid diff!
@@ -284,7 +283,7 @@ export function lineRangeMappingFromRangeMappings(alignments: readonly RangeMapp
 	return changes;
 }
 
-function getLineRangeMapping(rangeMapping: RangeMapping, originalLines: AbstractText, modifiedLines: AbstractText): DetailedLineRangeMapping {
+export function getLineRangeMapping(rangeMapping: RangeMapping, originalLines: AbstractText, modifiedLines: AbstractText): DetailedLineRangeMapping {
 	let lineStartDelta = 0;
 	let lineEndDelta = 0;
 

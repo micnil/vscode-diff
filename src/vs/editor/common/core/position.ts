@@ -35,31 +35,6 @@ export class Position {
 		this.column = column;
 	}
 
-	/**
-	 * Create a new position from this position.
-	 *
-	 * @param newLineNumber new line number
-	 * @param newColumn new column
-	 */
-
-
-	/**
-	 * Derive a new position from this position.
-	 *
-	 * @param deltaLineNumber line number delta
-	 * @param deltaColumn column delta
-	 */
-
-
-	/**
-	 * Test if this position equals other position
-	 */
-
-
-	/**
-	 * Test if position `a` equals position `b`
-	 */
-
 
 	/**
 	 * Test if this position is before other position.
@@ -103,6 +78,13 @@ export class Position {
 			return false;
 		}
 		return a.column <= b.column;
+	}
+
+	/**
+	 * Convert to a human-readable representation.
+	 */
+	public toString(): string {
+		return '(' + this.lineNumber + ',' + this.column + ')';
 	}
 
 }

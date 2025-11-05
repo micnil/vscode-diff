@@ -67,6 +67,10 @@ export class LineRange {
 		);
 	}
 
+	public toString(): string {
+		return `[${this.startLineNumber},${this.endLineNumberExclusive})`;
+	}
+
 	/**
 	 * The resulting range is empty if the ranges do not intersect, but touch.
 	 * If the ranges don't even touch, the result is undefined.

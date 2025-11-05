@@ -49,12 +49,6 @@ export class OffsetRange implements IOffsetRange {
 		return `[${this.start}, ${this.endExclusive})`;
 	}
 
-
-
-
-
-
-
 	/**
 	 * for all numbers n: range1.contains(n) or range2.contains(n) => range1.join(range2).contains(n)
 	 * The joined range is the smallest range that contains both ranges.
@@ -78,8 +72,6 @@ export class OffsetRange implements IOffsetRange {
 		return undefined;
 	}
 
-
-
 	public intersects(other: OffsetRange): boolean {
 		const start = Math.max(this.start, other.start);
 		const end = Math.min(this.endExclusive, other.endExclusive);
@@ -92,15 +84,17 @@ export class OffsetRange implements IOffsetRange {
 		return start <= end;
 	}
 
-
-
-
-
 	public slice<T>(arr: readonly T[]): T[] {
 		return arr.slice(this.start, this.endExclusive);
 	}
 
-
+	public map<T>(f: (offset: number) => T): T[] {
+		const result: T[] = [];
+		for (let i = this.start; i < this.endExclusive; i++) {
+			result.push(f(i));
+		}
+		return result;
+	}
 
 	public forEach(f: (offset: number) => void): void {
 		for (let i = this.start; i < this.endExclusive; i++) {
