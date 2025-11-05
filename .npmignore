@@ -7,3 +7,4 @@ eslint.config.mjs
 knip.json
 example
 node_modules/
+.vscode/
