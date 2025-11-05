@@ -177,6 +177,43 @@ means that the 4th line in the original text was removed from after line 3 in th
 
 ## Changelog
 
+### 3.0.0
+
+### Breaking change
+* The class `AdvancedLinesDiffComputer` has change name to `DefaultLinesDiffComputer`
+* THe output of `DefaultLinesDiffComputer` has renamed keys:
+```
+// OLD
+[
+  {
+    "originalRange": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "modifiedRange": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    }
+	}
+]
+// NEW
+[
+  {
+    "original": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    },
+    "modified": {
+      "startLineNumber": 2,
+      "endLineNumberExclusive": 3
+    }
+	}
+]
+```
+### Minors
+* Various refactorings and bug fixes such as:
+	- https://github.com/microsoft/vscode/pull/213035
+
 ### 2.1.1
 * Fix build errors in 2.1.0 [#3](https://github.com/micnil/vscode-diff/issues/3)
 
